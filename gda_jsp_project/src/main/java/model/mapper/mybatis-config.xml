@@ -4,10 +4,11 @@
 <configuration>
   <!-- config 파일에서 사용되는 환경 변수 설정 -->
   <properties resource="model/mapper/mybatis.properties" />
-  
-  <typeAliases> <!-- 클래스의 별명 설정 -->
-    <typeAlias type="model.member.Member" alias="Member"/> <!-- 클래스명을 별명설정 -->
-  </typeAliases>
+ 
+ <!--  
+  <typeAliases> 클래스의 별명 설정
+    <typeAlias type="model.member.Member" alias="Member"/> 클래스명을 별명설정
+  </typeAliases> -->
   
   <!-- Connection 객체  -->
   <environments default="development">
