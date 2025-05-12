@@ -1,0 +1,278 @@
+스토리지의 78% 사용됨 … 스토리지가 부족하면 Drive에 저장하거나 Gmail을 사용할 수 없습니다. 1개월 동안 100GB 스토리지를 ₩2,400 ₩600에 이용하세요.
+style.css
+/* ✅ Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #fff;
+    color: #222;
+    line-height: 1.5;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ✅ Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 50px;
+    border-bottom: 1px solid #eee;
+    background-color: #ffffff;
+    flex-wrap: wrap;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
+/* ✅ Navigation */
+.nav {
+    display: flex;
+    gap: 30px;
+    font-size: 15px;
+}
+
+.nav a {
+    padding-bottom: 4px;
+    color: #888;
+}
+
+.nav a.active {
+    color: #333;
+    font-weight: 600;
+    border-bottom: 2px solid #333;
+}
+
+/* ✅ Login Button */
+.login-btn {
+    padding: 8px 18px;
+    background-color: #5a60ea;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background-color: #3e46d7;
+}
+
+/* ✅ Category Tags */
+.category-tags {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0 15px;
+    flex-wrap: wrap;
+}
+
+.category-tags button {
+    background-color: #f3f1ff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 999px;
+    font-size: 14px;
+    color: #5a60ea;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.category-tags button:hover {
+    background-color: #e6e4fb;
+}
+
+/* ✅ Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.search-bar input {
+    width: 50%;
+    padding: 14px 20px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    font-size: 14px;
+}
+
+/* ✅ Banner */
+.banner {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 40px;
+    max-width: 90%;
+}
+
+.banner img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+/* ✅ Lecture Section */
+.lecture-section {
+    padding: 0 60px 60px;
+}
+
+.lecture-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* ✅ Lecture Card */
+.lecture-card {
+    width: 220px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: center;
+    padding: 20px 10px;
+    transition: all 0.2s;
+}
+
+.lecture-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.lecture-card img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.lecture-card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 5px;
+}
+
+.lecture-card p {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 12px;
+    height: 40px;
+}
+
+.lecture-card button {
+    background-color: #eef2ff;
+    border: 1px solid #a4b1f3;
+    color: #4b5de9;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lecture-card button:hover {
+    background-color: #dde5ff;
+}
+
+/* ✅ Footer */
+.footer {
+    background-color: #111;
+    color: #ccc;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.footer-logo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.footer-links {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: #bbb;
+    margin: 0 12px;
+    font-size: 13px;
+}
+
+.footer-bottom {
+    font-size: 12px;
+    color: #777;
+}
+
+.footer-bottom a {
+    color: #999;
+    margin: 0 6px;
+}
+
+.footer select {
+    margin-top: 20px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #666;
+    background-color: #222;
+    color: #ccc;
+}
+
+/* ✅ Responsive */
+@media screen and (max-width: 768px) {
+    .card-container {
+        justify-content: center;
+    }
+
+    .lecture-card {
+        width: 90%;
+    }
+
+    .search-bar input {
+        width: 80%;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-right {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .category-tags {
+        flex-wrap: wrap;
+    }
+}

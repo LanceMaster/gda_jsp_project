@@ -1,0 +1,187 @@
+body {
+    font-family: "Noto Sans KR", sans-serif;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .main-wrap {
+    padding-left: 14px;
+    padding-right: 14px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  @media (max-width: 768px) {
+    .main-wrap {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+
+  .custom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 0 24px 0;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-img {
+    width: 36px;
+    height: 36px;
+    margin-right: 6px;
+  }
+
+  .logo-text {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #222;
+    letter-spacing: -1px;
+  }
+
+  .nav-area {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-link-custom {
+    color: #888;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin-right: 18px;
+    border: none;
+    background: none;
+    padding: 0;
+    transition: color 0.2s;
+  }
+
+  .nav-link-custom.active {
+    color: #6c6ce5;
+    border-bottom: 2px solid #6c6ce5;
+    font-weight: 700;
+  }
+
+  .login-btn {
+    background: #6c6ce5;
+    color: #fff;
+    border-radius: 50px;
+    border: 2px solid transparent;
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding: 12px 40px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(108, 108, 229, 0.3);
+  }
+
+  .login-btn i {
+    font-size: 1.1rem;
+    margin-right: 8px;
+  }
+
+  .login-btn:hover {
+    background: #fff;
+    color: #6c6ce5;
+    border: 2px solid #6c6ce5;
+    box-shadow: 0 6px 16px rgba(108, 108, 229, 0.4);
+  }
+
+  .tag-btn {
+    background: #f3f2fd;
+    color: #6c6ce5;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 32px;
+    margin: 0 12px 0 0;
+    font-weight: 500;
+    font-size: 1.07rem;
+    transition: background 0.2s, color 0.2s,
+      transform 0.3s cubic-bezier(0.4, 1.5, 0.5, 1), box-shadow 0.2s;
+    will-change: transform;
+  }
+
+  .tag-btn:last-child {
+    margin-right: 0;
+  }
+
+  .tag-btn:hover,
+  .tag-btn:focus {
+    background: #6c6ce5;
+    color: #fff;
+    transform: translateY(-12px) scale(1.07);
+    box-shadow: 0 8px 24px rgba(108, 108, 229, 0.18);
+    z-index: 1;
+  }
+
+  .search-bar-area {
+    margin: 32px 0 0 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-bar {
+    border-radius: 25px;
+    padding: 16px 24px 16px 44px;
+    border: 1.5px solid #e0e0e0;
+    width: 100%;
+    max-width: 800px;
+    font-size: 1.07rem;
+    background: #fff
+      url("https://fonts.gstatic.com/s/i/materialicons/search/v6/24px.svg")
+      14px 50% no-repeat;
+    background-size: 20px 20px;
+    color: #444;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .search-bar::placeholder {
+    color: #bbb;
+    font-weight: 400;
+  }
+
+  /* 강의 카드 스타일 */
+  .lecture-card-custom {
+    background: #fafaff;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(108, 108, 229, 0.08), 0 1.5px 4px rgba(0,0,0,0.04);
+    border: 1.5px solid #ecebfa;
+    transition: box-shadow 0.25s, transform 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .lecture-card-custom:hover {
+    box-shadow: 0 12px 32px rgba(108, 108, 229, 0.18), 0 2px 8px rgba(0,0,0,0.08);
+    transform: translateY(-6px) scale(1.025);
+    z-index: 2;
+  }
+  .lecture-card-custom .card-img-top {
+    background: linear-gradient(120deg, #e7e6fb 0%, #f3f2fd 100%);
+  }
+
+  @media (max-width: 768px) {
+    .custom-header,
+    .nav-area {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .tag-btn {
+      margin-bottom: 10px;
+      margin-right: 8px;
+      padding: 10px 18px;
+    }
+
+    .search-bar-area {
+      margin-top: 18px;
+    }
+  }
