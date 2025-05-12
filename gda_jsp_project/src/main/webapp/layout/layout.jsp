@@ -10,15 +10,22 @@
 <meta charset="UTF-8" />
 <title><sitemesh:write property="title" /></title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700&display=swap" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/mainstyle.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.css" />
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700&display=swap" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/mainstyle.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.css" />
 
 <!-- JS: jQuery를 가장 먼저! -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 
 
 </head>
@@ -45,39 +52,49 @@
 
 		<sitemesh:write property="body" />
 
-		<!-- 로그인폼 -->
-		<div id="loginModalOverlay" class="modal-overlay d-none">
-			<div class="login-modal">AJAX로 로그인 폼이 여기에 삽입됨</div>
+		<!-- 로그인 팝업 모달 -->
+		<div id="loginPopupOverlay" class="popup-overlay d-none">
+			<div class="popup-content">
+
+				<!-- 로그인 폼이 여기에 AJAX로 삽입됨 -->
+			</div>
 		</div>
+
 
 	</div>
 
 
 	<!-- script -->
-	<script>
-		$(document).ready(function () {
-		  $(".login-btn").on("click", function () {
-			$.ajax({
-			  url: "${pageContext.request.contextPath}/main/loginform", // 로그인 폼 경로
-			  method: "GET",
-			  success: function (data) {
-				$("#loginModalOverlay .login-modal").html(data);
-				$("#loginModalOverlay").removeClass("d-none");
-			  },
-			  error: function () {
-				alert("로그인 창을 불러오는 데 실패했습니다.");
-			  },
-			});
-		  });
-	  
-		  // 바깥 클릭 시 닫기
-		  $(document).on("click", "#loginModalOverlay", function (e) {
-			if ($(e.target).is("#loginModalOverlay")) {
-			  $("#loginModalOverlay").addClass("d-none");
-			}
-		  });
-		});
-	  </script>
+<script>
+  $(document).ready(function () {
+    $(".login-btn").on("click", function () {
+      $.ajax({
+        url: "${pageContext.request.contextPath}/main/loginform", // 로그인 폼 경로
+        method: "GET",
+        success: function (data) {
+          $(".popup-content").html(data);
+          $("#loginPopupOverlay").removeClass("d-none");
+        },
+        error: function () {
+          alert("로그인 폼을 불러오지 못했습니다.");
+        }
+      });
+    });
+
+    // 배경 클릭하면 팝업 닫기
+    $(document).on("click", "#loginPopupOverlay", function (e) {
+      if ($(e.target).is("#loginPopupOverlay")) {
+        $("#loginPopupOverlay").addClass("d-none");
+      }
+    });
+
+    // 로그인 폼 내부에서 닫기 버튼 클릭 시
+    $(document).on("click", ".popup-close-btn", function () {
+      $("#loginPopupOverlay").addClass("d-none");
+    });
+  });
+</script>
+
 
 </body>
 </html>
