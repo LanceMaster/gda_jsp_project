@@ -176,7 +176,7 @@
 		<div class="alert alert-danger login-error">${loginError}</div>
 	</c:if>
 	<form id="loginForm"
-		action="${pageContext.request.contextPath}/main/login" method="post"
+		action="${pageContext.request.contextPath}/user/login" method="post"
 		autocomplete="off">
 		<div class="form-group">
 			<span class="input-icon"><i class="fas fa-user"></i></span> <input
@@ -233,7 +233,7 @@
   $(document).on("click", ".bottom-link a", function(e) {
     e.preventDefault();
     $.ajax({
-        url: "${pageContext.request.contextPath}/main/signupform",
+        url: "${pageContext.request.contextPath}/user/signupform",
         method: "GET",
         success: function(data) {
             $(".popup-content").html(data);

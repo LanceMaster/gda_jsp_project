@@ -17,7 +17,7 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/mainstyle.css" />
+	href="${pageContext.request.contextPath}/static/css/mainstyle.css" />
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.css" />
 
@@ -59,9 +59,9 @@
 							id="profileDropdown" data-toggle="dropdown" aria-haspopup="true"
 							aria-expanded="false"> 프로필 </a>
 						<div class="dropdown-menu" aria-labelledby="profileDropdown">
-							<a class="dropdown-item" href="${path}/main/mypage">프로필 상세</a> <a
-								class="dropdown-item" href="${path}/main/cart">장바구니</a> <a
-								class="dropdown-item" href="${path}/main/logout">로그아웃</a>
+							<a class="dropdown-item" href="${path}/user/mypage">프로필 상세</a> <a
+								class="dropdown-item" href="${path}/user/cart">장바구니</a> <a
+								class="dropdown-item" href="${path}/user/logout">로그아웃</a>
 						</div>
 					</div>
 				</c:if>
@@ -86,7 +86,7 @@
 		$(document).ready(function() {
 			$(".login-btn").on("click", function() {
 				$.ajax({
-					url : "${pageContext.request.contextPath}/main/loginform", // 로그인 폼 경로
+					url : "${pageContext.request.contextPath}/user/loginform", // 로그인 폼 경로
 					method : "POST",
 					success : function(data) {
 						$(".popup-content").html(data);
