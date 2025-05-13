@@ -4,7 +4,12 @@
 <configuration>
   <!-- config 파일에서 사용되는 환경 변수 설정 -->
   <properties resource="model/mapper/mybatis.properties" />
- 
+  <plugins>
+    <plugin interceptor="com.github.pagehelper.PageInterceptor">
+      <property name="helperDialect" value="mysql"/>
+      <property name="reasonable" value="true"/>
+    </plugin>
+  </plugins>
  <!--  
   <typeAliases> 클래스의 별명 설정
     <typeAlias type="model.member.Member" alias="Member"/> 클래스명을 별명설정
@@ -23,12 +28,7 @@
     </environment>
   </environments>
    <!-- PageHelper 플러그인 설정 추가 -->
-  <plugins>
-    <plugin interceptor="com.github.pagehelper.PageInterceptor">
-      <property name="helperDialect" value="mysql"/>
-      <property name="reasonable" value="true"/>
-    </plugin>
-  </plugins>
+ 
   <!--  sql 구문을 가진 파일 목록 -->
   <mappers>
     <package name="model.mapper"/> <!-- mapper 패키지의 인터페이스들을 sql구문으로 등록 -->

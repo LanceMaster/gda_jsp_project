@@ -37,7 +37,7 @@ public class userController extends MskimRequestMapping {
 			// 세션에 사용자 정보를 저장
 			return "redirect:" + request.getContextPath() + "/user/mainpage";
 
-		}
+		} 
 
 		else {
 			request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");
