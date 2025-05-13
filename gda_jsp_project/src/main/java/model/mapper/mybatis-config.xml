@@ -25,5 +25,6 @@
   <!--  sql 구문을 가진 파일 목록 -->
   <mappers>
     <package name="model.mapper"/> <!-- mapper 패키지의 인터페이스들을 sql구문으로 등록 -->
+    
   </mappers>
 </configuration>
