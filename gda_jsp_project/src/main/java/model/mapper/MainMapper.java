@@ -3,7 +3,7 @@ package model.mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import dto.UserDTO;
+import model.dto.UserDTO;
 
 public interface MainMapper {
 
