@@ -7,10 +7,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import dao.UserDAO;
-import dto.UserDTO;
 import gdu.mskim.MskimRequestMapping;
 import gdu.mskim.RequestMapping;
+import model.dao.UserDAO;
+import model.dto.UserDTO;
 
 @WebServlet(urlPatterns = { "/main/*" }, initParams = { @WebInitParam(name = "view", value = "/view/") })
 public class MainController extends MskimRequestMapping {

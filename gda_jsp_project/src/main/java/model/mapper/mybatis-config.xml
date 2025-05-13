@@ -22,9 +22,15 @@
       </dataSource>
     </environment>
   </environments>
+   <!-- PageHelper 플러그인 설정 추가 -->
+  <plugins>
+    <plugin interceptor="com.github.pagehelper.PageInterceptor">
+      <property name="helperDialect" value="mysql"/>
+      <property name="reasonable" value="true"/>
+    </plugin>
+  </plugins>
   <!--  sql 구문을 가진 파일 목록 -->
   <mappers>
     <package name="model.mapper"/> <!-- mapper 패키지의 인터페이스들을 sql구문으로 등록 -->
-    
   </mappers>
 </configuration>
