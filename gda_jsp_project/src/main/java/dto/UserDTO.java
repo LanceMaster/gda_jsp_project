@@ -4,36 +4,32 @@ import java.util.Date;
 
 public class UserDTO {
     private int userId;
-//    private String username; // 추가된 필드
     private String email;
     private String password;
     private String name;
     private String phone;
     private Date birthdate;
-    private String imageUrl;
-    private String roleCode;
+    private String profileImage;
+    private String role;
+    private String bio;
+    private String resume;
     private boolean isVerified;
     private boolean isDeleted;
     private boolean agreedTerms;
     private Date createdAt;
     private Date updatedAt;
+    private Date lastLoginAt;
 
     // 기본 생성자
     public UserDTO() {}
 
-    // getter & setter
+    // getter/setter
     public int getUserId() {
         return userId;
     }
     public void setUserId(int userId) {
         this.userId = userId;
     }
-//    public String getUsername() {
-//        return username;
-//    }
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
     public String getEmail() {
         return email;
     }
@@ -64,17 +60,29 @@ public class UserDTO {
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
     }
-    public String getImageUrl() {
-        return imageUrl;
+    public String getProfileImage() {
+        return profileImage;
     }
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
-    public String getRoleCode() {
-        return roleCode;
+    public String getRole() {
+        return role;
     }
-    public void setRoleCode(String roleCode) {
-        this.roleCode = roleCode;
+    public void setRole(String role) {
+        this.role = role;
+    }
+    public String getBio() {
+        return bio;
+    }
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+    public String getResume() {
+        return resume;
+    }
+    public void setResume(String resume) {
+        this.resume = resume;
     }
     public boolean isVerified() {
         return isVerified;
@@ -105,5 +113,11 @@ public class UserDTO {
     }
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    public Date getLastLoginAt() {
+        return lastLoginAt;
+    }
+    public void setLastLoginAt(Date lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
     }
 }

@@ -42,13 +42,11 @@
 				</div>
 			</div>
 			<a class="carousel-control-prev" href="#mainCarousel" role="button"
-				data-slide="prev"> <span
-				class="carousel-control-prev-icon" aria-hidden="true"></span> <span
-				class="sr-only">이전</span>
+				data-slide="prev"> <span class="carousel-control-prev-icon"
+				aria-hidden="true"></span> <span class="sr-only">이전</span>
 			</a> <a class="carousel-control-next" href="#mainCarousel" role="button"
-				data-slide="next"> <span
-				class="carousel-control-next-icon" aria-hidden="true"></span> <span
-				class="sr-only">다음</span>
+				data-slide="next"> <span class="carousel-control-next-icon"
+				aria-hidden="true"></span> <span class="sr-only">다음</span>
 			</a>
 		</div>
 	</section>
@@ -124,14 +122,13 @@
 			</div>
 		</div>
 	</div>
-	</div>
 
 	<!-- Bootstrap JS, Popper.js, jQuery (순서 중요) -->
 	<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
-	<script
+	<!-- 	<script
 		src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 	<script
 		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+ -->
 
 </body>
