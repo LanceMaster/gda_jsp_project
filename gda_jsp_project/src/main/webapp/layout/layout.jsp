@@ -102,15 +102,6 @@
 				$("#loginPopupOverlay").addClass("d-none");
 			});
 
-			// 배경 클릭하면 팝업 닫기
-			/* 	$(document).on("click", "#loginPopupOverlay", function(e) {
-					if ($(e.target).is("#loginPopupOverlay")) {
-						$("#loginPopupOverlay").addClass("d-none");
-					}
-				}); */
-				
-				
-
 		});
 	</script>
 </body>
