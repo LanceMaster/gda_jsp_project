@@ -1,5 +1,7 @@
 package controller;
 
+import java.io.IOException;
+
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,25 +17,40 @@ public class MainController extends MskimRequestMapping {
 
 	public UserDAO userDAO = new UserDAO();
 
-	@RequestMapping("login")
-	public String login(HttpServletRequest request, HttpServletResponse response) {
+	// 로그인폼 불러오기
+	@RequestMapping("loginform")
+	public String loginform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 로그인 폼을 보여주는 JSP 페이지로 이동
+		return "main/loginform"; // JSP 페이지 경로
+	}
 
-		String id = request.getParameter("username");
-		String pw = request.getParameter("password");
-		UserDTO userDTO = userDAO.login(id, pw);
-		// 만약에 로그인 실패화면 데이터가 없을경우
-		if (userDTO == null) {
-			// 로그인 실패
-			System.out.println("로그인 실패");
-			// 로그인 실패시 다시 메인페이지이동
-			return "main/mainpage";
+	// 로그인 처리
+	@RequestMapping("login")
+	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String id = request.getParameter("id");
+		String password = request.getParameter("password");
+
+		UserDTO userDTO = userDAO.login(id, password);
+
+		if (userDTO != null) { // 로그인 성공
+			request.getSession().setAttribute("user", userDTO);
+			// 세션에 사용자 정보를 저장
+			return "redirect:" + request.getContextPath() + "/main/mainpage";
 
 		}
-		// 로그인 성공시
-		System.out.println("로그인 성공");
-		return "redirect:/main/mainpage";
 
-//		return "main/login";
+		else {
+			request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");
+			return "main/loginform";
+		}
+
+	}
+
+	// 로그아웃 처리
+	@RequestMapping("logout")
+	public String logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.getSession().invalidate(); // 세션 무효화
+		return "redirect:" + request.getContextPath() + "/main/mainpage"; // 로그인 폼으로 리다이렉트
 	}
 
 }

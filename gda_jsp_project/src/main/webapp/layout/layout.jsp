@@ -27,6 +27,8 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </head>
 <body>
@@ -38,63 +40,78 @@
 				<svg class="logo-img" viewBox="0 0 40 40" fill="none">
             <path d="M5 32L20 8L35 32H28L20 18L12 32H5Z" fill="#6C6CE5" />
           </svg>
-				<span class="logo-text">코딩스쿨</span>
+				<a href="${path}/main/mainpage" class="logo-text"
+					style="text-decoration: none; color: inherit;">코딩스쿨</a>
 			</div>
 			<div class="nav-area">
-				<a href="#" class="nav-link-custom active">강의</a> <a href="#"
+				<a href="#" class="nav-link-custom">강의</a> <a href="#"
 					class="nav-link-custom">커뮤니티</a>
-				<button class="login-btn ml-3">
-					<i class="fas fa-sign-in-alt"></i> 로그인
-				</button>
+				<%-- 로그인시 로그아웃보이고 로그인 안할시 로그인보이게 하기 --%>
+				<c:if test="${empty sessionScope.user}">
+					<button class="login-btn ml-3">
+						<i class="fas fa-sign-in-alt"></i> 로그인
+					</button>
+				</c:if>
+				<!-- nav-area 내에 추가 -->
+				<c:if test="${not empty sessionScope.user}">
+					<div class="dropdown d-inline ml-3">
+						<a href="#" class="nav-link-custom dropdown-toggle"
+							id="profileDropdown" data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"> 프로필 </a>
+						<div class="dropdown-menu" aria-labelledby="profileDropdown">
+							<a class="dropdown-item" href="${path}/main/mypage">프로필 상세</a> <a
+								class="dropdown-item" href="${path}/main/cart">장바구니</a> <a
+								class="dropdown-item" href="${path}/main/logout">로그아웃</a>
+						</div>
+					</div>
+				</c:if>
 			</div>
-		</div>
+			<!-- 로그인중 navbar -->
+			<!-- jstl로 해야함 -->
 
+		</div>
 
 		<sitemesh:write property="body" />
 
 		<!-- 로그인 팝업 모달 -->
 		<div id="loginPopupOverlay" class="popup-overlay d-none">
 			<div class="popup-content">
-
 				<!-- 로그인 폼이 여기에 AJAX로 삽입됨 -->
 			</div>
 		</div>
-
-
 	</div>
 
-
 	<!-- script -->
-<script>
-  $(document).ready(function () {
-    $(".login-btn").on("click", function () {
-      $.ajax({
-        url: "${pageContext.request.contextPath}/main/loginform", // 로그인 폼 경로
-        method: "GET",
-        success: function (data) {
-          $(".popup-content").html(data);
-          $("#loginPopupOverlay").removeClass("d-none");
-        },
-        error: function () {
-          alert("로그인 폼을 불러오지 못했습니다.");
-        }
-      });
-    });
+	<script>
+		$(document).ready(function() {
+			$(".login-btn").on("click", function() {
+				$.ajax({
+					url : "${pageContext.request.contextPath}/main/loginform", // 로그인 폼 경로
+					method : "POST",
+					success : function(data) {
+						$(".popup-content").html(data);
+						$("#loginPopupOverlay").removeClass("d-none");
+					},
+					error : function() {
+						alert("로그인 폼을 불러오지 못했습니다.");
+					},
+				});
+			});
+			// 로그인 폼 내부에서 닫기 버튼 클릭 시
+			$(document).on("click", ".popup-close-btn", function() {
+				$("#loginPopupOverlay").addClass("d-none");
+			});
 
-    // 배경 클릭하면 팝업 닫기
-    $(document).on("click", "#loginPopupOverlay", function (e) {
-      if ($(e.target).is("#loginPopupOverlay")) {
-        $("#loginPopupOverlay").addClass("d-none");
-      }
-    });
+			// 배경 클릭하면 팝업 닫기
+			/* 	$(document).on("click", "#loginPopupOverlay", function(e) {
+					if ($(e.target).is("#loginPopupOverlay")) {
+						$("#loginPopupOverlay").addClass("d-none");
+					}
+				}); */
+				
+				
 
-    // 로그인 폼 내부에서 닫기 버튼 클릭 시
-    $(document).on("click", ".popup-close-btn", function () {
-      $("#loginPopupOverlay").addClass("d-none");
-    });
-  });
-</script>
-
-
+		});
+	</script>
 </body>
 </html>
