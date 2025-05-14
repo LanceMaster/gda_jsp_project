@@ -1,10 +1,10 @@
-package dao;
+package model.dao;
 
 import org.apache.ibatis.session.SqlSession;
 
-import dto.UserDTO;
-import model.MybatisConnection;
+import model.dto.UserDTO;
 import model.mapper.MainMapper;
+import utils.MybatisConnection;
 
 public class UserDAO {
 	private Class<MainMapper> mapperClass = MainMapper.class;
@@ -20,6 +20,11 @@ public class UserDAO {
 
     	return null;
     			
+	}
+
+	public int emailDupCheck(String email) {
+		
+		return 0;
 	}
 
    
