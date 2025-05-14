@@ -12,4 +12,8 @@ public interface MainMapper {
 	//로그인
 	@Select("SELECT * FROM users WHERE email = #{id} AND password = #{pw}")
 	UserDTO login(@Param("id") String id, @Param("pw") String pw);
+
+	//이메일 중복확인
+	@Select("SELECT COUNT(*) FROM users WHERE email = #{email}")
+	int emailDupCheck(@Param("email") String email);
 }
