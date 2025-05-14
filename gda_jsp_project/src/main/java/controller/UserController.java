@@ -13,7 +13,7 @@ import model.dao.UserDAO;
 import model.dto.UserDTO;
 
 @WebServlet(urlPatterns = { "/user/*" }, initParams = { @WebInitParam(name = "view", value = "/view/") })
-public class userController extends MskimRequestMapping {
+public class UserController extends MskimRequestMapping {
 
 	public UserDAO userDAO = new UserDAO();
 
@@ -59,19 +59,20 @@ public class userController extends MskimRequestMapping {
 		request.getSession().invalidate(); // 세션 무효화
 		return "redirect:" + request.getContextPath() + "/user/mainpage"; // 로그인 폼으로 리다이렉트
 	}
-	
-	//이메일 중복확인
+
+	// 이메일 중복확인
 	@RequestMapping("emailDupCheck")
 	public String emailDupCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String email = request.getParameter("email");
 		int result = userDAO.emailDupCheck(email);
-		//ajax로 response가 현재 signupform보면 
-		//response가 avaliable이면 ajax가 사용가능한 이메일
-		//avaliable이 아니면 ajax가 사용불가능한 이메일
-		
-	
+		// ajax로 response가 현재 signupform보면
+		// response가 avaliable이면 ajax가 사용가능한 이메일
+		// avaliable이 아니면 ajax가 사용불가능한 이메일
+		    String msg = (result == 0) ? "사용 가능한 이메일입니다." : "이미 사용 중인 이메일입니다.";
+		    request.setAttribute("msg", msg);
+			request.setAttribute("url", request.getContextPath() + "/user/signupform");
 
-		return null; // JSON 응답을 위해 JSP 페이지로 이동하지 않음
+		return "user/plain"; // JSON 응답을 위해 JSP 페이지로 이동하지 않음
 	}
 
 }

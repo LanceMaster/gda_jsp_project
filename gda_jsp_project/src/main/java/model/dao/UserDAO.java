@@ -11,22 +11,36 @@ public class UserDAO {
 
 	public UserDTO login(String id, String pw) {
 
-    	SqlSession session = MybatisConnection.getConnection();
-    	try {
+		SqlSession session = MybatisConnection.getConnection();
+		try {
 			return session.getMapper(mapperClass).login(id, pw);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 
-    	return null;
-    			
+		return null;
+
 	}
 
 	public int emailDupCheck(String email) {
-		
-		return 0;
-	}
 
-   
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			// 이메일 중복 체크
+
+			int resultCount = session.getMapper(mapperClass).emailDupCheck(email);
+			if (resultCount > 0) {
+				return 1; // 중복된 이메일
+			} else {
+				return 0; // 사용 가능한 이메일
+
+			}
+
+		} catch (Exception e) {
+
+		}
+		return 0;
+
+	}
 
 }
