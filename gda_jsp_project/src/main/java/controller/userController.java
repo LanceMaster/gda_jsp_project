@@ -24,6 +24,13 @@ public class userController extends MskimRequestMapping {
 		return "user/loginform"; // JSP 페이지 경로
 	}
 
+	// 회원가입폼 불러오기
+	@RequestMapping("signupform")
+	public String signupform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 회원가입 폼을 보여주는 JSP 페이지로 이동
+		return "user/signupform"; // JSP 페이지 경로
+	}
+
 	// 로그인 처리
 	@RequestMapping("login")
 	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -37,7 +44,7 @@ public class userController extends MskimRequestMapping {
 			// 세션에 사용자 정보를 저장
 			return "redirect:" + request.getContextPath() + "/user/mainpage";
 
-		} 
+		}
 
 		else {
 			request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");
@@ -51,6 +58,20 @@ public class userController extends MskimRequestMapping {
 	public String logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.getSession().invalidate(); // 세션 무효화
 		return "redirect:" + request.getContextPath() + "/user/mainpage"; // 로그인 폼으로 리다이렉트
+	}
+	
+	//이메일 중복확인
+	@RequestMapping("emailDupCheck")
+	public String emailDupCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String email = request.getParameter("email");
+		int result = userDAO.emailDupCheck(email);
+		//ajax로 response가 현재 signupform보면 
+		//response가 avaliable이면 ajax가 사용가능한 이메일
+		//avaliable이 아니면 ajax가 사용불가능한 이메일
+		
+	
+
+		return null; // JSON 응답을 위해 JSP 페이지로 이동하지 않음
 	}
 
 }

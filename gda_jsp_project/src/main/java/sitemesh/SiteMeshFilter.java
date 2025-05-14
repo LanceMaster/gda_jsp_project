@@ -19,10 +19,11 @@ public class SiteMeshFilter extends ConfigurableSiteMeshFilter {
 	protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
 		builder.addDecoratorPath("/user/*", "/layout/layout.jsp")		
 		.addExcludedPath("/user/login*")
+    .addExcludedPath("/user/signupform")
 		.addExcludedPath("/static/css/*")
 		.addExcludedPath("/static/js/*")
 		.addExcludedPath("/static/images/*");
-		builder.addDecoratorPath("/projects/*", "/layout/layout.jsp");
-		
+
+
 	}
 }

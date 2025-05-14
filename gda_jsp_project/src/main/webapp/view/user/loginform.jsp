@@ -7,166 +7,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Insert title here</title>
-<style>
-#loginPopupOverlay, .modal-overlay {
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100vw;
-	height: 100vh;
-	background: rgba(0, 0, 0, 0.18);
-	z-index: 9998;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.login-modal-custom {
-	position: relative;
-	z-index: 9999;
-	max-width: 800px; /* 크기 크게 */
-	margin: 0 auto;
-	background: #fff;
-	border-radius: 12px;
-	padding: 32px 32px 24px 32px;
-	font-family: 'Noto Sans KR', sans-serif;
-}
-
-.login-modal-custom .login-title {
-	font-size: 2rem;
-	font-weight: 700;
-	text-align: center;
-	margin-bottom: 6px;
-}
-
-.login-modal-custom .login-desc {
-	text-align: center;
-	color: #888;
-	margin-bottom: 16px;
-	font-size: 1.1rem;
-}
-
-.login-modal-custom .form-control {
-	background: #f5f6fa;
-	border: none;
-	border-radius: 8px;
-	margin-bottom: 10px;
-	font-size: 1.1rem;
-	padding-left: 36px;
-	height: 44px;
-}
-
-.login-modal-custom .input-icon {
-	position: absolute;
-	left: 12px;
-	top: 50%;
-	transform: translateY(-50%);
-	color: #bbb;
-	font-size: 1.15rem;
-}
-
-.login-modal-custom .form-group {
-	position: relative;
-}
-
-.login-modal-custom .login-btn-main {
-	width: 100%;
-	background: #6C6CE5;
-	color: #fff;
-	font-weight: 600;
-	border: none;
-	border-radius: 8px;
-	margin: 14px 0 16px 0;
-	padding: 12px 0;
-	font-size: 1.1rem;
-	transition: background 0.2s;
-}
-
-.login-modal-custom .login-btn-main:hover {
-	background: #5757c9;
-}
-
-.login-modal-custom .login-links {
-	display: flex;
-	justify-content: space-between;
-	font-size: 1rem;
-	margin-bottom: 10px;
-}
-
-.login-modal-custom .or-divider {
-	display: flex;
-	align-items: center;
-	text-align: center;
-	margin: 18px 0 12px 0;
-	font-size: 1rem;
-}
-
-.login-modal-custom .or-divider::before, .login-modal-custom .or-divider::after
-	{
-	content: '';
-	flex: 1;
-	border-bottom: 1px solid #eee;
-}
-
-.login-modal-custom .or-divider:not(:empty)::before {
-	margin-right: .7em;
-}
-
-.login-modal-custom .or-divider:not(:empty)::after {
-	margin-left: .7em;
-}
-
-.login-modal-custom .sns-btn {
-	width: 100%;
-	border-radius: 8px;
-	border: none;
-	margin-bottom: 10px;
-	font-size: 1.05rem;
-	font-weight: 500;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	padding: 11px 0;
-}
-
-.sns-naver {
-	background: #e8f5e9;
-	color: #1ec800;
-}
-
-.sns-kakao {
-	background: #fff7e0;
-	color: #3c1e1e;
-}
-
-.sns-google {
-	background: #ffeaea;
-	color: #ea4335;
-}
-
-.login-modal-custom .bottom-link {
-	text-align: center;
-	margin-top: 10px;
-	font-size: 1rem;
-}
-
-.login-modal-custom .bottom-link a {
-	color: #6C6CE5;
-	text-decoration: none;
-	font-weight: 500;
-}
-
-.popup-close-btn {
-	position: absolute;
-	top: 12px;
-	right: 16px;
-	font-size: 1.3rem;
-	color: #bbb;
-	cursor: pointer;
-	z-index: 10000;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/userlogin.css">
 </head>
 <div class="login-modal-custom position-relative">
 	<div class="popup-close-btn">&times;</div>
@@ -203,12 +44,13 @@
 			<i class="fab fa-google"></i>Continue with Google
 		</button>
 		<div class="bottom-link">
-			계정이 필요하신가요? <a href="#">회원가입</a>
+			계정이 필요하신가요? <a href="javascript:fun_btn()" >회원가입</a>
 		</div>
 	</form>
 </div>
 <script>
-  $(document).on("submit", "#loginForm", function(e) {
+	//중복바인딩 제거
+  $(document).off("submit", "#loginForm").on("submit", "#loginForm", function(e) {
     e.preventDefault();
     $.ajax({
         url: $(this).attr("action"),
@@ -230,18 +72,32 @@
     });
 });
   //회원가입 버튼 클릭 시
-  $(document).on("click", ".bottom-link a", function(e) {
-    e.preventDefault();
-    $.ajax({
+//  $(document).on("click", ".bottom-link a", function(e) {
+//   	window.alert("회원가입 버튼 클릭");
+//    });
+//   function fun_btn() {
+// 	  window.alert("회원가입 버튼 클릭");
+// }
+
+// 회원가입 버튼 클릭 시
+$(document).off("click", ".bottom-link a").on("click", ".bottom-link a", function(e) {
+	//링크는이동안하고 loginform에서 signupform으로 이동
+	e.preventDefault();
+	//회원가입 페이지로 이동
+	$.ajax({
         url: "${pageContext.request.contextPath}/user/signupform",
-        method: "GET",
+        method: "POST",
         success: function(data) {
             $(".popup-content").html(data);
+            $("#loginPopupOverlay").removeClass("d-none");
         },
         error: function() {
             alert("회원가입 폼을 불러오지 못했습니다.");
         }
     });
-    });
+	
+});
+
+  
 </script>
 </html>
