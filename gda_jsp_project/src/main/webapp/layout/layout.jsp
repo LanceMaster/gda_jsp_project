@@ -98,13 +98,14 @@
 				});
 			});
 
-			// 배경 클릭하면 팝업 닫기
+		/* 	// 배경 클릭하면 팝업 닫기
 			$(document).on("click", "#loginPopupOverlay", function(e) {
 				if ($(e.target).is("#loginPopupOverlay")) {
 					$("#loginPopupOverlay").addClass("d-none");
 				}
 			});
-
+ */
+ 
 			// 로그인 폼 내부에서 닫기 버튼 클릭 시
 			$(document).on("click", ".popup-close-btn", function() {
 				$("#loginPopupOverlay").addClass("d-none");

@@ -1,0 +1,238 @@
+  #loginPopupOverlay,
+      .modal-overlay {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.18);
+        z-index: 9998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-modal-custom {
+        position: relative;
+        z-index: 9999;
+        max-width: 800px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 32px 32px 24px 32px;
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      .login-modal-custom .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 6px;
+      }
+      .login-modal-custom .login-desc {
+        text-align: center;
+        color: #888;
+        margin-bottom: 16px;
+        font-size: 1.1rem;
+      }
+      .login-modal-custom .form-control {
+        background: #f5f6fa;
+        border: none;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        padding-left: 36px;
+        height: 44px;
+      }
+      .login-modal-custom .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #bbb;
+        font-size: 1.15rem;
+      }
+      .login-modal-custom .form-group {
+        position: relative;
+      }
+      .login-modal-custom .login-btn-main {
+        width: 100%;
+        background: #6c6ce5;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        margin: 14px 0 16px 0;
+        padding: 12px 0;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+      }
+      .login-modal-custom .login-btn-main:hover {
+        background: #5757c9;
+      }
+      .login-modal-custom .login-links {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1rem;
+        margin-bottom: 10px;
+      }
+      .login-modal-custom .or-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 18px 0 12px 0;
+        font-size: 1rem;
+      }
+      .login-modal-custom .or-divider::before,
+      .login-modal-custom .or-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #eee;
+      }
+      .login-modal-custom .or-divider:not(:empty)::before {
+        margin-right: 0.7em;
+      }
+      .login-modal-custom .or-divider:not(:empty)::after {
+        margin-left: 0.7em;
+      }
+      .login-modal-custom .sns-btn {
+        width: 100%;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 0;
+      }
+      .sns-naver {
+        background: #e8f5e9;
+        color: #1ec800;
+      }
+      .sns-kakao {
+        background: #fff7e0;
+        color: #3c1e1e;
+      }
+      .sns-google {
+        background: #ffeaea;
+        color: #ea4335;
+      }
+      .login-modal-custom .bottom-link {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 1rem;
+      }
+      .login-modal-custom .bottom-link a {
+        color: #6c6ce5;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .popup-close-btn {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        font-size: 1.3rem;
+        color: #bbb;
+        cursor: pointer;
+        z-index: 10000;
+      }
+
+      .form-group {
+        position: relative;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0;
+      }
+      .form-group input.form-control {
+        flex: 1;
+        margin-bottom: 0;
+      }
+      .form-group > .input-icon {
+        left: 12px;
+      }
+      #emailVerifyBtn {
+        margin-left: 8px;
+        height: 44px;
+        padding: 0 18px;
+        font-size: 1.05rem;
+        font-weight: 500;
+        background: #6c6ce5;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        transition: background 0.2s;
+      }
+      #emailVerifyBtn:hover {
+        background: #5757c9;
+      }
+      input[type="date"].form-control {
+        color: #888;
+      }
+      .gender-group {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 10px;
+        margin-top: 2px;
+      }
+      .agree-group {
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+      }
+      .email-guide {
+        color: #6c6ce5;
+        font-size: 0.98rem;
+        margin-bottom: 6px;
+        margin-left: 2px;
+        text-align: left;
+      }
+      .form-group.email-group {
+        display: flex;
+        align-items: stretch; /* 높이 맞춤 */
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .form-group.email-group > .btn {
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+      }
+      .form-group.email-group .input-wrap {
+        flex: 2;
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .form-group.email-group input.form-control {
+        font-weight: normal;
+        background: #f5f6fa;
+        height: 44px; /* 높이 통일 */
+        margin-bottom: 0;
+      }
+      #emailVerifyBtn {
+        flex: 1;
+        min-width: 120px;
+        margin-bottom: 0;
+        margin-left: 0;
+        height: 44px; /* 높이 통일 */
+        padding: 0 18px;
+        font-size: 1.05rem;
+        font-weight: 500;
+        background: #6c6ce5;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        transition: background 0.2s;
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #emailVerifyBtn:hover {
+        background: #5757c9;
+      }

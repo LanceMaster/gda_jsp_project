@@ -22,6 +22,11 @@ public class UserDAO {
     			
 	}
 
+	public int emailDupCheck(String email) {
+		
+		return 0;
+	}
+
    
 
 }
