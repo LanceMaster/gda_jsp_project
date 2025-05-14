@@ -1,17 +1,15 @@
 package model.dao;
 
 import org.apache.ibatis.session.SqlSession;
-import java.util.List;
 import model.dto.ProjectsDTO;
 import model.mapper.ProjectsMapper;
-import utils.MybatisConnection;
+import java.util.List;
 
 public class ProjectsDAO {
-    private SqlSession session;
     private ProjectsMapper mapper;
 
-    public ProjectsDAO() {
-        this.session = MybatisConnection.getConnection();
+    // 외부에서 SqlSession을 받아서 사용
+    public ProjectsDAO(SqlSession session) {
         this.mapper = session.getMapper(ProjectsMapper.class);
     }
 
@@ -38,10 +36,5 @@ public class ProjectsDAO {
     // 프로젝트 삭제
     public int delete(int projectId) {
         return mapper.delete(projectId);
-    }
-
-    // 세션 종료
-    public void close() {
-        MybatisConnection.close(session);
     }
 }

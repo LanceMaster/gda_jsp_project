@@ -1,0 +1,26 @@
+.main-wrap { max-width: 1200px; margin: auto; }
+.page-title { font-size: 24px; font-weight: bold; margin: 20px 0; }
+.search-bar, .filter-bar { margin-bottom: 15px; display: flex; gap: 10px; }
+.project-list { display: flex; flex-wrap: wrap; gap: 20px; }
+.project-card { border: 1px solid #ddd; padding: 15px; width: calc(33% - 20px); box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+.project-card h3 { margin-top: 0; }
+.badge { background: #28a745; color: #fff; padding: 2px 8px; border-radius: 4px; }
+.pagination { margin-top: 20px; display: flex; justify-content: center; gap: 5px; }
+
+/* 기존 button 스타일 */
+.pagination button { padding: 5px 10px; }
+
+/* 추가된 a 태그 스타일 */
+.pagination a {
+  display: inline-block;
+  padding: 5px 10px;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+}
+
+.pagination a.active {
+  font-weight: bold;
+  background: #eee;
+}
