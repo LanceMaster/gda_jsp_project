@@ -19,6 +19,9 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/static/css/mainstyle.css" />
+	<c:if test="${not empty pageCss}">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}${pageCss}" />
+</c:if>
  <sitemesh:write property="head"/>
 
  

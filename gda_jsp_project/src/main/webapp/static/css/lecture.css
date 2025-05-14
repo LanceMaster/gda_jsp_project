@@ -1,0 +1,123 @@
+/* ✅ Reset */
+@charset "UTF-8";
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f9f9fb;
+  color: #111;
+  line-height: 1.6;
+}
+
+/* ✅ 컨테이너 정렬 */
+.container {
+  max-width: 640px;
+  margin: 60px auto;
+  padding: 40px 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+/* ✅ 제목 */
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 36px;
+  text-align: center;
+  color: #222;
+}
+
+/* ✅ 입력 필드 공통 */
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  font-size: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+textarea {
+  height: 120px;
+  resize: none;
+}
+
+/* ✅ 태그 입력 영역 */
+.tag-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.tag-area input[type="text"] {
+  flex: 1;
+}
+
+/* ✅ 파일 업로드 안내 박스 */
+.file-drop {
+  width: 100%;
+  height: 56px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background-color: #fafafa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  color: #777;
+}
+
+/* ✅ 업로드 input 정렬 */
+.upload-row {
+  margin-bottom: 32px;
+}
+
+/* ✅ 버튼 스타일 */
+button {
+  background-color: #6366f1; /* 퍼플톤 */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background-color: #4f46e5;
+}
+
+.file-drop {
+  border: 2px dashed #aaa;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  color: #888;
+  margin: 10px 0;
+  transition: background-color 0.3s;
+}
+
+.file-drop.dragover {
+  background-color: #f0f0ff;
+  color: #333;
+  border-color: #5b5fc7;
+}
+

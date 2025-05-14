@@ -1,0 +1,175 @@
+/* ✅ 전체 컨테이너 */
+.lecture-container {
+  max-width: 960px;
+  margin: 60px auto;
+  padding: 40px;
+  background-color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #111;
+  line-height: 1.6;
+}
+
+/* ✅ 썸네일 이미지 */
+.lecture-thumbnail img {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ✅ 제목/가격/평점 구역 */
+.lecture-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.lecture-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.lecture-price {
+  font-size: 20px;
+  color: #111;
+  font-weight: 600;
+}
+
+.lecture-rating {
+  font-size: 18px;
+  color: #ffbd00;
+}
+
+.start-button {
+  background-color: #111;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.start-button:hover {
+  background-color: #333;
+}
+
+/* ✅ 설명 영역 */
+.lecture-description {
+  margin: 60px 0;
+}
+
+.lecture-description h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.lecture-description p {
+  font-size: 15px;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.lecture-description ul {
+  margin-left: 1em;
+  padding-left: 0.5em;
+}
+
+.lecture-description li {
+  font-size: 14px;
+  color: #333;
+  margin: 8px 0;
+}
+
+/* ✅ 리뷰 작성 영역 */
+.review-form {
+  border-top: 1px solid #eee;
+  padding-top: 30px;
+  margin-top: 40px;
+}
+
+.review-form h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.review-form .review-stars {
+  font-size: 16px;
+  color: #ffbd00;
+  margin-left: 10px;
+}
+
+.review-form textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+
+.review-form select {
+  width: 150px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.review-form button {
+  background-color: #4e6ef2;
+  color: #fff;
+  padding: 10px 26px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.review-form button:hover {
+  background-color: #3a52c3;
+}
+
+/* ✅ 리뷰 목록 (Ajax 삽입) */
+.review-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 30px;
+}
+
+.review-list li {
+  background-color: #f8f8fc;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.review-list li .author {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.review-list li .rating {
+  color: #ffbd00;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.review-list li .content {
+  color: #333;
+  font-size: 14px;
+}
