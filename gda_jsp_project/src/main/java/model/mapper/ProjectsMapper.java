@@ -27,4 +27,6 @@ public interface ProjectsMapper {
 
     @Delete("DELETE FROM projects WHERE project_id = #{projectId}")
     int delete(int projectId);
+    
+    //test
 }
