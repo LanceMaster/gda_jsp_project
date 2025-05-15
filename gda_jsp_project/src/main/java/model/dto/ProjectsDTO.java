@@ -88,7 +88,7 @@ public class ProjectsDTO {
     @Override
     public String toString() {
         return "ProjectsDTO [projectId=" + projectId + ", title=" + title + ", description=" + description
-                + ", thumbnail=" + thumbnail + ", recruitStatus=" + recruitStatus + ", viewCount=" + viewCount
+                +  ", recruitStatus=" + recruitStatus + ", viewCount=" + viewCount
                 + ", createdAt=" + createdAt + ", leaderId=" + leaderId + "]";
     }
 }

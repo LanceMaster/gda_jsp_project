@@ -9,11 +9,6 @@
 </head>
 <body>
 <!-- ✅ 로그인 안 했으면 로그인 페이지로 이동 -->
-<c:if test="${empty sessionScope.user}">
-    <script>
-        location.href = '${pageContext.request.contextPath}/user/loginform';
-    </script>
-</c:if>
 <!-- ✅ 여기까지 -->
 
 <div class="form-container">
@@ -65,7 +60,7 @@ $(document).ready(function() {
     });
 });
 
-// 태그 하나씩 추가
+//태그 추가 + 삭제 기능 통합
 function addSelectedTag() {
     const select = document.getElementById("tagSelect");
     const selectedOption = select.options[select.selectedIndex];
@@ -75,18 +70,40 @@ function addSelectedTag() {
     const tagId = selectedOption.value;
     const tagName = selectedOption.text;
 
-    // 중복 추가 방지
+    // 중복 방지
     if (document.getElementById("tagHidden_" + tagId)) {
         alert("이미 추가된 태그입니다.");
         return;
     }
 
-    // 시각적 표시
+    // 시각적 표시 + 삭제 버튼
     const span = document.createElement("span");
-    span.textContent = tagName;
+    span.textContent = tagName + " ";
+    span.id = "tagSpan_" + tagId;
+    span.style.display = "inline-block";
+    span.style.backgroundColor = "#e0e0e0";
+    span.style.color = "#333";
+    span.style.padding = "4px 8px";
+    span.style.margin = "4px";
+    span.style.borderRadius = "8px";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.textContent = "x";
+    deleteBtn.style.marginLeft = "4px";
+    deleteBtn.style.background = "none";
+    deleteBtn.style.border = "none";
+    deleteBtn.style.color = "#ff4d4d";
+    deleteBtn.style.cursor = "pointer";
+    deleteBtn.onclick = function() {
+        tagContainer.removeChild(span);
+        hiddenTags.removeChild(document.getElementById("tagHidden_" + tagId));
+    };
+
+    span.appendChild(deleteBtn);
     tagContainer.appendChild(span);
 
-    // 전송용 hidden input
+    // 숨겨진 input
     const hiddenInput = document.createElement("input");
     hiddenInput.type = "hidden";
     hiddenInput.name = "tags";

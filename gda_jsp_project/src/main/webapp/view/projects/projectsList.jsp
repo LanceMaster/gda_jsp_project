@@ -1,17 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<!DOCTYPE html>
-<html>
+
+
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/static/css/projectsList.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<head>
 
 <meta charset="UTF-8" />
 <title>프로젝트 목록</title>
-</head>
-<body class="projectsList-body">
+
 	<div class="main-wrap">
 		<h2 class="page-title">프로젝트 모집 게시판</h2>
 
@@ -101,5 +100,3 @@
 		<!-- ✅ 방어 처리된 페이징 영역 끝 -->
 
 	</div>
-</body>
-</html>

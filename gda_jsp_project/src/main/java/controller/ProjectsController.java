@@ -91,7 +91,6 @@ public class ProjectsController extends MskimRequestMapping {
 	        ProjectsDTO project = new ProjectsDTO();
 	        project.setTitle(title);
 	        project.setDescription(description);
-	        project.setThumbnail(null); // ✅ 파일 업로드 제거 - 썸네일은 null 처리
 	        project.setLeaderId(userId);
 	        project.setViewCount(0);
 
@@ -137,7 +136,6 @@ public class ProjectsController extends MskimRequestMapping {
             project.setProjectId(Integer.parseInt(request.getParameter("projectId")));
             project.setTitle(request.getParameter("title"));
             project.setDescription(request.getParameter("description"));
-            project.setThumbnail(request.getParameter("thumbnail"));
             project.setLeaderId(Integer.parseInt(request.getParameter("leaderId")));
             project.setRecruitStatus(ProjectsDTO.RecruitStatus.valueOf(request.getParameter("recruitStatus").toUpperCase()));
 
