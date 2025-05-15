@@ -198,3 +198,47 @@ h1 {
   padding: 0 40px;
 }
 
+/* ✅ 정렬 드롭다운 전체 박스 우측 정렬 */
+.sort-dropdown {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 20px 0;
+  padding-right: 10px;
+}
+
+/* ✅ 라벨 텍스트 */
+.sort-dropdown label {
+  margin-right: 8px;
+  font-weight: 500;
+  color: #444;
+}
+
+/* ✅ 셀렉트 박스 현대적 스타일 */
+.sort-dropdown select {
+  appearance: none; /* 기본 화살표 제거 */
+  background-color: #f9f9fb;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px 36px 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='10' height='7' viewBox='0 0 10 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.sort-dropdown select:hover {
+  border-color: #888;
+}
+
+.sort-dropdown select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(100, 150, 250, 0.2);
+  border-color: #6495ed;
+}
+

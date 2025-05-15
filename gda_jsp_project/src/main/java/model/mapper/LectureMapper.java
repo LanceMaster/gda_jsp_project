@@ -5,6 +5,7 @@ import model.dto.LectureDTO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LectureMapper {
 
@@ -90,24 +91,24 @@ public interface LectureMapper {
     """)
     List<LectureDTO> searchByKeyword(@Param("keyword") String keyword);
 
-    // ✅ 6. 강의 ID로 상세 조회
     @Select("""
-        SELECT 
-            lecture_id AS lectureId,
-            title,
-            description,
-            thumbnail,
-            category,
-            price,
-            avg_rating AS avgRating,
-            instructor_id AS instructorId,
-            published_at AS publishedAt,
-            created_at AS createdAt,
-            updated_at AS updatedAt
-        FROM lectures
-        WHERE lecture_id = #{lectureId}
-    """)
-    LectureDTO getLectureById(@Param("lectureId") int lectureId);
+    	    SELECT 
+    	        lecture_id AS lectureId,
+    	        title,
+    	        description,
+    	        thumbnail,
+    	        category,
+    	        price,
+    	        avg_rating AS avgRating,
+    	        instructor_id AS instructorId,
+    	        published_at AS publishedAt,
+    	        created_at AS createdAt,
+    	        updated_at AS updatedAt
+    	    FROM lectures
+    	    WHERE lecture_id = #{lectureId}
+    	""")
+    	LectureDTO getLectureById(@Param("lectureId") int lectureId);
+
 
     // ✅ 7. 첫 번째 콘텐츠 조회 (order_no = 1)
     @Select("""
@@ -127,7 +128,13 @@ public interface LectureMapper {
     """)
     ContentDTO getFirstContentByLectureId(@Param("lectureId") int lectureId);
 
-    // ✅ 8. 강의 평균 평점 갱신 (user_interactions 기준)
+    @Select("""
+    	    SELECT title FROM lectures WHERE lecture_id = #{lectureId}
+    	""")
+    	String selectTitleById(@Param("lectureId") int lectureId);
+
+    
+    // ✅ 8. 강의 평균 평점 갱신
     @Update("""
         UPDATE lectures
         SET avg_rating = (
@@ -140,6 +147,7 @@ public interface LectureMapper {
         WHERE lecture_id = #{lectureId}
     """)
     void updateLectureRating(@Param("lectureId") int lectureId);
-    
-    
+
+    // ✅ 9. 동적 정렬 + 카테고리 필터 (XML에 정의됨)
+    List<LectureDTO> getLecturesFilteredSorted(Map<String, Object> params);
 }

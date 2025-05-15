@@ -1,6 +1,7 @@
 package service;
 
 import model.dao.ContentDAO;
+
 import model.dao.LectureDAO;
 import model.dto.ContentDTO;
 import model.dto.LectureDTO;
@@ -8,6 +9,9 @@ import org.apache.ibatis.session.SqlSession;
 import utils.MyBatisUtil;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 
 /**
  * 📚 LectureService
@@ -66,6 +70,26 @@ public class LectureService {
     public void updateAverageRating(int lectureId) {
         lectureDAO.updateLectureRating(lectureId);
     }
+    
+
+    public List<LectureDTO> getLecturesByCategorySorted(String category, String sort) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("category", category);
+        params.put("sort", sort);
+        return lectureDAO.getLecturesFilteredSorted(params);
+    }
+
+    public List<LectureDTO> getAllLecturesSorted(String sort) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("category", null);
+        params.put("sort", sort);
+        return lectureDAO.getLecturesFilteredSorted(params);
+    }
+    
+    public String getLectureTitleById(int lectureId) {
+        return lectureDAO.selectTitleById(lectureId);
+    }
+
 
     /**
      * ✅ 강의 등록 + 콘텐츠 등록
