@@ -31,7 +31,20 @@
   </form>
 </div>
 
+<!-- ✅ 정렬 드롭다운 -->
+<div class="sort-dropdown">
+  <form method="get" action="/lecture/lectureList">
+    <input type="hidden" name="category" value="${param.category}" />
+    <label for="sort-select"></label>
+    <select name="sort" id="sort-select" onchange="this.form.submit()">
+      <option value="latest" ${param.sort == 'latest' || param.sort == null ? 'selected' : ''}>🆕 최신순</option>
+      <option value="popular" ${param.sort == 'popular' ? 'selected' : ''}>🔥 인기순</option>
+    </select>
+  </form>
 </div>
+
+
+
 
 <!-- ✅ 강의 목록 출력 -->
 <div class="lecture-list">
