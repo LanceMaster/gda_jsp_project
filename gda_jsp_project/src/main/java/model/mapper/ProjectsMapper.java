@@ -6,10 +6,12 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Options;
 import model.dto.ProjectsDTO;
 
 @Mapper
 public interface ProjectsMapper {
+
     @Select("SELECT * FROM projects")
     List<ProjectsDTO> listAll();
 
@@ -18,6 +20,7 @@ public interface ProjectsMapper {
 
     @Insert("INSERT INTO projects (title, description, thumbnail, recruit_status, view_count, created_at, leader_id) "
           + "VALUES (#{title}, #{description}, #{thumbnail}, #{recruitStatus}, #{viewCount}, #{createdAt}, #{leaderId})")
+    @Options(useGeneratedKeys = true, keyProperty = "projectId")
     int insert(ProjectsDTO project);
 
     @Update("UPDATE projects SET title = #{title}, description = #{description}, thumbnail = #{thumbnail}, "
@@ -27,5 +30,4 @@ public interface ProjectsMapper {
 
     @Delete("DELETE FROM projects WHERE project_id = #{projectId}")
     int delete(int projectId);
-    
 }
