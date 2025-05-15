@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import utils.MyBatisUtil;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 🎓 LectureDAO
@@ -80,6 +81,13 @@ public class LectureDAO {
             if (session == null) useSession.close();
         }
     }
+    
+    public String selectTitleById(int lectureId) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            LectureMapper mapper = session.getMapper(LectureMapper.class);
+            return mapper.selectTitleById(lectureId);
+        }
+    }
 
     // ✅ 6. 강의 등록 (세션 기반 트랜잭션)
     public int insertLecture(LectureDTO lectureDTO) {
@@ -114,4 +122,15 @@ public class LectureDAO {
             if (session == null) useSession.close();
         }
     }
+    public List<LectureDTO> getLecturesFilteredSorted(Map<String, Object> params) {
+        SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession();
+        try {
+            LectureMapper mapper = session.getMapper(LectureMapper.class);
+            return mapper.getLecturesFilteredSorted(params);
+        } finally {
+            session.close();
+        }
+    }
+    
+    
 }

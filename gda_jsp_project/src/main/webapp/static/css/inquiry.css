@@ -1,67 +1,151 @@
-/* 📄 inquiry.css - 강의 문의글 작성 스타일 */
-body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: #f9f9fb;
+/* ✅ 기본 초기화 */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-.container {
-  max-width: 640px;
-  margin: 60px auto;
-  padding: 40px 30px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #ffffff;
+  color: #222;
+  padding: 40px;
 }
 
-h2 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 36px;
-  text-align: center;
+/* 📦 전체 컨테이너 */
+.inquiry-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* 🔍 검색 영역 */
+.inquiry-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.inquiry-search input[type="text"] {
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 15px;
+  border: 1px solid #ddd;
+  border-radius: 40px;
+  outline: none;
+  background-color: #fafafa;
+  background-image: url('/static/images/search-icon.svg');
+  background-repeat: no-repeat;
+  background-position: 18px center;
+  padding-left: 44px;
+}
+
+.write-btn {
+  margin-left: 20px;
+  padding: 10px 18px;
+  background-color: #4e6cf1;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s;
+}
+
+.write-btn::before {
+  content: "👤";
+}
+
+.write-btn:hover {
+  background-color: #3c57c7;
+}
+
+/* 📋 테이블 영역 */
+.inquiry-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.inquiry-table thead {
+  background-color: #f9f9f9;
+}
+
+.inquiry-table th,
+.inquiry-table td {
+  padding: 16px;
+  font-size: 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.inquiry-table th {
+  color: #666;
+  font-weight: 600;
+}
+
+.inquiry-table td {
   color: #222;
 }
 
-/* ✅ 입력 필드 */
-input[type="text"],
-textarea {
-  width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 24px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  box-sizing: border-box;
-  resize: vertical;
+.inquiry-table td a {
+  color: #333;
+  text-decoration: none;
 }
 
-textarea {
-  min-height: 160px;
+.inquiry-table td a:hover {
+  text-decoration: underline;
 }
 
-/* ✅ 에러 메시지 */
-.error-message {
-  color: #d93025;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-/* ✅ 등록 버튼 */
-button[type="submit"] {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: bold;
-  background-color: #4285f4;
-  color: white;
+/* 📌 상세보기 버튼 */
+.detail-btn {
+  padding: 6px 12px;
+  background-color: #4e6cf1;
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 13px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s;
 }
 
-button[type="submit"]:hover {
-  background-color: #3367d6;
+.detail-btn:hover {
+  background-color: #3c57c7;
+}
+
+/* 🔢 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  min-width: 36px;
+  text-align: center;
+}
+
+.page-btn:hover {
+  background-color: #f1f1f1;
+}
+
+.page-btn.active {
+  background-color: #4e6cf1;
+  color: #fff;
+  border-color: #4e6cf1;
 }

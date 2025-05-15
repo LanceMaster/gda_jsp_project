@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="model.mapper.LectureMapper">
+
+  <select id="getLecturesFilteredSorted" parameterType="map" resultType="model.dto.LectureDTO">
+    SELECT 
+      l.lecture_id AS lectureId,
+      l.title,
+      l.description,
+      l.thumbnail,
+      l.category,
+      l.price,
+      l.avg_rating AS avgRating,
+      l.published_at AS publishedAt,
+      (
+        SELECT COUNT(*) 
+        FROM user_interactions ui
+        WHERE ui.target_type = 'LECTURE'
+          AND ui.target_id = l.lecture_id
+          AND ui.interaction_kind = 'FEEDBACK'
+      ) AS reviewCount
+    FROM lectures l
+    WHERE l.status = 'PUBLISHED'
+
+    <if test="category != null and category != ''">
+      AND l.category = #{category}
+    </if>
+
+    ORDER BY
+    <choose>
+      <when test="sort == 'popular'">
+        l.avg_rating DESC, reviewCount DESC
+      </when>
+      <otherwise>
+        l.published_at DESC
+      </otherwise>
+    </choose>
+  </select>
+
+</mapper>

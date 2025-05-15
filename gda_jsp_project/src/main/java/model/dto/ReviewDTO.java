@@ -3,32 +3,33 @@ package model.dto;
 import java.time.LocalDateTime;
 
 /**
- * 📦 ReviewDTO - 리뷰 데이터 전달 객체
+ * 📦 ReviewDTO - 강의 리뷰 데이터 전달 객체
  */
 public class ReviewDTO {
-    private int reviewId;
-    private int targetId;     // 강의 ID
-    private String content;   // 리뷰 내용
-    private int rating;       // 별점 (1~5)
-    private int userId;       // 작성자 ID
-    private String userName;  // 작성자 이름 (옵션)
-    private LocalDateTime createdAt;
 
-    // 📌 Getter/Setter
-    public int getReviewId() {
-        return reviewId;
+    private int interactionId;   // 리뷰 고유 ID
+    private int lectureId;       // 대상 강의 ID
+    private String content;      // 리뷰 내용
+    private int rating;          // 평점 (1~5)
+    private int userId;          // 작성자 ID
+    private String reviewer;     // 작성자 이름 (화면 노출용)
+    private LocalDateTime createdAt; // 작성일
+
+    // ✅ Getter/Setter
+    public int getInteractionId() {
+        return interactionId;
     }
 
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
+    public void setInteractionId(int interactionId) {
+        this.interactionId = interactionId;
     }
 
-    public int getTargetId() {
-        return targetId;
+    public int getLectureId() {
+        return lectureId;
     }
 
-    public void setTargetId(int targetId) {
-        this.targetId = targetId;
+    public void setLectureId(int lectureId) {
+        this.lectureId = lectureId;
     }
 
     public String getContent() {
@@ -55,12 +56,12 @@ public class ReviewDTO {
         this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getReviewer() {
+        return reviewer;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setReviewer(String reviewer) {
+        this.reviewer = reviewer;
     }
 
     public LocalDateTime getCreatedAt() {

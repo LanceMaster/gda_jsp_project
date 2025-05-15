@@ -32,124 +32,47 @@ public class LectureController extends MskimRequestMapping {
     public String lectureList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("UTF-8");
 
-        String category = request.getParameter("category");
-        String keyword = request.getParameter("keyword");
+        String category = request.getParameter("category"); // 카테고리 필터
+        String sort = request.getParameter("sort");         // 정렬 기준
 
         List<LectureDTO> lectures;
 
-        // 🔍 조건 분기: category → keyword → 전체
+        // 🔍 category가 지정된 경우 → 정렬까지 함께 반영
         if (category != null && !category.isBlank()) {
-            lectures = lectureService.getLecturesByCategory(category);
-        } else if (keyword != null && !keyword.isBlank()) {
-            lectures = lectureService.searchLecturesByKeyword(keyword);
+            lectures = lectureService.getLecturesByCategorySorted(category, sort);
         } else {
-            lectures = lectureService.getAllLectures();
+            lectures = lectureService.getAllLecturesSorted(sort);
         }
 
+        // 📦 데이터 전달
         request.setAttribute("lectures", lectures);
+        request.setAttribute("param", request.getParameterMap()); // 🔁 파라미터 유지용
         return "lecture/lectureList";
     }
 
 
+
     @RequestMapping("lecturedetail")
     public String lectureDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
+        String param = request.getParameter("lectureId");
+        if (param == null || !param.matches("\\d+")) {
+            request.setAttribute("error", "잘못된 요청입니다.");
+            return "error/errorPage";
+        }
+
+        int lectureId = Integer.parseInt(param);
         LectureDTO lecture = lectureService.getLectureById(lectureId);
+        if (lecture == null) {
+            request.setAttribute("error", "존재하지 않는 강의입니다.");
+            return "error/errorPage";
+        }
+
         List<ReviewDTO> reviewList = reviewService.getReviewsByLectureId(lectureId);
+
         request.setAttribute("lecture", lecture);
         request.setAttribute("reviewList", reviewList);
+
         return "lecture/lectureDetail";
-    }
-
-    @RequestMapping("inquiries")
-    public String inquiryList(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        int page = 1;
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
-        }
-        int size = 10;
-        int offset = (page - 1) * size;
-        List<InquiryDTO> inquiryList = inquiryService.getAllInquiries(size, offset);
-        int totalCount = inquiryService.getInquiryCount();
-        int totalPages = (int) Math.ceil((double) totalCount / size);
-        request.setAttribute("inquiryList", inquiryList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        return "lecture/inquiryList";
-    }
-
-    @RequestMapping("inquiry/detail")
-    public String inquiryDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        int inquiryId = Integer.parseInt(request.getParameter("inquiryId"));
-        InquiryDTO inquiry = inquiryService.getInquiryById(inquiryId);
-        request.setAttribute("inquiry", inquiry);
-        return "lecture/inquiryDetail";
-    }
-
-    @RequestMapping("inquiry/write")
-    public String inquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession();
-        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/user/loginform.jsp";
-
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-
-        if (title == null || title.isBlank() || content == null || content.isBlank()) {
-            request.setAttribute("error", "제목과 내용을 모두 입력해주세요.");
-            return "lecture/inquiryWrite";
-        }
-
-        InquiryDTO dto = new InquiryDTO();
-        dto.setTitle(title);
-        dto.setContent(content);
-        dto.setLectureId(lectureId);
-        dto.setUserId(loginUser.getUserId());
-        dto.setCreatedAt(LocalDateTime.now());
-
-        inquiryService.registerInquiry(dto);
-        return "redirect:/lecture/inquiries?lectureId=" + lectureId;
-    }
-
-    @RequestMapping("inquiry/update")
-    public String inquiryUpdate(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession();
-        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/user/loginform.jsp";
-
-        int inquiryId = Integer.parseInt(request.getParameter("inquiryId"));
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
-
-        if (title == null || title.isBlank() || content == null || content.isBlank()) {
-            request.setAttribute("error", "제목과 내용을 모두 입력해주세요.");
-            request.setAttribute("inquiry", inquiryService.getInquiryById(inquiryId));
-            request.setAttribute("lectureId", lectureId);
-            return "lecture/inquiryEdit";
-        }
-
-        InquiryDTO dto = new InquiryDTO();
-        dto.setInquiryId(inquiryId);
-        dto.setTitle(title);
-        dto.setContent(content);
-        dto.setLectureId(lectureId);
-        dto.setUserId(loginUser.getUserId());
-
-        inquiryService.updateInquiry(dto);
-        return "redirect:/lecture/inquiries?lectureId=" + lectureId;
-    }
-
-    @RequestMapping("inquiry/delete")
-    public String inquiryDelete(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
-        int inquiryId = Integer.parseInt(request.getParameter("inquiryId"));
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-        inquiryService.deleteInquiry(inquiryId);
-        return "redirect:/lecture/inquiries?lectureId=" + lectureId;
     }
 
     @RequestMapping("play")
