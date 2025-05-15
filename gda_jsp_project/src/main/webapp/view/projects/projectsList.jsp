@@ -3,14 +3,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
 <html>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/static/css/projectsList.css" />
+
 <head>
+
 <meta charset="UTF-8" />
 <title>프로젝트 목록</title>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/static/css/projectslist.css" />
-
 </head>
-<body class="projectslist-body">
+<body class="projectsList-body">
 	<div class="main-wrap">
 		<h2 class="page-title">프로젝트 모집 게시판</h2>
 
@@ -37,7 +38,7 @@
 						${param.status == 'CLOSED' ? 'selected' : ''}>모집완료</option>
 				</select>
 				<button type="submit" class="action-btn">적용</button>
-				<button type="button" onclick="location.href='writeForm'"
+				<button type="button" onclick="location.href='projectsForm'"
 					class="action-btn">글쓰기</button>
 			</div>
 		</form>
@@ -57,6 +58,11 @@
 							<a href="info?projectId=${p.projectId}">${p.title}</a>
 						</h3>
 					</div>
+					    <!-- ✅ 내용 출력 추가 시작 -->
+                           <div class="card-content">
+                           ${p.description}
+                           </div>
+                        <!-- ✅ 내용 출력 추가 끝 -->
 					<div class="card-meta">
 						<span>작성자: ${p.leaderId}</span> | <span>등록일: ${p.createdAt}</span>
 						| <span>조회수: ${p.viewCount}</span>

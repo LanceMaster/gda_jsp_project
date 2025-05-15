@@ -3,7 +3,7 @@ package model.dto;
 import java.util.Date;
 
 public class UserDTO {
-    private int userId;
+    private int user_id;
     private String email;
     private String password;
     private String name;
@@ -24,12 +24,7 @@ public class UserDTO {
     public UserDTO() {}
 
     // getter/setter
-    public int getUserId() {
-        return userId;
-    }
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+   
     public String getEmail() {
         return email;
     }
@@ -120,4 +115,12 @@ public class UserDTO {
     public void setLastLoginAt(Date lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
+
+	public int getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
+	}
 }
