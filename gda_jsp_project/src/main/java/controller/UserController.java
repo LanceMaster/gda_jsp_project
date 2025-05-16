@@ -33,6 +33,7 @@ public class UserController extends MskimRequestMapping {
 	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		String id = request.getParameter("id");
+		
 		String password = request.getParameter("password");
 
 		UserDTO userDTO = userDAO.login(id, password);
