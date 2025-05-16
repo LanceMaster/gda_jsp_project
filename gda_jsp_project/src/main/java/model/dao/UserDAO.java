@@ -43,4 +43,15 @@ public class UserDAO {
 
 	}
 
+
+	public int signup(UserDTO userDTO) {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	public boolean updatePasswordByEmail(String email, String newPassword) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
