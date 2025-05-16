@@ -18,15 +18,15 @@ public interface ProjectsMapper {
     @Select("SELECT * FROM projects WHERE project_id = #{projectId}")
     ProjectsDTO listById(int projectId);
 
-    @Insert("INSERT INTO projects (title, description, thumbnail, recruit_status, view_count, created_at, leader_id) "
-          + "VALUES (#{title}, #{description}, #{thumbnail}, #{recruitStatus}, #{viewCount}, #{createdAt}, #{leaderId})")
-    @Options(useGeneratedKeys = true, keyProperty = "projectId")
-    int insert(ProjectsDTO project);
+    @Insert("INSERT INTO projects (title, description, recruit_status, view_count, leader_id) "
+    	      + "VALUES (#{title}, #{description}, #{recruitStatus}, #{viewCount}, #{leaderId})")
+    	@Options(useGeneratedKeys = true, keyProperty = "projectId")
+    	int insert(ProjectsDTO project);
 
-    @Update("UPDATE projects SET title = #{title}, description = #{description}, thumbnail = #{thumbnail}, "
-          + "recruit_status = #{recruitStatus}, view_count = #{viewCount}, created_at = #{createdAt}, leader_id = #{leaderId} "
-          + "WHERE project_id = #{projectId}")
-    int update(ProjectsDTO project);
+    @Update("UPDATE projects SET title = #{title}, description = #{description}, "
+    	      + "recruit_status = #{recruitStatus}, view_count = #{viewCount}, leader_id = #{leaderId} "
+    	      + "WHERE project_id = #{projectId}")
+    	int update(ProjectsDTO project);
 
     @Delete("DELETE FROM projects WHERE project_id = #{projectId}")
     int delete(int projectId);

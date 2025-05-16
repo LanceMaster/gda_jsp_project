@@ -18,5 +18,12 @@
     <url-pattern>/user/mypage</url-pattern>
     <!-- 로그인 필요 페이지만 지정 -->
 </filter-mapping>
+
+<filter-mapping>
+    <filter-name>LoginCheckFilter</filter-name>
+    <url-pattern>/projects/projectsForm</url-pattern>
+    <url-pattern>/projects/projectsEdit</url-pattern>
+    <!-- 로그인 필요 페이지만 지정 -->
+</filter-mapping>
   
 </web-app>
