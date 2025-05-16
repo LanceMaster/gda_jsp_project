@@ -22,13 +22,11 @@ public class ReviewDAO {
         }
     }
 
-    /**
-     * 📌 리뷰 등록
-     */
     public void insertReview(ReviewDTO dto) {
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
             ReviewMapper mapper = session.getMapper(ReviewMapper.class);
             mapper.insertReview(dto);
+            session.commit();
         }
     }
 

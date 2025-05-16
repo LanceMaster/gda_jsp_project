@@ -12,6 +12,18 @@ public class InquiryDTO {
     private String content;
     private boolean isAnswered;
     private LocalDateTime createdAt;
+    private String userName;  // 작성자 이름
+
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    
 	public int getInquiryId() {
 		return inquiryId;
 	}

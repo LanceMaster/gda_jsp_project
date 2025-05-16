@@ -3,17 +3,22 @@ package controller;
 import gdu.mskim.MskimRequestMapping;
 import gdu.mskim.RequestMapping;
 import model.dto.InquiryDTO;
+import model.dto.UserDTO;
 import service.InquiryService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.annotation.WebInitParam;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * 📋 InquiryController
- * - 강의 문의 목록 조회, 삭제 처리 담당
+ * - 강의 문의 목록, 작성, 삭제 통합 컨트롤러
  */
 @WebServlet(
     urlPatterns = "/lecture/inquiry/*",
@@ -28,35 +33,91 @@ public class InquiryController extends MskimRequestMapping {
      * URL: /lecture/inquiry/list
      */
     @RequestMapping("list")
-    public String inquiryList(HttpServletRequest request) throws Exception {
+    public String listInquiries(HttpServletRequest req, HttpServletResponse res) throws Exception {
         int page = 1;
-        int limit = 10;
+        int size = 10;
 
-        String pageParam = request.getParameter("page");
-        if (pageParam != null && !pageParam.isBlank()) {
-            try {
-                page = Integer.parseInt(pageParam);
-            } catch (NumberFormatException e) {
-                page = 1; // 잘못된 입력은 기본값으로 처리
-            }
+        String pageParam = req.getParameter("page");
+        if (pageParam != null && pageParam.matches("\\d+")) {
+            page = Integer.parseInt(pageParam);
         }
 
-        int offset = (page - 1) * limit;
+        List<InquiryDTO> inquiryList = inquiryService.getPagedInquiries(page, size);
+        int totalCount = inquiryService.getTotalInquiries();
+        int totalPages = (int) Math.ceil(totalCount / (double) size);
 
-        List<InquiryDTO> inquiryList = inquiryService.getPagedInquiries(limit, offset);
-        int totalCount = inquiryService.getTotalCount();
-        int totalPages = (int) Math.ceil((double) totalCount / limit);
+        req.setAttribute("inquiryList", inquiryList);
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
 
-        request.setAttribute("inquiryList", inquiryList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        return "lecture/inquiryList";
+    }
 
-        return "lecture/inquiryList"; // 📄 /view/lecture/inquiryList.jsp
+    @RequestMapping("write")
+    public String handleInquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        request.setCharacterEncoding("UTF-8");
+
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            return "lecture/inquiryWrite"; // 작성 폼
+        }
+
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            UserDTO loginUser = (UserDTO) request.getSession().getAttribute("loginUser");
+            if (loginUser == null) {
+                throw new IllegalStateException("로그인 후 작성 가능합니다.");
+            }
+
+            InquiryDTO dto = new InquiryDTO();
+            dto.setUserId(loginUser.getUser_id()); // DTO에 맞게
+            dto.setLectureId(Integer.parseInt(request.getParameter("lectureId")));
+            dto.setTitle(request.getParameter("title"));
+            dto.setContent(request.getParameter("content"));
+            dto.setType("LECTURE");
+            dto.setCreatedAt(LocalDateTime.now());
+
+            inquiryService.insertInquiry(dto);
+
+            return "redirect:inquiryList"; // ✅ 등록 후에는 목록으로 이동
+        }
+
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        return null;
+    }
+
+    @RequestMapping("inquirywrite")
+    public String handleNewInquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        request.setCharacterEncoding("UTF-8");
+
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            // 📄 새 폼으로 이동
+            return "lecture/inquiryWrite"; // 또는 inquiryWrite2.jsp 로 분리 가능
+        }
+
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            UserDTO loginUser = (UserDTO) request.getSession().getAttribute("loginUser");
+            if (loginUser == null) {
+                throw new IllegalStateException("로그인 후 작성 가능합니다.");
+            }
+
+            InquiryDTO dto = new InquiryDTO();
+            dto.setUserId(loginUser.getUser_id());
+            dto.setLectureId(Integer.parseInt(request.getParameter("lectureId")));
+            dto.setTitle(request.getParameter("title"));
+            dto.setContent(request.getParameter("content"));
+            dto.setType("LECTURE");
+            dto.setCreatedAt(LocalDateTime.now());
+
+            inquiryService.insertInquiry(dto);
+            return "redirect:inquiryList";
+        }
+
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        return null;
     }
 
     /**
-     * ✅ 문의글 삭제 처리 (일반 목록에서 삭제)
-     * URL: /lecture/inquiry/delete?inquiryId=3
+     * ✅ 문의글 삭제 (목록에서 삭제)
+     * URL: /lecture/inquiry/delete
      */
     @RequestMapping("delete")
     public String deleteInquiry(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -68,12 +129,28 @@ public class InquiryController extends MskimRequestMapping {
         int inquiryId = Integer.parseInt(idParam);
         inquiryService.deleteInquiry(inquiryId);
 
-        return "redirect:list"; // 📌 상대 경로 리다이렉트
+        return "redirect:inquiryList";
     }
 
+    @RequestMapping("detail")
+    public String inquiryDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String param = request.getParameter("inquiryId");
+        if (param == null || !param.matches("\\d+")) {
+            throw new IllegalArgumentException("유효한 문의 ID가 필요합니다.");
+        }
+
+        int inquiryId = Integer.parseInt(param);
+        InquiryDTO inquiry = inquiryService.getInquiryById(inquiryId);
+        if (inquiry == null) {
+            throw new IllegalArgumentException("해당 문의글을 찾을 수 없습니다.");
+        }
+
+        request.setAttribute("inquiry", inquiry);
+        return "lecture/inquiryDetail";
+    }
     /**
-     * ✅ 문의글 삭제 처리 (특정 강의의 문의 탭에서 삭제한 경우)
-     * URL: /lecture/inquiry/inquiry/delete?inquiryId=3&lectureId=10
+     * ✅ 문의글 삭제 (강의 상세 페이지 문의 탭)
+     * URL: /lecture/inquiry/inquiry/delete
      */
     @RequestMapping("inquiry/delete")
     public String inquiryDelete(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -86,4 +163,4 @@ public class InquiryController extends MskimRequestMapping {
 
         return "redirect:/lecture/inquiries?lectureId=" + lectureId;
     }
-}
+} 

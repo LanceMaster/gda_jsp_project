@@ -60,6 +60,31 @@ public class LectureDAO {
         }
     }
 
+    public List<LectureDTO> getLectureList(String keyword, String category, String sort) {
+        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession();
+        try {
+            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+            return mapper.searchLectureList(keyword, category, sort);
+        } finally {
+            if (session == null) useSession.close();
+        }
+    }
+    
+    public List<LectureDTO> searchLectures(List<String> keywords, String category, String sort) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            LectureMapper mapper = session.getMapper(LectureMapper.class);
+            return mapper.searchLectures(keywords, category, sort);
+        }
+    }
+
+    
+        public List<LectureDTO> selectLectures(String keyword, String category, String sort) {
+            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                LectureMapper mapper = session.getMapper(LectureMapper.class);
+                return mapper.selectLectures(keyword, category, sort);
+            }
+        }
+
     // ✅ 4. 강의 상세 조회
     public LectureDTO getLectureById(int lectureId) {
         SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession();
