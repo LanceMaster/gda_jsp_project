@@ -12,6 +12,11 @@ public class TagDAO {
     public TagDAO(SqlSession session) {
         this.session = session;
     }
+    
+    // ✅ 세션 주입 생성자
+    public TagDAO() {
+        this.session = null;
+    }
 
     /**
      * ✅ 특정 강의에 연결된 태그 목록 조회

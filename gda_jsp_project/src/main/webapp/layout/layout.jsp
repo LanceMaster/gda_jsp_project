@@ -53,7 +53,7 @@
 					style="text-decoration: none; color: inherit">코딩스쿨</a>
 			</div>
 			<div class="nav-area">
-				<a href="${path}/lecture/lectureList" class="nav-link-custom">강의</a>
+				<a href="${path}/lecture/lecturelist" class="nav-link-custom">강의</a>
 
 				<div class="dropdown d-inline">
 					<a href="#" class="nav-link-custom dropdown-toggle"
