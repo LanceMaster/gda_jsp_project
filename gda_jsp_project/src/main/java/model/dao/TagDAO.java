@@ -22,8 +22,10 @@ public class TagDAO {
      * ✅ 특정 강의에 연결된 태그 목록 조회
      */
     public List<TagDTO> getTagsByLectureId(int lectureId) {
-        TagMapper mapper = session.getMapper(TagMapper.class);
-        return mapper.getTagsByLectureId(lectureId);
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            TagMapper mapper = session.getMapper(TagMapper.class);
+            return mapper.getTagsByLectureId(lectureId);
+        }
     }
 
     /**
@@ -34,6 +36,7 @@ public class TagDAO {
         return mapper.getTagsByProjectId(projectId);
     }
 
+    
     /**
      * ✅ 전체 태그 목록 조회
      */

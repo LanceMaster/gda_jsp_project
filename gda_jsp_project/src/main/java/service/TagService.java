@@ -16,5 +16,9 @@ public class TagService {
             TagDAO tagDAO = new TagDAO(session);
             return tagDAO.getAllTags();
         }
+        
+        
     }
+    
+    
 }

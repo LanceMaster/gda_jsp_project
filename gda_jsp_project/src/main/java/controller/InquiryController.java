@@ -68,7 +68,7 @@ public class InquiryController extends MskimRequestMapping {
             }
 
             InquiryDTO dto = new InquiryDTO();
-            dto.setUserId(loginUser.getUser_id()); // DTO에 맞게
+            dto.setUserId(loginUser.getUserId()); // DTO에 맞게
             dto.setLectureId(Integer.parseInt(request.getParameter("lectureId")));
             dto.setTitle(request.getParameter("title"));
             dto.setContent(request.getParameter("content"));
@@ -100,7 +100,7 @@ public class InquiryController extends MskimRequestMapping {
             }
 
             InquiryDTO dto = new InquiryDTO();
-            dto.setUserId(loginUser.getUser_id());
+            dto.setUserId(loginUser.getUserId());
             dto.setLectureId(Integer.parseInt(request.getParameter("lectureId")));
             dto.setTitle(request.getParameter("title"));
             dto.setContent(request.getParameter("content"));
