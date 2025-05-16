@@ -72,7 +72,7 @@
 						id="communityDropdown" data-toggle="dropdown" aria-haspopup="true"
 						aria-expanded="false">커뮤니티</a>
 					<div class="dropdown-menu" aria-labelledby="communityDropdown">
-						<a class="dropdown-item" href="${path}/community/teamproject">팀
+						<a class="dropdown-item" href="${path}/projects/projectsList">팀
 							프로젝트</a> <a class="dropdown-item" href="${path}/community/mentoring">멘토링</a>
 					</div>
 				</div>
