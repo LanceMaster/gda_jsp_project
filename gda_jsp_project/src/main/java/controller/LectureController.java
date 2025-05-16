@@ -5,10 +5,15 @@ import gdu.mskim.RequestMapping;
 import model.dto.*;
 import service.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+
+import com.google.gson.Gson;
+
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,33 +33,56 @@ public class LectureController extends MskimRequestMapping {
     private final InquiryService inquiryService = new InquiryService();
     private final ReviewService reviewService = new ReviewService();
 
+    /**
+     * ✅ 강의 목록 조회
+     * - 키워드 검색 / 카테고리 필터 / 정렬 조건 모두 지원
+     * - 내부적으로 조건에 따라 적절한 DAO 메서드로 분기 처리
+     */
     @RequestMapping("lecturelist")
     public String lectureList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("UTF-8");
 
-        String category = request.getParameter("category"); // 카테고리 필터
-        String sort = request.getParameter("sort");         // 정렬 기준
+        // 🔍 파라미터 수집
+        String keyword = request.getParameter("keyword");
+        String category = request.getParameter("category");
+        String sort = request.getParameter("sort");
 
-        List<LectureDTO> lectures;
+        // ✅ 모든 조건을 포함한 통합 검색
+        List<LectureDTO> lectures = lectureService.searchLectures(keyword, category, sort);
 
-        // 🔍 category가 지정된 경우 → 정렬까지 함께 반영
-        if (category != null && !category.isBlank()) {
-            lectures = lectureService.getLecturesByCategorySorted(category, sort);
-        } else {
-            lectures = lectureService.getAllLecturesSorted(sort);
-        }
-
-        // 📦 데이터 전달
+        // ✅ 뷰로 전달
         request.setAttribute("lectures", lectures);
-        request.setAttribute("param", request.getParameterMap()); // 🔁 파라미터 유지용
+        request.setAttribute("param", request.getParameterMap());
+
         return "lecture/lectureList";
     }
+
+    @WebServlet("/lecture/ajaxFilter")
+    public class LectureAjaxController extends HttpServlet {
+        private final LectureService lectureService = new LectureService();
+        private final Gson gson = new Gson();
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+            res.setContentType("application/json;charset=UTF-8");
+
+            String keyword = req.getParameter("keyword");
+            String category = req.getParameter("category");
+            String sort = req.getParameter("sort");
+
+            List<LectureDTO> filteredLectures = lectureService.getLectureList(keyword, category, sort);
+            gson.toJson(filteredLectures, res.getWriter());
+        }
+    }
+    
 
 
 
     @RequestMapping("lecturedetail")
     public String lectureDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String param = request.getParameter("lectureId");
+
+
         if (param == null || !param.matches("\\d+")) {
             request.setAttribute("error", "잘못된 요청입니다.");
             return "error/errorPage";
@@ -64,6 +92,7 @@ public class LectureController extends MskimRequestMapping {
         LectureDTO lecture = lectureService.getLectureById(lectureId);
         if (lecture == null) {
             request.setAttribute("error", "존재하지 않는 강의입니다.");
+            
             return "error/errorPage";
         }
 

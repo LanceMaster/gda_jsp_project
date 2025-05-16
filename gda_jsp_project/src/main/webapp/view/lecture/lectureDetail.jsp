@@ -26,7 +26,7 @@
       <h1>${lecture.title}</h1>
       <p class="lecture-category">"${lecture.category} - 배포까지 한 번에"</p>
       <div class="price-rating">
-        <p class="lecture-price">₩<fmt:formatNumber value="${lecture.price}" type="number" /></p>
+        <p class="lecture-price">₩${lecture.price}<fmt:formatNumber value="${lecture.price}" type="number" /></p>
         <button class="start-btn">지금 시작하기</button>
         <span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
       </div>
@@ -46,9 +46,7 @@
     <p class="desc-footer">이 수업은 실전형 프로젝트를 통해 핵심 개념을 빠르게 학습할 수 있도록 설계되어 있습니다.</p>
 
     <!-- 질문 게시판 바로가기 -->
-    <a href="<c:url value='/lecture/inquiryList' />" class="ask-btn">
-      질문 게시판 바로가기
-    </a>
+    <a href="<c:url value='/lecture/inquiry/list' />">강의 질문 게시판</a>
   </div>
 
   <div class="review-section">
@@ -57,51 +55,53 @@
       <span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
     </div>
 
-    <div class="review-form">
-      <textarea placeholder="댓글을 입력해 주세요."></textarea>
-      <div class="review-controls">
-        <select>
-          <option value="5">⭐⭐⭐⭐⭐</option>
-          <option value="4">⭐⭐⭐⭐</option>
-          <option value="3">⭐⭐⭐</option>
-          <option value="2">⭐⭐</option>
-          <option value="1">⭐</option>
-        </select>
-        <button class="submit-btn">제출</button>
-      </div>
-    </div>
+<!-- ✅ 리뷰 작성 폼 -->
+<form id="reviewForm">
+  <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
 
-    <ul class="review-list">
-      <c:forEach var="review" items="${reviewList}">
-        <li class="review-item">
-          <div class="review-card">
+  <textarea name="content" placeholder="댓글을 입력해 주세요."></textarea>
 
-            <!-- 👤 유저 정보 -->
-            <div class="review-user">
-              <img src="<c:url value='/static/images/user.png' />" class="user-icon" />
-              <div class="user-meta">
-                <div class="meta-top">
-                  <strong class="reviewer-name">${review.reviewer}</strong>
-                  <span class="review-date">${review.formattedCreatedAt}</span>
-                </div>
-                <div class="review-stars">
-                  <c:forEach begin="1" end="5" var="i">
-                    <c:choose>
-                      <c:when test="${i <= review.rating}">⭐</c:when>
-                      <c:otherwise>☆</c:otherwise>
-                    </c:choose>
-                  </c:forEach>
-                </div>
-              </div>
-            </div>
-
-            <!-- 🧾 리뷰 내용 -->
-            <p class="review-content">${review.content}</p>
-          </div>
-        </li>
-      </c:forEach>
-    </ul>
+  <div class="review-controls">
+    <select name="rating">
+      <option value="5">⭐⭐⭐⭐⭐</option>
+      <option value="4">⭐⭐⭐⭐</option>
+      <option value="3">⭐⭐⭐</option>
+      <option value="2">⭐⭐</option>
+      <option value="1">⭐</option>
+    </select>
+    <button type="submit" class="submit-btn">제출</button>
   </div>
+</form>
+
+<!-- ✅ 리뷰 목록 -->
+<ul class="review-list" id="reviewList">
+  <c:forEach var="review" items="${reviewList}">
+    <li class="review-item">
+      <div class="review-card">
+        <div class="review-user">
+          <img src="<c:url value='/static/images/user.png' />" class="user-icon" />
+          <div class="user-meta">
+            <div class="meta-top">
+              <strong class="reviewer-name">${review.reviewer}</strong>
+              <span class="review-date">
+                <fmt:formatDate value="${review.createdAt}" pattern="yyyy-MM-dd HH:mm" />
+              </span>
+            </div>
+            <div class="review-stars">
+              <c:forEach begin="1" end="5" var="i">
+                <c:choose>
+                  <c:when test="${i <= review.rating}">⭐</c:when>
+                  <c:otherwise>☆</c:otherwise>
+                </c:choose>
+              </c:forEach>
+            </div>
+          </div>
+        </div>
+        <p class="review-content">${review.content}</p>
+      </div>
+    </li>
+  </c:forEach>
+</ul>
 
 </div>
 </body>

@@ -1,9 +1,11 @@
 package model.mapper;
 
 import model.dto.ContentDTO;
+
 import model.dto.LectureDTO;
 import org.apache.ibatis.annotations.*;
-
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
@@ -150,4 +152,94 @@ public interface LectureMapper {
 
     // ✅ 9. 동적 정렬 + 카테고리 필터 (XML에 정의됨)
     List<LectureDTO> getLecturesFilteredSorted(Map<String, Object> params);
+    
+    @Select("""
+    	    <script>
+    	        SELECT * FROM lecture
+    	        WHERE status = 'PUBLISHED'
+    	        <if test="keyword != null and keyword != ''">
+    	            AND (title LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+    	        </if>
+    	        <if test="category != null and category != ''">
+    	            AND category = #{category}
+    	        </if>
+    	        <choose>
+    	            <when test="sort == 'popular'">
+    	                ORDER BY view_count DESC
+    	            </when>
+    	            <otherwise>
+    	                ORDER BY created_at DESC
+    	            </otherwise>
+    	        </choose>
+    	    </script>
+    	""")
+    	List<LectureDTO> searchLectureList(@Param("keyword") String keyword, @Param("category") String category, @Param("sort") String sort);
+
+    
+    @Select("""
+    	    <script>
+    	        SELECT l.*, 
+    	               (SELECT ROUND(AVG(r.rating), 1) FROM user_interactions r 
+    	                WHERE r.target_type = 'LECTURE' AND r.target_id = l.lecture_id) AS avgRating,
+    	               (SELECT COUNT(*) FROM user_interactions r 
+    	                WHERE r.target_type = 'LECTURE' AND r.target_id = l.lecture_id) AS reviewCount
+    	        FROM lectures l
+    	        WHERE l.status = 'PUBLISHED'
+    	        <if test="keywords != null and keywords.size > 0">
+    	            AND (
+    	                <foreach collection="keywords" item="kw" separator=" OR ">
+    	                    l.title LIKE CONCAT('%', #{kw}, '%')
+    	                    OR l.description LIKE CONCAT('%', #{kw}, '%')
+    	                </foreach>
+    	            )
+    	        </if>
+    	        <if test="category != null and category != ''">
+    	            AND l.category = #{category}
+    	        </if>
+    	        <choose>
+    	            <when test="sort == 'popular'">
+    	                ORDER BY avgRating DESC
+    	            </when>
+    	            <otherwise>
+    	                ORDER BY l.created_at DESC
+    	            </otherwise>
+    	        </choose>
+    	    </script>
+    	""")
+    	List<LectureDTO> searchLectures(@Param("keywords") List<String> keywords,
+    	                                @Param("category") String category,
+    	                                @Param("sort") String sort);
+    
+    @Select({
+        "<script>",
+        "SELECT l.*, IFNULL(AVG(ui.rating), 0) AS avgRating, COUNT(ui.interaction_id) AS reviewCount",
+        "FROM lectures l",
+        "LEFT JOIN user_interactions ui ON l.lecture_id = ui.target_id AND ui.target_type = 'LECTURE'",
+        "<where>",
+        " l.status = 'PUBLISHED'",
+        " <if test='keyword != null and keyword != \"\"'>",
+        "   AND (l.title LIKE CONCAT('%', #{keyword}, '%')",
+        "        OR l.description LIKE CONCAT('%', #{keyword}, '%')",
+        "        OR EXISTS (SELECT 1 FROM users u WHERE u.user_id = l.instructor_id AND u.name LIKE CONCAT('%', #{keyword}, '%'))",
+        "   )",
+        " </if>",
+        " <if test='category != null and category != \"\"'>",
+        "   AND l.category = #{category}",
+        " </if>",
+        "</where>",
+        "GROUP BY l.lecture_id",
+        "<choose>",
+        " <when test='sort == \"popular\"'>",
+        "   ORDER BY (AVG(ui.rating) * 0.7 + COUNT(ui.interaction_id) * 0.3) DESC",
+        " </when>",
+        " <otherwise>",
+        "   ORDER BY l.published_at DESC",
+        " </otherwise>",
+        "</choose>",
+        "</script>"
+    })
+    List<LectureDTO> selectLectures(@Param("keyword") String keyword,
+                                     @Param("category") String category,
+                                     @Param("sort") String sort);
 }
+
