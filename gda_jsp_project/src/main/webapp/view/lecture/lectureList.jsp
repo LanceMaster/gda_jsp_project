@@ -25,11 +25,17 @@
       type="text"
       name="keyword"
       value="${param.keyword}"
-      placeholder="🔍검색하고 싶은 강의, 강사명을 입력해주세요"
+      placeholder="🔍 강의, 강사명을 입력하세요"
+      class="search-input"
     />
-    <button type="submit"></button>
+    <input type="hidden" name="category" value="${param.category}" />
+    <input type="hidden" name="sort" value="${param.sort}" />
+    <button type="submit" class="search-btn">검색</button>
   </form>
 </div>
+
+
+
 
 <!-- ✅ 정렬 드롭다운 -->
 <div class="sort-dropdown">

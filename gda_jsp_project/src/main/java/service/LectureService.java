@@ -10,6 +10,7 @@ import utils.MyBatisUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -31,6 +32,10 @@ public class LectureService {
     public List<LectureDTO> getAllLectures() {
         return lectureDAO.getAllLectures();
     }
+    public List<LectureDTO> getLectureList(String keyword, String category, String sort) {
+        return lectureDAO.selectLectures(keyword, category, sort);
+    }
+
 
     /**
      * ✅ 카테고리로 강의 목록 조회
@@ -89,6 +94,49 @@ public class LectureService {
     public String getLectureTitleById(int lectureId) {
         return lectureDAO.selectTitleById(lectureId);
     }
+    
+    
+    
+    public List<LectureDTO> searchLectures(String keyword, String category, String sort) {
+        // 유사 키워드 매핑 처리
+        List<String> keywords = mapRelatedKeywords(keyword);
+        return lectureDAO.searchLectures(keywords, category, sort);
+    }
+
+    private List<String> mapRelatedKeywords(String keyword) {
+        if (keyword == null || keyword.isBlank()) return null;
+
+        keyword = keyword.toLowerCase();
+        List<String> result = new ArrayList<>();
+        result.add(keyword);
+
+        switch (keyword) {
+            case "자바": case "java":
+                result.add("java");
+                result.add("자바");
+                break;
+            case "스프링": case "spring":
+                result.add("spring");
+                result.add("스프링");
+                break;
+            case "파이썬": case "python":
+                result.add("python");
+                result.add("파이썬");
+                break;
+            case "백엔드":
+                result.add("backend");
+                result.add("백엔드");
+                break;
+            case "프론트엔드":
+                result.add("frontend");
+                result.add("프론트엔드");
+                break;
+            // 필요한 경우 계속 추가 가능
+        }
+
+        return result.stream().distinct().toList();
+    }
+
 
 
     /**

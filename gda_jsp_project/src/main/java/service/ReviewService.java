@@ -22,7 +22,9 @@ public class ReviewService {
     public List<ReviewDTO> getReviewsByLectureId(int lectureId) {
         return reviewDAO.getReviewsByLectureId(lectureId);
     }
-
+    public void addReview(ReviewDTO dto) {
+        reviewDAO.insertReview(dto);
+    }
     /**
      * ✅ 리뷰 등록
      */

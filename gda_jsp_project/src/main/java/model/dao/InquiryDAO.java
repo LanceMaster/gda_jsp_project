@@ -9,25 +9,48 @@ import java.util.List;
 
 public class InquiryDAO {
 
-    public List<InquiryDTO> selectAll(int limit, int offset) {
+    public List<InquiryDTO> getPagedInquiries(int limit, int offset) {
         try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
             InquiryMapper mapper = session.getMapper(InquiryMapper.class);
-            return mapper.selectAll(limit, offset);
+            return mapper.getPagedInquiries(limit, offset);
         }
     }
 
-    public int countAll() {
+    public int countInquiries() {
         try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            InquiryMapper mapper = session.getMapper(InquiryMapper.class);
-            return mapper.countAll();
+            return session.getMapper(InquiryMapper.class).countInquiries();
         }
     }
 
-    public void deleteById(int id) {
+    public InquiryDTO getInquiryById(int inquiryId) {
+        SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession();
+        try {
+            InquiryMapper mapper = session.getMapper(InquiryMapper.class);
+            return mapper.selectInquiryById(inquiryId);
+        } finally {
+            session.close();
+        }
+    }
+
+    
+    
+
+    public void insertInquiry(InquiryDTO inquiry) {
         try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
             InquiryMapper mapper = session.getMapper(InquiryMapper.class);
-            mapper.deleteById(id);
+            mapper.insertInquiry(inquiry);
             session.commit();
+        }
+    }
+    
+    
+
+    
+    public boolean deleteInquiry(int inquiryId) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            int rows = session.getMapper(InquiryMapper.class).deleteInquiry(inquiryId);
+            session.commit();
+            return rows > 0;
         }
     }
 }

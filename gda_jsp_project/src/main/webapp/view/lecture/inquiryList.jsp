@@ -10,10 +10,11 @@
 <div class="inquiry-container">
 
   <!-- 🔍 검색 및 작성 버튼 -->
-  <div class="inquiry-search">
-    <input type="text" placeholder="강의명, 강사명 검색 (기능 미구현)">
-    <a href="<c:url value='/lecture/inquiry/write' />" class="write-btn">문의글 작성하기</a>
-  </div>
+<div class="inquiry-search">
+  <input type="text" placeholder="강의명, 강사명 검색 (기능 미구현)">
+  <a href="<c:url value='/lecture/inquiry/inquirywrite' />" class="write-btn">문의글 작성하기</a>
+</div>
+
 
   <!-- 📋 문의글 목록 테이블 -->
   <table class="inquiry-table">
@@ -44,29 +45,29 @@
 
           <!-- 제목 (링크) -->
           <td>
-            <a href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId}' />">
-              <c:out value="${inquiry.title}" />
+  			<a href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId}' />">
+  			<c:out value="${inquiry.title}" />
             </a>
           </td>
-
           <!-- 작성일 -->
-          <td>
-            <fmt:formatDate value="${inquiry.createdAt}" pattern="yyyy-MM-dd HH:mm" />
-          </td>
-
-          <!-- 상세/삭제 -->
+					<td>${inquiry.createdAt.toString().replace("T", " ")}</td>
+					<!-- 상세/삭제 -->
           <td>
             <a href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId}' />" class="detail-btn">상세보기</a>
 
             <form method="post"
-                  action="<c:url value='/lecture/inquiry/delete' />"
-                  style="display:inline;"
-                  onsubmit="return confirm('정말 삭제하시겠습니까?');">
-              <input type="hidden" name="inquiryId" value="${inquiry.inquiryId}" />
-              <input type="hidden" name="lectureId" value="${inquiry.lectureId}" />
-              <button type="submit" class="delete-button">삭제</button>
-            </form>
-          </td>
+							action="<c:url value='/lecture/inquiry/delete' />"
+							style="display: inline;"
+							onsubmit="return confirm('정말 삭제하시겠습니까?');">
+							<input type="hidden" name="inquiryId"
+								value="${inquiry.inquiryId}" /> <input type="hidden"
+								name="lectureId" value="${inquiry.lectureId}" />
+							<c:if
+								test="${sessionScope.loginUser.role == 'INSTRUCTOR' or sessionScope.loginUser.role == 'ADMIN'}">
+								<button type="submit" class="delete-button">삭제</button>
+							</c:if>
+						</form>
+					</td>
         </tr>
       </c:forEach>
 
