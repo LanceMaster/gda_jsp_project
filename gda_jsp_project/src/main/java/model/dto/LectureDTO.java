@@ -16,6 +16,7 @@ public class LectureDTO {
     private float avgRating;
     private int instructorId;
     private Integer reviewCount;
+    
 
     // ✅ Getter & Setter
 

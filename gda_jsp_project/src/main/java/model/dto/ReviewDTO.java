@@ -1,6 +1,7 @@
 package model.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 📦 ReviewDTO - 강의 리뷰 데이터 전달 객체
@@ -15,6 +16,12 @@ public class ReviewDTO {
     private String reviewer;     // 작성자 이름 (화면 노출용)
     private LocalDateTime createdAt; // 작성일
 
+    // ✅ 날짜 포맷 문자열 반환용 getter
+    public String getFormattedCreatedAt() {
+        if (createdAt == null) return "";
+        return createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    }
+    
     // ✅ Getter/Setter
     public int getInteractionId() {
         return interactionId;
