@@ -15,18 +15,20 @@
 
         <!-- 제목 입력 -->
         <input type="text" name="title" value="${project.title}" placeholder="콘텐츠 제목" required />
+        
+        <!-- 모집 상태 드롭다운 추가 -->
+<div class="status-section">
+    <label for="recruitStatus">모집 상태</label>
+    <select name="recruitStatus" id="recruitStatus">
+        <option value="RECRUITING" ${project.recruitStatus == 'RECRUITING' ? 'selected' : ''}>모집중</option>
+        <option value="COMPLETED" ${project.recruitStatus == 'COMPLETED' ? 'selected' : ''}>모집완료</option>
+    </select>
+</div>
 
         <!-- 내용 입력 (Summernote) -->
         <textarea name="description" id="summernote" required>${project.description}</textarea>
 
-        <!-- 썸네일 파일 업로드 -->
-        <div class="file-section">
-            <label>썸네일 업로드</label>
-            <input type="file" name="thumbnail" accept="image/*" />
-            <c:if test="${not empty project.thumbnailUrl}">
-                <div>현재 썸네일: <img src="${pageContext.request.contextPath}${project.thumbnailUrl}" alt="썸네일" style="max-width: 100px;" /></div>
-            </c:if>
-        </div>
+
 
         <!-- 태그 선택 + 추가 버튼 -->
         <h3>태그 목록 (테스트)</h3>

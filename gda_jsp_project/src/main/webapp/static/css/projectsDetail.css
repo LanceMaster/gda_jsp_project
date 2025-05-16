@@ -1,0 +1,56 @@
+.project-container {
+    width: 800px;
+    margin: 0 auto;
+}
+.project-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    position: relative;
+}
+.edit-link {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 14px;
+    color: #6c63ff;
+    text-decoration: none;
+    border: 1px solid #6c63ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.project-meta {
+    color: gray;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+.tag {
+    display: inline-block;
+    background: #f0f0f0;
+    padding: 4px 8px;
+    margin-right: 5px;
+    border-radius: 4px;
+}
+.comment-box {
+    width: 100%;
+    margin-top: 20px;
+}
+.comment-input {
+    width: 80%;
+    padding: 10px;
+}
+.comment-submit {
+    padding: 10px 20px;
+    background: #6c63ff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+.comment-list {
+    margin-top: 20px;
+}
+.comment-item {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
