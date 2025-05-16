@@ -60,6 +60,19 @@ public class AccountServlet extends HttpServlet {
 			handleChangePassword(request, response);
 			return;
 		}
+		
+		if("deleteAccount".equals(action)) {
+			// 계정 삭제 처리
+			String email = request.getParameter("email");
+			boolean deleted = userDAO.deleteAccount(email);
+			// 삭제 결과에 따라 응답
+			if (deleted) {
+				// 세션 무효화
+				request.getSession().invalidate();
+			}
+			response.getWriter().write(deleted ? "success" : "fail");
+			return;
+		}
 
 		// 다른 action 처리 시 추가...
 	}

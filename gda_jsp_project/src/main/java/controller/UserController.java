@@ -2,6 +2,7 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
@@ -72,7 +73,7 @@ public class UserController extends MskimRequestMapping {
 	 */
 	@RequestMapping("signup")
 	public String signup(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// 업로드 폴더 경로 설정 (예: webapp/upload/user/)
+		// 업로드 폴더 경로 설정
 		String path = request.getServletContext().getRealPath("/") + "/upload/user/";
 		File dir = new File(path);
 		if (!dir.exists())
@@ -86,27 +87,53 @@ public class UserController extends MskimRequestMapping {
 		} catch (IOException e) {
 			e.printStackTrace();
 			request.setAttribute("signupError", "파일 업로드 실패");
-			return "user/signupform"; // 실패 시 다시 폼으로
+			return "user/signupform";
 		}
 
-		// MultipartRequest에서 파라미터 꺼내기
+		// 파라미터 추출
 		String email = multi.getParameter("email");
 		String password = multi.getParameter("password");
-//		String profileFileName = multi.getFilesystemName("profile"); // 업로드된 파일명 (예: 프로필 이미지)
+		String role = multi.getParameter("role"); // "STUDENT" 또는 "INSTRUCTOR"
+		String resumeFileName = multi.getFilesystemName("resume"); // 업로드된 이력서 파일 이름
 
-		// DTO에 데이터 세팅
+		// 필수 항목 체크
+		if (email == null || password == null || role == null || email.trim().isEmpty() || password.trim().isEmpty()) {
+			request.setAttribute("signupError", "이메일, 비밀번호, 역할은 필수 입력입니다.");
+			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
+
+		}
+
+		// 이력서 파일 체크 (강사만 필수)
+		if ("INSTRUCTOR".equalsIgnoreCase(role) && (resumeFileName == null || resumeFileName.trim().isEmpty())) {
+			request.setAttribute("signupError", "강사 신청 시 이력서 파일은 필수입니다.");
+			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
+
+		}
+
+		// DTO 설정
 		UserDTO userDTO = new UserDTO();
 		userDTO.setEmail(email);
 		userDTO.setPassword(password);
-//	    userDTO.setProfileFilename(profileFileName != null ? profileFileName : "");
+		userDTO.setName(multi.getParameter("name"));
+		userDTO.setPhone(multi.getParameter("phone"));
+		userDTO.setRole(role.toUpperCase()); // "STUDENT" or "INSTRUCTOR"
+		userDTO.setResume(resumeFileName != null ? resumeFileName : "");
+		userDTO.setAgreedTerms(true); // 약관 동의 여부
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			userDTO.setBirthdate(sdf.parse(multi.getParameter("birthdate")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
+		}
 
 		int result = userDAO.signup(userDTO);
 
 		if (result > 0) {
-			return "redirect:" + request.getContextPath() + "/user/loginform"; // 성공시 로그인 폼으로
+			return "redirect:" + request.getContextPath() + "/user/loginform";
 		} else {
 			request.setAttribute("signupError", "회원가입 실패");
-			return "user/signupform"; // 실패시 다시 폼으로
+			return "user/signupform";
 		}
 	}
 
@@ -117,6 +144,25 @@ public class UserController extends MskimRequestMapping {
 		return "user/findidform"; // JSP 페이지 경로
 	}
 
+//	//회원탈퇴 처리
+//	@RequestMapping("delete")
+//	public String delete(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//		String id = request.getParameter("id");
+//		String password = request.getParameter("password");
+//
+//		UserDTO userDTO = userDAO.login(id, password);
+//
+//		if (userDTO != null) {
+//			userDAO.delete(id);
+//			request.getSession().invalidate(); // 세션 무효화
+//			return "redirect:" + request.getContextPath() + "/user/mainpage"; // 메인 페이지로 리다이렉트
+//		} else {
+//			request.setAttribute("deleteError", "아이디 또는 비밀번호를 확인해주세요");
+//			return "user/deleteform"; // 회원탈퇴 폼으로 리다이렉트
+//		}
+//	}
+//	
+
 	// 로그아웃 처리
 	@RequestMapping("logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -125,18 +171,18 @@ public class UserController extends MskimRequestMapping {
 	}
 
 	// 이메일 중복확인
-	@RequestMapping("emailDupCheck")
-	public String emailDupCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String email = request.getParameter("email");
-		int result = userDAO.emailDupCheck(email);
-		// ajax로 response가 현재 signupform보면
-		// response가 avaliable이면 ajax가 사용가능한 이메일
-		// avaliable이 아니면 ajax가 사용불가능한 이메일
-		String msg = (result == 0) ? "사용 가능한 이메일입니다." : "이미 사용 중인 이메일입니다.";
-		request.setAttribute("msg", msg);
-		request.setAttribute("url", request.getContextPath() + "/user/signupform");
-
-		return "user/plain"; // JSON 응답을 위해 JSP 페이지로 이동하지 않음
-	}
+//	@RequestMapping("emailDupCheck")
+//	public String emailDupCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//		String email = request.getParameter("email");
+//		int result = userDAO.emailDupCheck(email);
+//		// ajax로 response가 현재 signupform보면
+//		// response가 avaliable이면 ajax가 사용가능한 이메일
+//		// avaliable이 아니면 ajax가 사용불가능한 이메일
+//		String msg = (result == 0) ? "사용 가능한 이메일입니다." : "이미 사용 중인 이메일입니다.";
+//		request.setAttribute("msg", msg);
+//		request.setAttribute("url", request.getContextPath() + "/user/signupform");
+//
+//		return "user/plain"; // JSON 응답을 위해 JSP 페이지로 이동하지 않음
+//	}
 
 }
