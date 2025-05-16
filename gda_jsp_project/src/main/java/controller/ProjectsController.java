@@ -85,7 +85,7 @@ public class ProjectsController extends MskimRequestMapping {
 	        if (loginUser == null) {
 	            return "redirect:/user/loginform";
 	        }
-	        int userId = loginUser.getUser_id();
+	        int userId = loginUser.getUserId();
 
 	        // ✅ DTO 생성 및 값 설정
 	        ProjectsDTO project = new ProjectsDTO();
