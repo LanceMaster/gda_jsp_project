@@ -10,7 +10,6 @@ public class ProjectsDTO {
     private int projectId;                        // 프로젝트 ID
     private String title;                         // 제목
     private String description;                   // 설명
-    private String thumbnail;                     // 썸네일 경로
     private RecruitStatus recruitStatus = RecruitStatus.RECRUITING; // 기본 모집 상태
     private int viewCount = 0;                    // 기본 조회수 0
     private Date createdAt;                       // 생성 일시
@@ -40,14 +39,6 @@ public class ProjectsDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
     }
 
     // ✅ Enum을 문자열로 변환하여 반환
@@ -83,12 +74,22 @@ public class ProjectsDTO {
     public void setLeaderId(int leaderId) {
         this.leaderId = leaderId;
     }
+    private String leaderName;  // ✅ 추가
+
+    public String getLeaderName() {
+        return leaderName;
+    }
+
+    public void setLeaderName(String leaderName) {
+        this.leaderName = leaderName;
+    }
 
     // ✅ 디버깅용 toString 메서드
     @Override
     public String toString() {
         return "ProjectsDTO [projectId=" + projectId + ", title=" + title + ", description=" + description
-                +  ", recruitStatus=" + recruitStatus + ", viewCount=" + viewCount
-                + ", createdAt=" + createdAt + ", leaderId=" + leaderId + "]";
+                + ", recruitStatus=" + recruitStatus + ", viewCount=" + viewCount
+                + ", createdAt=" + createdAt + ", leaderId=" + leaderId
+                + ", leaderName=" + leaderName + "]";
     }
 }

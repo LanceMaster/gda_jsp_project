@@ -10,14 +10,17 @@ import com.github.pagehelper.PageInfo;
 import gdu.mskim.MskimRequestMapping;
 import gdu.mskim.RequestMapping;
 import gdu.mskim.MSLogin;
+import model.dao.CommentDAO;
 import model.dao.ProjectsDAO;
 import model.dao.TagDAO;
+import model.dto.CommentDTO;
 import model.dto.ProjectsDTO;
 import model.dto.TagDTO;
 import model.dto.UserDTO;
 import org.apache.ibatis.session.SqlSession;
 import utils.MybatisConnection;
 import java.util.List;
+
 
 @WebServlet(urlPatterns = {"/projects/*"}, initParams = {@WebInitParam(name = "view", value = "/view/")})
 public class ProjectsController extends MskimRequestMapping {
@@ -35,6 +38,7 @@ public class ProjectsController extends MskimRequestMapping {
 	    try (SqlSession session = MybatisConnection.getConnection()) {
 	        ProjectsDAO dao = new ProjectsDAO(session);
 	        PageHelper.startPage(pageNum, pageSize);
+
 	        List<ProjectsDTO> list = dao.listAll();
 	        PageInfo<ProjectsDTO> pageInfo = new PageInfo<>(list);
 
@@ -42,19 +46,44 @@ public class ProjectsController extends MskimRequestMapping {
 	        request.setAttribute("pageInfo", pageInfo);
 	        PageHelper.clearPage();
 	        return "projects/projectsList";
+	        
 	    } 
 	}
 
-    @RequestMapping("Detail")
-    public String info(HttpServletRequest request, HttpServletResponse response) {
-        try (SqlSession session = MybatisConnection.getConnection()) {
-            int projectId = Integer.parseInt(request.getParameter("projectId"));
-            ProjectsDAO dao = new ProjectsDAO(session);
-            ProjectsDTO project = dao.listById(projectId);
-            request.setAttribute("project", project);
-            return "projects/Detail";
-        }
-    }
+	@RequestMapping("Detail")
+	public String detail(HttpServletRequest request, HttpServletResponse response) {
+	    try (SqlSession session = MybatisConnection.getConnection()) {
+	        int projectId = Integer.parseInt(request.getParameter("projectId"));
+
+	        ProjectsDAO projectsDAO = new ProjectsDAO(session);
+	        ProjectsDTO project = projectsDAO.findProjectWithLeaderName(projectId);
+
+	        // ✅ 디버깅 로그 추가
+	        System.out.println("[DEBUG] 조회된 프로젝트 정보: " + project);
+	       
+	        if (project == null) {
+	            System.out.println("[ERROR] 프로젝트 조회 실패 - projectId: " + projectId);
+	            return "redirect:projectsList";  // ✅ 실패 시 목록으로 리다이렉트
+	        }
+
+	        CommentDAO commentDAO = new CommentDAO(session);
+	        List<CommentDTO> comments = commentDAO.getCommentsByProjectId(projectId);
+
+	        TagDAO tagDAO = new TagDAO(session);
+	        List<TagDTO> projectTags = tagDAO.getTagsByProjectId(projectId);
+
+	        request.setAttribute("project", project);
+	        request.setAttribute("comments", comments);
+	        request.setAttribute("projectTags", projectTags);
+
+	        return "projects/projectsDetail";  // ✅ 정상 처리 시 상세 페이지
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "redirect:projectsList";  // ✅ 예외 발생 시 목록으로 리다이렉트
+	    }
+	}
+
+
 
 	    @RequestMapping("projectsForm")
 	    public String Form(HttpServletRequest request, HttpServletResponse response) {
@@ -85,7 +114,7 @@ public class ProjectsController extends MskimRequestMapping {
 	        if (loginUser == null) {
 	            return "redirect:/user/loginform";
 	        }
-	        int userId = loginUser.getUser_id();
+	        int userId = loginUser.getUserId();
 
 	        // ✅ DTO 생성 및 값 설정
 	        ProjectsDTO project = new ProjectsDTO();
@@ -123,27 +152,46 @@ public class ProjectsController extends MskimRequestMapping {
         try (SqlSession session = MybatisConnection.getConnection()) {
             int projectId = Integer.parseInt(request.getParameter("projectId"));
             ProjectsDAO dao = new ProjectsDAO(session);
-            ProjectsDTO project = dao.listById(projectId);
+            ProjectsDTO project = dao.findProjectWithLeaderName(projectId);
             request.setAttribute("project", project);
             return "projects/projectsEdit";
         }
     }
 
-    @RequestMapping("Edit")
-    public String update(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping("edit")
+    public String edit(HttpServletRequest request, HttpServletResponse response) {
         try (SqlSession session = MybatisConnection.getConnection()) {
+            // 필수 파라미터 검증
+            String projectIdStr = request.getParameter("projectId");
+            if (projectIdStr == null || projectIdStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("projectId는 필수입니다.");
+            }
+
+            String leaderIdStr = request.getParameter("leaderId");
+            if (leaderIdStr == null || leaderIdStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("leaderId는 필수입니다.");
+            }
+
+            String statusStr = request.getParameter("recruitStatus");
+            ProjectsDTO.RecruitStatus status;
+            try {
+                status = ProjectsDTO.RecruitStatus.valueOf(statusStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("잘못된 모집 상태입니다: " + statusStr);
+            }
+
             ProjectsDTO project = new ProjectsDTO();
-            project.setProjectId(Integer.parseInt(request.getParameter("projectId")));
+            project.setProjectId(Integer.parseInt(projectIdStr));
             project.setTitle(request.getParameter("title"));
             project.setDescription(request.getParameter("description"));
-            project.setLeaderId(Integer.parseInt(request.getParameter("leaderId")));
-            project.setRecruitStatus(ProjectsDTO.RecruitStatus.valueOf(request.getParameter("recruitStatus").toUpperCase()));
+            project.setLeaderId(Integer.parseInt(leaderIdStr));
+            project.setRecruitStatus(status);
 
             ProjectsDAO dao = new ProjectsDAO(session);
             dao.update(project);
             session.commit();
 
-            return "redirect:info?projectId=" + project.getProjectId();
+            return "redirect:Detail?projectId=" + project.getProjectId();
         }
     }
 
@@ -157,4 +205,62 @@ public class ProjectsController extends MskimRequestMapping {
             return "redirect:projectsList";
         }
     }
+    
+ // 댓글 등록 처리
+    @RequestMapping("addComment")
+    public String addComment(HttpServletRequest request, HttpServletResponse response) {
+        UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
+        if (loginUser == null) {
+            // 로그인하지 않았으면 로그인 페이지로 이동
+            return "redirect:/user/loginform";
+        }
+        
+        UserDTO loginUser1 = (UserDTO) request.getSession().getAttribute("user");
+        if (loginUser1 == null) {
+            System.out.println("[ERROR] 비로그인 상태 - 세션 없음");
+            return "redirect:/user/loginform";
+        }
+
+        System.out.println("[DEBUG] 세션 유저 ID: " + loginUser1.getUserId());
+
+        int userId = loginUser1.getUserId();
+        // 디버깅: users 테이블에 userId가 존재하는지 DB에서 먼저 확인
+
+        
+
+        int projectId = Integer.parseInt(request.getParameter("projectId"));
+        String content = request.getParameter("commentContent");
+        int user_Id = loginUser1.getUserId();
+
+        System.out.println("[DEBUG] 댓글 작성 시도 - userId: " + userId);
+
+        CommentDTO comment = new CommentDTO();
+        comment.setProjectId(projectId);
+        comment.setContent(content);
+        comment.setUserId(userId);
+
+        try (SqlSession session = MybatisConnection.getConnection()) {
+            CommentDAO commentDAO = new CommentDAO(session);
+            commentDAO.insert(comment);
+            session.commit();
+        }
+
+        return "redirect:Detail?projectId=" + projectId;
+    }
+
+ // 댓글 삭제 처리
+    @RequestMapping("deleteComment")
+    public String deleteComment(HttpServletRequest request, HttpServletResponse response) {
+        try (SqlSession session = MybatisConnection.getConnection()) {
+            int commentId = Integer.parseInt(request.getParameter("commentId"));
+            int projectId = Integer.parseInt(request.getParameter("projectId"));
+
+            CommentDAO commentDAO = new CommentDAO(session);
+            commentDAO.softDelete(commentId);
+            session.commit();
+
+            return "redirect:Detail?projectId=" + projectId;
+        }
+    }
+
 }

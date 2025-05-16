@@ -11,19 +11,25 @@
 
 <div class="form-container">
     <h2>팀프로젝트 수정</h2>
-    <form method="post" action="${pageContext.request.contextPath}/projects/edit?projectId=${project.projectId}" id="projectsForm" enctype="multipart/form-data">
+   <form method="post" action="${pageContext.request.contextPath}/projects/edit?projectId=${project.projectId}" id="projectsForm">
+
+    <!-- ✅ leaderId 전달용 hidden input -->
+    <input type="hidden" name="leaderId" value="${project.leaderId}" />
+    <!-- ✅ projectId 전달용 hidden input -->
+    <input type="hidden" name="projectId" value="${project.projectId}" />
+
 
         <!-- 제목 입력 -->
         <input type="text" name="title" value="${project.title}" placeholder="콘텐츠 제목" required />
         
         <!-- 모집 상태 드롭다운 추가 -->
-<div class="status-section">
-    <label for="recruitStatus">모집 상태</label>
-    <select name="recruitStatus" id="recruitStatus">
-        <option value="RECRUITING" ${project.recruitStatus == 'RECRUITING' ? 'selected' : ''}>모집중</option>
-        <option value="COMPLETED" ${project.recruitStatus == 'COMPLETED' ? 'selected' : ''}>모집완료</option>
-    </select>
-</div>
+        <div class="status-section">
+            <label for="recruitStatus">모집 상태</label>
+            <select name="recruitStatus" id="recruitStatus">
+                <option value="RECRUITING" ${project.recruitStatus == 'RECRUITING' ? 'selected' : ''}>모집중</option>
+                <option value="COMPLETED" ${project.recruitStatus == 'COMPLETED' ? 'selected' : ''}>모집완료</option>
+            </select>
+        </div>
 
         <!-- 내용 입력 (Summernote) -->
         <textarea name="description" id="summernote" required>${project.description}</textarea>

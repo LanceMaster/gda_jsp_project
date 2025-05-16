@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <c:set var="pageCss" value="/static/css/projectsDetail.css" />
 <!DOCTYPE html>
 <html>
@@ -19,7 +20,8 @@
 
     <!-- 작성자, 등록일, 조회수 -->
     <div class="project-meta">
-        ${project.leaderName} | 게시물등록일 : ${project.createdAt}
+        ${project.leaderName} | 게시물등록일 :
+        <fmt:formatDate value="${project.createdAt}" pattern="yyyy-MM-dd" />
         <br> 조회수 ${project.viewCount} Views
     </div>
 
@@ -50,6 +52,11 @@
             <div class="comment-item">
                 <strong>${comment.userId}</strong> <br/>
                 ${comment.content}
+                <form method="post" action="${pageContext.request.contextPath}/projects/deleteComment" style="display:inline;">
+                    <input type="hidden" name="commentId" value="${comment.commentId}" />
+                    <input type="hidden" name="projectId" value="${project.projectId}" />
+                    <button type="submit" class="comment-delete-button">삭제</button>
+                </form>
             </div>
         </c:forEach>
     </div>
