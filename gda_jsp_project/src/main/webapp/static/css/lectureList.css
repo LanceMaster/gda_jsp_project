@@ -223,12 +223,32 @@ h1 {
 }
 
 
+/* ✅ 검색창 전체 영역 */
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  width: 100%;
+}
+
+/* ✅ 검색 폼: 한 줄 정렬 + 둥근 테두리 */
+.search-form {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #ccc;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
 /* ✅ 검색 입력창 */
 .search-input {
   flex: 1;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 12px 20px;
+  font-size: 15px;
   border: none;
+  border-radius: 9999px 0 0 9999px;
   color: #333;
   background-color: #fff;
 }
@@ -243,11 +263,12 @@ h1 {
 
 /* ✅ 검색 버튼 */
 .search-btn {
-  padding: 0 16px;
-  font-size: 14px;
+  padding: 0 24px;
+  font-size: 15px;
   background-color: #4338ca;
   color: white;
   border: none;
+  border-radius: 0 9999px 9999px 0;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }

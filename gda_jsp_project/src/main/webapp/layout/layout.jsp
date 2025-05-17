@@ -98,7 +98,7 @@
 								</c:when>
 								<c:otherwise>
 									<a class="dropdown-item" href="${path}/user/mypage">프로필 상세</a>
-									<a class="dropdown-item" href="${path}/user/cart">장바구니</a>
+									<a class="dropdown-item" href="${path}/lecture/cart">장바구니</a>
 									<a class="dropdown-item" href="${path}/user/logout">로그아웃</a>
 								</c:otherwise>
 							</c:choose>

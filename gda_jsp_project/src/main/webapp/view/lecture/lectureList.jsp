@@ -28,21 +28,18 @@
     <button type="submit" class="category-btn" name="category" value="백엔드">백엔드</button>
   </div>
 
-<div class="search-box">
-  <form method="get" action="${pageContext.request.contextPath}/lecture/lecturelist" class="search-form">
+  <!-- ✅ 검색창 -->
+  <div class="search-box">
     <input type="text" name="keyword" value="${param.keyword}" placeholder="🔍 강의, 강사명을 입력하세요" class="search-input" />
-    <button type="submit" class="search-btn">
-      <span>검색</span>
-    </button>
-  </form>
-</div>
+    <button type="submit" class="search-btn">검색</button>
+  </div>
 
   <!-- ✅ 정렬 드롭다운 -->
   <div class="sort-dropdown">
     <label for="sort-select">정렬:</label>
     <select name="sort" id="sort-select" onchange="this.form.submit()">
       <option value="latest" <c:if test="${param.sort == 'latest' || empty param.sort}">selected</c:if>>최신순</option>
-      <option value="popular" <c:if test="${param.sort == 'popular'}">selected</c:if>>평점순</option>
+      <option value="popular" <c:if test="${param.sort == 'popular'}">selected</c:if>>인기순</option>
     </select>
   </div>
 </form>
