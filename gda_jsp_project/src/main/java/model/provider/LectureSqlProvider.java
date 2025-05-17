@@ -1,47 +1,55 @@
 package model.provider;
 
-import java.util.Map;
+import model.dto.LectureSearchCondition;
+import org.apache.ibatis.jdbc.SQL;
 
 public class LectureSqlProvider {
 
-    public String buildFilteredSortedQuery(Map<String, Object> params) {
-        StringBuilder sql = new StringBuilder();
+	 public String findLectures(LectureSearchCondition cond) {
+	        return new SQL() {{
+	            SELECT("l.lecture_id AS lectureId, l.title, l.thumbnail, l.category, l.price, l.avg_rating AS avgRating");
+	            SELECT("(SELECT COUNT(*) FROM user_interactions WHERE target_type = 'LECTURE' AND target_id = l.lecture_id) AS reviewCount");
+	            FROM("lectures l");
+	            WHERE("l.status = 'PUBLISHED'");
 
-        sql.append("""
-            SELECT 
-              l.lecture_id AS lectureId,
-              l.title,
-              l.description,
-              l.thumbnail,
-              l.category,
-              l.price,
-              l.avg_rating AS avgRating,
-              l.published_at AS publishedAt,
-              (
-                SELECT COUNT(*) 
-                FROM user_interactions ui
-                WHERE ui.target_type = 'LECTURE'
-                  AND ui.target_id = l.lecture_id
-                  AND ui.interaction_kind = 'FEEDBACK'
-              ) AS reviewCount
-            FROM lectures l
-            WHERE l.status = 'PUBLISHED'
-        """);
+	            if (cond.getCategory() != null && !cond.getCategory().isBlank()) {
+	                WHERE("l.category = #{category}");
+	            }
 
-        // ✅ WHERE 조건: category 필터
-        Object category = params.get("category");
-        if (category != null && !category.toString().isBlank()) {
-            sql.append(" AND l.category = #{category} ");
-        }
+	            if (cond.getKeyword() != null && !cond.getKeyword().isBlank()) {
+	                WHERE("(l.title LIKE CONCAT('%', #{keyword}, '%') OR l.description LIKE CONCAT('%', #{keyword}, '%'))");
+	            }
 
-        // ✅ 정렬 조건: sort 값에 따라 ORDER BY 다르게
-        String sort = (String) params.get("sort");
-        if ("popular".equals(sort)) {
-            sql.append(" ORDER BY l.avg_rating DESC, reviewCount DESC ");
+	            if ("popular".equals(cond.getSort())) {
+	                ORDER_BY("l.avg_rating DESC");
+	            } else {
+	                ORDER_BY("l.published_at DESC");
+	            }
+	        }}.toString() + " LIMIT #{offset}, #{size}";
+	    }
+
+    private static String getOrderByClause(LectureSearchCondition cond) {
+        if ("popular".equals(cond.getSort())) {
+            return " ORDER BY l.avg_rating DESC ";
         } else {
-            sql.append(" ORDER BY l.published_at DESC ");
+            return " ORDER BY l.published_at DESC ";
         }
+    }
+    
+    public static String countLectures(LectureSearchCondition cond) {
+        return new SQL() {{
+            SELECT("COUNT(*)");
+            FROM("lectures l");
+            WHERE("l.status = 'PUBLISHED'");
 
-        return sql.toString();
+            if (cond.getCategory() != null && !cond.getCategory().isEmpty()) {
+                WHERE("l.category = #{category}");
+            }
+
+            if (cond.getKeyword() != null && !cond.getKeyword().isEmpty()) {
+                WHERE("(l.title LIKE CONCAT('%', #{keyword}, '%') OR l.description LIKE CONCAT('%', #{keyword}, '%'))");
+            }
+
+        }}.toString();
     }
 }

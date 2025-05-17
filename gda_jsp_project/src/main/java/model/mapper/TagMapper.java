@@ -55,6 +55,17 @@ public interface TagMapper {
     void insertMapping(@Param("targetId") int targetId,
                        @Param("targetType") String targetType,
                        @Param("tagId") int tagId);
+    
+    @Select("""
+            SELECT t.tag_id AS tagId, t.name AS name
+            FROM tag_mappings tm
+            JOIN tags t ON tm.tag_id = t.tag_id
+            WHERE tm.target_type = 'LECTURE'
+            GROUP BY t.tag_id
+            ORDER BY COUNT(*) DESC
+            LIMIT #{limit}
+        """)
+        List<TagDTO> getTopTags(@Param("limit") int limit);
 
 }
 

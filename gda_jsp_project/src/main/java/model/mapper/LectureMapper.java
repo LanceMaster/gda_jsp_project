@@ -1,8 +1,12 @@
 package model.mapper;
 
 import model.dto.ContentDTO;
-
+import model.dto.LectureCardDTO;
 import model.dto.LectureDTO;
+import model.dto.LectureSearchCondition;
+import model.provider.LectureSqlProvider;
+import sql.LectureSqlBuilder;
+
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Param;
@@ -93,6 +97,7 @@ public interface LectureMapper {
     """)
     List<LectureDTO> searchByKeyword(@Param("keyword") String keyword);
 
+    
     @Select("""
     	    SELECT 
     	        lecture_id AS lectureId,
@@ -176,40 +181,6 @@ public interface LectureMapper {
     	List<LectureDTO> searchLectureList(@Param("keyword") String keyword, @Param("category") String category, @Param("sort") String sort);
 
     
-    @Select("""
-    	    <script>
-    	        SELECT l.*, 
-    	               (SELECT ROUND(AVG(r.rating), 1) FROM user_interactions r 
-    	                WHERE r.target_type = 'LECTURE' AND r.target_id = l.lecture_id) AS avgRating,
-    	               (SELECT COUNT(*) FROM user_interactions r 
-    	                WHERE r.target_type = 'LECTURE' AND r.target_id = l.lecture_id) AS reviewCount
-    	        FROM lectures l
-    	        WHERE l.status = 'PUBLISHED'
-    	        <if test="keywords != null and keywords.size > 0">
-    	            AND (
-    	                <foreach collection="keywords" item="kw" separator=" OR ">
-    	                    l.title LIKE CONCAT('%', #{kw}, '%')
-    	                    OR l.description LIKE CONCAT('%', #{kw}, '%')
-    	                </foreach>
-    	            )
-    	        </if>
-    	        <if test="category != null and category != ''">
-    	            AND l.category = #{category}
-    	        </if>
-    	        <choose>
-    	            <when test="sort == 'popular'">
-    	                ORDER BY avgRating DESC
-    	            </when>
-    	            <otherwise>
-    	                ORDER BY l.created_at DESC
-    	            </otherwise>
-    	        </choose>
-    	    </script>
-    	""")
-    	List<LectureDTO> searchLectures(@Param("keywords") List<String> keywords,
-    	                                @Param("category") String category,
-    	                                @Param("sort") String sort);
-    
     @Select({
         "<script>",
         "SELECT l.*, IFNULL(AVG(ui.rating), 0) AS avgRating, COUNT(ui.interaction_id) AS reviewCount",
@@ -241,5 +212,35 @@ public interface LectureMapper {
     List<LectureDTO> selectLectures(@Param("keyword") String keyword,
                                      @Param("category") String category,
                                      @Param("sort") String sort);
+
+    @SelectProvider(type = LectureSqlProvider.class, method = "findLectures")
+    List<LectureCardDTO> findLectures(LectureSearchCondition cond);
+    
+    
+        @SelectProvider(type = LectureSqlProvider.class, method = "countLectures")
+        int countLectures(LectureSearchCondition cond);
+
+        
+        @Select("""
+        	    SELECT lecture_id, title, avg_rating, (
+        	      SELECT COUNT(*) FROM user_interactions
+        	      WHERE target_type = 'LECTURE' AND target_id = l.lecture_id
+        	    ) AS reviewCount
+        	    FROM lectures l
+        	    WHERE status = 'PUBLISHED' AND avg_rating IS NOT NULL
+        	    ORDER BY avg_rating DESC
+        	    LIMIT #{limit}
+        	""")
+        	List<LectureCardDTO> getRecommendedLectures(@Param("limit") int limit);
+        
+        @SelectProvider(type = LectureSqlBuilder.class, method = "buildSearchQuery")
+        List<LectureDTO> searchLectures(@Param("category") String category,
+                                         @Param("keyword") String keyword,
+                                         @Param("sort") String sort,
+                                         @Param("offset") int offset,
+                                         @Param("size") int size);
+        
+
 }
+
 

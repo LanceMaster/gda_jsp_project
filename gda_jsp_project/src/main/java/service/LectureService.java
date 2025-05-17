@@ -4,7 +4,11 @@ import model.dao.ContentDAO;
 
 import model.dao.LectureDAO;
 import model.dto.ContentDTO;
+import model.dto.LectureCardDTO;
 import model.dto.LectureDTO;
+import model.dto.LectureSearchCondition;
+import model.mapper.LectureMapper;
+
 import org.apache.ibatis.session.SqlSession;
 import utils.MyBatisUtil;
 
@@ -25,6 +29,42 @@ public class LectureService {
     private final LectureDAO lectureDAO = new LectureDAO();
     private final ContentDAO contentDAO = new ContentDAO();
 
+    private final LectureMapper lectureMapper;
+
+    public LectureService() {
+        SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession();
+        this.lectureMapper = session.getMapper(LectureMapper.class); // 직접 주입
+    }
+
+//    public List<LectureCardDTO> getLectures(LectureSearchCondition cond) {
+//        StringBuilder sql = new StringBuilder();
+//        sql.append("SELECT l.*, ");
+//        sql.append(" (SELECT COUNT(*) FROM user_interactions ");
+//        sql.append("  WHERE target_type='LECTURE' AND target_id=l.lecture_id) AS reviewCount, ");
+//        sql.append(" (SELECT ROUND(AVG(rating),1) FROM user_interactions ");
+//        sql.append("  WHERE target_type='LECTURE' AND target_id=l.lecture_id) AS avgRating ");
+//        sql.append("FROM lectures l ");
+//        sql.append("WHERE l.status = 'PUBLISHED' ");
+//
+//        if (cond.getCategory() != null && !cond.getCategory().isBlank()) {
+//            sql.append("AND l.category = '").append(cond.getCategory()).append("' ");
+//        }
+//
+//        if (cond.getKeyword() != null && !cond.getKeyword().isBlank()) {
+//            sql.append("AND (l.title LIKE '%").append(cond.getKeyword()).append("%' ");
+//            sql.append("OR l.description LIKE '%").append(cond.getKeyword()).append("%') ");
+//        }
+//
+//        if ("popular".equalsIgnoreCase(cond.getSort())) {
+//            sql.append("ORDER BY avgRating DESC ");
+//        } else {
+//            sql.append("ORDER BY l.published_at DESC ");
+//        }
+//
+//        sql.append("LIMIT ").append(cond.getOffset()).append(", ").append(cond.getSize());
+//
+//        return lectureMapper.findLecturesWithRawSql(sql.toString());
+//    }
     /**
      * ✅ 전체 강의 목록 조회
      * - status = 'PUBLISHED' 조건 포함
@@ -37,6 +77,18 @@ public class LectureService {
     }
 
 
+    public Map<String, Object> getLecturePage(LectureSearchCondition cond) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            LectureDAO dao = new LectureDAO(session);
+            List<LectureCardDTO> lectures = dao.findLectures(cond);
+            int totalCount = dao.countLectures(cond);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("lectures", lectures);
+            result.put("totalCount", totalCount);
+            return result;
+        }
+    }
     /**
      * ✅ 카테고리로 강의 목록 조회
      * - category 필터 기반
@@ -95,13 +147,9 @@ public class LectureService {
         return lectureDAO.selectTitleById(lectureId);
     }
     
+
+
     
-    
-    public List<LectureDTO> searchLectures(String keyword, String category, String sort) {
-        // 유사 키워드 매핑 처리
-        List<String> keywords = mapRelatedKeywords(keyword);
-        return lectureDAO.searchLectures(keywords, category, sort);
-    }
 
     private List<String> mapRelatedKeywords(String keyword) {
         if (keyword == null || keyword.isBlank()) return null;
@@ -138,7 +186,6 @@ public class LectureService {
     }
 
 
-
     /**
      * ✅ 강의 등록 + 콘텐츠 등록
      * - MyBatis 수동 커밋을 통한 트랜잭션 처리
@@ -172,4 +219,6 @@ public class LectureService {
             if (session != null) session.close();
         }
     }
+    
+    
 }

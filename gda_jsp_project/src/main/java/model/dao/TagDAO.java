@@ -46,4 +46,10 @@ public class TagDAO {
 		TagMapper mapper = session.getMapper(TagMapper.class);
 		mapper.insertMapping(targetId, targetType, tagId);
 	}
+	
+
+	    public List<TagDTO> getTopTags(int limit) {
+	        TagMapper mapper = session.getMapper(TagMapper.class);
+	        return mapper.getTopTags(limit);
+	    }
 }

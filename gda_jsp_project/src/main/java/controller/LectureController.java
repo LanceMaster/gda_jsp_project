@@ -38,43 +38,7 @@ public class LectureController extends MskimRequestMapping {
      * - 키워드 검색 / 카테고리 필터 / 정렬 조건 모두 지원
      * - 내부적으로 조건에 따라 적절한 DAO 메서드로 분기 처리
      */
-    @RequestMapping("lecturelist")
-    public String lectureList(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
 
-        // 🔍 파라미터 수집
-        String keyword = request.getParameter("keyword");
-        String category = request.getParameter("category");
-        String sort = request.getParameter("sort");
-
-        // ✅ 모든 조건을 포함한 통합 검색
-        List<LectureDTO> lectures = lectureService.searchLectures(keyword, category, sort);
-
-        // ✅ 뷰로 전달
-        request.setAttribute("lectures", lectures);
-        request.setAttribute("param", request.getParameterMap());
-
-        return "lecture/lectureList";
-    }
-
-    @WebServlet("/lecture/ajaxFilter")
-    public class LectureAjaxController extends HttpServlet {
-        private final LectureService lectureService = new LectureService();
-        private final Gson gson = new Gson();
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-            res.setContentType("application/json;charset=UTF-8");
-
-            String keyword = req.getParameter("keyword");
-            String category = req.getParameter("category");
-            String sort = req.getParameter("sort");
-
-            List<LectureDTO> filteredLectures = lectureService.getLectureList(keyword, category, sort);
-            gson.toJson(filteredLectures, res.getWriter());
-        }
-    }
-    
 
 
 
