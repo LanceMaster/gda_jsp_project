@@ -8,20 +8,40 @@
 <div class="container">
   <h2>콘텐츠 업로드</h2>
 
-  <form method="post" action="/lecture/lectureUpload" enctype="multipart/form-data">
+<form method="post" action="/lecture/uploadSubmit" enctype="multipart/form-data">
+
 
     <!-- 강의 제목 -->
     <input type="text" name="lectureTitle" placeholder="콘텐츠 제목" required />
 
     <!-- 설명 -->
-    <label for="lectureDescription">설명</label>
+    <label for="lectureDescription">소제목</label>
     <textarea name="lectureDescription" placeholder="내용을 입력하세요" required></textarea>
 
-    <!-- 태그 -->
-    <div class="tag-area">
-      <input type="text" name="tag" placeholder="태그 추가하기" />
-      <button type="button">태그 추가하기</button>
-    </div>
+<!-- 📘 강의 과정 입력 -->
+<label for="curriculum">강의 과정 (커리큘럼)</label>
+<textarea name="curriculum" placeholder="<ul>\n  <li>1. 개요</li>\n  <li>2. 실습</li>\n</ul>" rows="6" required></textarea>
+<small>※ HTML 형식 입력 가능. 예: &lt;ul&gt;&lt;li&gt;내용&lt;/li&gt;&lt;/ul&gt;</small>
+
+
+
+   <!-- 태그 선택 + 추가 버튼 -->
+        <h3>태그 목록</h3>
+
+        <div class="tag-section">
+            <label>태그 선택</label>
+            <select id="tagSelect">
+                <c:forEach var="tag" items="${tagList}">
+                    <option value="${tag.tagId}">${tag.name}</option>
+                </c:forEach>
+            </select>
+            <button type="button" onclick="addSelectedTag()">+ 태그추가</button>
+            <div id="tagContainer"></div>
+        </div>
+
+        <!-- 동적으로 생성될 태그 전송용 hidden input -->
+        <div id="hiddenTags"></div>
+
 
     <!-- 🎬 강의 동영상 업로드 -->
     <label>강의 동영상 File</label>

@@ -23,6 +23,10 @@ public class TagDAO {
 		return mapper.getTagsByLectureId(lectureId);
 	}
 
+
+    public void insertMapping(int targetId, String targetType, int tagId) {
+        session.getMapper(TagMapper.class).insertMapping(targetId, targetType, tagId);
+    }
 	/**
 	 * ✅ 특정 프로젝트에 연결된 태그 목록 조회
 	 */
@@ -42,10 +46,10 @@ public class TagDAO {
 	/**
 	 * ✅ 태그 매핑 추가
 	 */
-	public void insertMapping(int targetId, String targetType, int tagId) {
-		TagMapper mapper = session.getMapper(TagMapper.class);
-		mapper.insertMapping(targetId, targetType, tagId);
-	}
+//	public void insertMapping(int targetId, String targetType, int tagId) {
+//		TagMapper mapper = session.getMapper(TagMapper.class);
+//		mapper.insertMapping(targetId, targetType, tagId);
+//	}
 	
 
 	    public List<TagDTO> getTopTags(int limit) {

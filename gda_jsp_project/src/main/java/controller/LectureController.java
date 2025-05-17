@@ -2,14 +2,19 @@ package controller;
 
 import gdu.mskim.MskimRequestMapping;
 import gdu.mskim.RequestMapping;
+import model.dao.LectureDAO;
+import model.dao.TagDAO;
 import model.dto.*;
 import service.*;
+import utils.MyBatisUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+
+import org.apache.ibatis.session.SqlSession;
 
 import com.google.gson.Gson;
 
@@ -87,12 +92,25 @@ public class LectureController extends MskimRequestMapping {
 
     @RequestMapping("uploadSubmit")
     public String uploadSubmit(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        // ✅ 로그인 유저 확인
+        UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
+        if (loginUser == null || !"INSTRUCTOR".equals(loginUser.getRole())) {
+            return "redirect:/user/loginform";
+        }
+        int userId = loginUser.getUserId();
+
+        // ✅ 파라미터 수집
         String title = request.getParameter("lectureTitle");
         String description = request.getParameter("lectureDescription");
+        String[] tagIds = request.getParameterValues("tags");
+
         int price = Integer.parseInt(request.getParameter("price"));
         int orderNo = Integer.parseInt(request.getParameter("orderNo"));
         int duration = Integer.parseInt(request.getParameter("duration"));
+        String curriculum = request.getParameter("curriculum");
 
+
+        // ✅ 파일 업로드 처리
         Part contentPart = request.getPart("contentFile");
         Part thumbnailPart = request.getPart("thumbnailFile");
 
@@ -108,11 +126,14 @@ public class LectureController extends MskimRequestMapping {
         contentPart.write(contentPath);
         thumbnailPart.write(thumbnailPath);
 
+        // ✅ DTO 구성
         LectureDTO lectureDTO = new LectureDTO();
         lectureDTO.setTitle(title);
         lectureDTO.setDescription(description);
+        lectureDTO.setCurriculum(curriculum);
         lectureDTO.setThumbnail("/upload/thumb/" + thumbnailSavedName);
         lectureDTO.setPrice(price);
+        lectureDTO.setInstructorId(userId); // 로그인한 강사 ID
 
         ContentDTO contentDTO = new ContentDTO();
         contentDTO.setTitle(title + " - part 1");
@@ -121,7 +142,29 @@ public class LectureController extends MskimRequestMapping {
         contentDTO.setOrderNo(orderNo);
         contentDTO.setDuration(duration);
 
-        lectureService.registerLectureWithContent(lectureDTO, contentDTO);
+        // ✅ DB 트랜잭션 처리
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            LectureDAO lectureDAO = new LectureDAO(session);
+            TagDAO tagDAO = new TagDAO(session);
+
+            // 강의 등록 (lecture_id 자동 생성됨)
+            lectureDAO.insertLecture(lectureDTO);  // lectureDTO.setLectureId(...)가 내부에서 반영되어야 함
+
+            // 콘텐츠 등록 (lectureId 참조 필요)
+            contentDTO.setLectureId(lectureDTO.getLectureId());
+            lectureDAO.insertContent(contentDTO);
+
+            // 태그 매핑
+            if (tagIds != null) {
+                for (String tagIdStr : tagIds) {
+                    int tagId = Integer.parseInt(tagIdStr);
+                    tagDAO.insertMapping(lectureDTO.getLectureId(), "LECTURE", tagId);
+                }
+            }
+
+            session.commit();
+        }
+
         return "redirect:/view/user/mainpage.jsp";
     }
 }

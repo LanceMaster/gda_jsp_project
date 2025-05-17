@@ -15,24 +15,24 @@ import java.util.Map;
 
 public interface LectureMapper {
 
-    // ✅ 1. 강의 등록
-    @Insert("""
-        INSERT INTO lectures
-        (title, description, thumbnail, category, price, status, avg_rating, published_at, created_at, updated_at, instructor_id)
-        VALUES
-        (#{title}, #{description}, #{thumbnail}, #{category}, #{price}, 'DRAFT', NULL, NULL, NOW(), NOW(), #{instructorId})
-    """)
-    @Options(useGeneratedKeys = true, keyProperty = "lectureId")
-    int insertLecture(LectureDTO lectureDTO);
-
-    // ✅ 2. 콘텐츠 등록
-    @Insert("""
-        INSERT INTO lecture_contents
-        (lecture_id, type, title, url, duration, order_no, created_at)
-        VALUES
-        (#{lectureId}, #{type}, #{title}, #{url}, #{duration}, #{orderNo}, NOW())
-    """)
-    int insertContent(ContentDTO contentDTO);
+//    // ✅ 1. 강의 등록
+//    @Insert("""
+//        INSERT INTO lectures
+//        (title, description, thumbnail, category, price, status, avg_rating, published_at, created_at, updated_at, instructor_id)
+//        VALUES
+//        (#{title}, #{description}, #{thumbnail}, #{category}, #{price}, 'DRAFT', NULL, NULL, NOW(), NOW(), #{instructorId})
+//    """)
+//    @Options(useGeneratedKeys = true, keyProperty = "lectureId")
+//    int insertLecture(LectureDTO lectureDTO);
+//
+//    // ✅ 2. 콘텐츠 등록
+//    @Insert("""
+//        INSERT INTO lecture_contents
+//        (lecture_id, type, title, url, duration, order_no, created_at)
+//        VALUES
+//        (#{lectureId}, #{type}, #{title}, #{url}, #{duration}, #{orderNo}, NOW())
+//    """)
+//    int insertContent(ContentDTO contentDTO);
 
     // ✅ 3. 전체 강의 목록 조회
     @Select("""
@@ -240,6 +240,18 @@ public interface LectureMapper {
                                          @Param("offset") int offset,
                                          @Param("size") int size);
         
+        @Insert("""
+                INSERT INTO lectures (title, description, thumbnail, price, instructor_id)
+                VALUES (#{title}, #{description}, #{thumbnail}, #{price}, #{instructorId})
+            """)
+            @Options(useGeneratedKeys = true, keyProperty = "lectureId")
+            void insertLecture(LectureDTO lecture);
+
+            @Insert("""
+                INSERT INTO lecture_contents (lecture_id, title, url, type, order_no, duration)
+                VALUES (#{lectureId}, #{title}, #{url}, #{type}, #{orderNo}, #{duration})
+            """)
+            void insertContent(ContentDTO content);
 
 }
 

@@ -62,7 +62,7 @@
 	            <%-- 강의 등록 --%>
 				<c:if
 					test="${not empty sessionScope.user and sessionScope.user.role == 'INSTRUCTOR'}">
-					<a href="${path}/lecture/register" class="nav-link-custom">강의
+					<a href="${path}/lecture/lectureUpload" class="nav-link-custom">강의
 						등록</a>
 				</c:if>
 
