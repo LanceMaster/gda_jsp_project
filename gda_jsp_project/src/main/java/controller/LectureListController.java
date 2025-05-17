@@ -19,6 +19,7 @@ public class LectureListController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LectureSearchCondition cond = new LectureSearchCondition();
         String category = req.getParameter("category");
+        
         cond.setCategory(category != null && !category.trim().isEmpty() ? category : null);
         cond.setKeyword(req.getParameter("keyword"));
         cond.setSort(req.getParameter("sort") != null ? req.getParameter("sort") : "latest");

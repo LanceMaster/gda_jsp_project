@@ -35,24 +35,26 @@ public interface LectureMapper {
 //    int insertContent(ContentDTO contentDTO);
 
     // ✅ 3. 전체 강의 목록 조회
-    @Select("""
-        SELECT 
-            l.lecture_id AS lectureId,
-            l.title,
-            l.description,
-            l.thumbnail,
-            l.category,
-            l.price,
-            l.avg_rating AS avgRating,
-            l.instructor_id AS instructorId,
-            l.published_at AS publishedAt,
-            l.created_at AS createdAt,
-            l.updated_at AS updatedAt
-        FROM lectures l
-        WHERE l.status = 'PUBLISHED'
-        ORDER BY l.created_at DESC
-    """)
-    List<LectureDTO> getAllLectures();
+	@Select("""
+		    SELECT 
+		        l.lecture_id AS lectureId,
+		        l.title,
+		        l.description,
+		        l.thumbnail,
+		        l.category,
+		        l.price,
+		        l.avg_rating AS avgRating,
+		        l.instructor_id AS instructorId,
+		        (SELECT COUNT(*) FROM user_interactions
+		         WHERE target_type = 'LECTURE'
+		           AND target_id = l.lecture_id
+		           AND interaction_kind = 'FEEDBACK') AS reviewCount
+		    FROM lectures l
+		    WHERE l.status = 'PUBLISHED'
+		    ORDER BY l.created_at DESC
+		""")
+		List<LectureDTO> getAllLectures();
+
 
     // ✅ 4. 카테고리별 조회
     @Select("""
