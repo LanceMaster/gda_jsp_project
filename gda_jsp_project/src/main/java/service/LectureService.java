@@ -106,6 +106,7 @@ public class LectureService {
         return lectureDAO.searchLecturesByKeyword("%" + keyword + "%");
     }
 
+    
     /**
      * ✅ 강의 상세 정보 조회
      */
@@ -127,6 +128,8 @@ public class LectureService {
     public void updateAverageRating(int lectureId) {
         lectureDAO.updateLectureRating(lectureId);
     }
+    
+    
     
 
     public List<LectureDTO> getLecturesByCategorySorted(String category, String sort) {
@@ -185,40 +188,40 @@ public class LectureService {
         return result.stream().distinct().toList();
     }
 
-
-    /**
-     * ✅ 강의 등록 + 콘텐츠 등록
-     * - MyBatis 수동 커밋을 통한 트랜잭션 처리
-     */
-    public void registerLectureWithContent(LectureDTO lectureDTO, ContentDTO contentDTO) {
-        SqlSession session = null;
-        try {
-            // 🔒 트랜잭션 시작 (수동 커밋)
-            session = MyBatisUtil.getSqlSessionFactory().openSession(false);
-
-            // 세션 기반 DAO 생성
-            LectureDAO lectureDAO = new LectureDAO(session);
-            ContentDAO contentDAO = new ContentDAO(session);
-
-            // 1. 강의 등록 (PK 생성됨)
-            int lectureId = lectureDAO.insertLecture(lectureDTO);
-
-            // 2. FK로 콘텐츠에 강의 ID 연결
-            contentDTO.setLectureId(lectureId);
-
-            // 3. 콘텐츠 등록
-            contentDAO.insertContent(contentDTO);
-
-            // 4. 커밋
-            session.commit();
-
-        } catch (Exception e) {
-            if (session != null) session.rollback();
-            throw new RuntimeException("⚠️ 강의/콘텐츠 등록 실패: " + e.getMessage(), e);
-        } finally {
-            if (session != null) session.close();
-        }
-    }
-    
-    
+//
+//    /**
+//     * ✅ 강의 등록 + 콘텐츠 등록
+//     * - MyBatis 수동 커밋을 통한 트랜잭션 처리
+//     */
+//    public void registerLectureWithContent(LectureDTO lectureDTO, ContentDTO contentDTO) {
+//        SqlSession session = null;
+//        try {
+//            // 🔒 트랜잭션 시작 (수동 커밋)
+//            session = MyBatisUtil.getSqlSessionFactory().openSession(false);
+//
+//            // 세션 기반 DAO 생성
+//            LectureDAO lectureDAO = new LectureDAO(session);
+//            ContentDAO contentDAO = new ContentDAO(session);
+//
+//            // 1. 강의 등록 (PK 생성됨)
+//            int lectureId = lectureDAO.insertLecture(lectureDTO);
+//
+//            // 2. FK로 콘텐츠에 강의 ID 연결
+//            contentDTO.setLectureId(lectureId);
+//
+//            // 3. 콘텐츠 등록
+//            contentDAO.insertContent(contentDTO);
+//
+//            // 4. 커밋
+//            session.commit();
+//
+//        } catch (Exception e) {
+//            if (session != null) session.rollback();
+//            throw new RuntimeException("⚠️ 강의/콘텐츠 등록 실패: " + e.getMessage(), e);
+//        } finally {
+//            if (session != null) session.close();
+//        }
+//    }
+//    
+//    
 }

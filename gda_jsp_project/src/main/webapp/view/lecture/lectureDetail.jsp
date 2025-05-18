@@ -55,23 +55,35 @@
       <span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
     </div>
 
-<!-- ✅ 리뷰 작성 폼 -->
-<form id="reviewForm">
-  <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
+<!-- ✅ 리뷰 작성 조건: 로그인 + 수강자 + 리뷰 미작성자 -->
+<c:if test="${hasEnrolled and not hasReviewed}">
+  <form id="reviewForm" method="post">
+    <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
 
-  <textarea name="content" placeholder="댓글을 입력해 주세요."></textarea>
+    <textarea name="content" placeholder="댓글을 입력해 주세요." required></textarea>
 
-  <div class="review-controls">
-    <select name="rating">
-      <option value="5">⭐⭐⭐⭐⭐</option>
-      <option value="4">⭐⭐⭐⭐</option>
-      <option value="3">⭐⭐⭐</option>
-      <option value="2">⭐⭐</option>
-      <option value="1">⭐</option>
-    </select>
-    <button type="submit" class="submit-btn">제출</button>
-  </div>
-</form>
+    <div class="review-controls">
+      <select name="rating" required>
+        <option value="">⭐ 평점을 선택하세요</option>
+        <option value="5">⭐⭐⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="1">⭐</option>
+      </select>
+      <button type="submit" class="submit-btn">제출</button>
+    </div>
+  </form>
+</c:if>
+
+<!-- ✅ 비로그인 또는 조건 미충족 시 안내 메시지 -->
+<c:if test="${not hasEnrolled}">
+  <p class="review-guide">※ 수강 완료 후에만 리뷰를 작성할 수 있습니다.</p>
+</c:if>
+
+<c:if test="${hasReviewed}">
+  <p class="review-guide">※ 이미 리뷰를 작성하셨습니다.</p>
+</c:if>
 
 <!-- ✅ 리뷰 목록 -->
 <ul class="review-list" id="reviewList">

@@ -123,28 +123,28 @@ public class LectureDAO {
         }
     }
 
-    // ✅ 6. 강의 등록 (세션 기반 트랜잭션)
-    public int insertLecture(LectureDTO lectureDTO) {
-        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
-        try {
-            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
-            mapper.insertLecture(lectureDTO); // @Options로 lectureId 자동 주입
-            return lectureDTO.getLectureId();
-        } finally {
-            if (session == null) useSession.close();
-        }
-    }
+//    // ✅ 6. 강의 등록 (세션 기반 트랜잭션)
+//    public int insertLecture(LectureDTO lectureDTO) {
+//        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
+//        try {
+//            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+//            mapper.insertLecture(lectureDTO); // @Options로 lectureId 자동 주입
+//            return lectureDTO.getLectureId();
+//        } finally {
+//            if (session == null) useSession.close();
+//        }
+//    }
 
     // ✅ 7. 콘텐츠 등록
-    public void insertContent(ContentDTO contentDTO) {
-        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
-        try {
-            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
-            mapper.insertContent(contentDTO);
-        } finally {
-            if (session == null) useSession.close();
-        }
-    }
+//    public void insertContent(ContentDTO contentDTO) {
+//        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
+//        try {
+//            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+//            mapper.insertContent(contentDTO);
+//        } finally {
+//            if (session == null) useSession.close();
+//        }
+//    }
 
     // ✅ 8. 강의 평점 평균 갱신
     public void updateLectureRating(int lectureId) {

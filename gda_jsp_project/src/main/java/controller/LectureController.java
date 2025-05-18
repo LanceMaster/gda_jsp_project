@@ -28,8 +28,9 @@ import java.util.UUID;
         @WebInitParam(name = "view", value = "/view/")
 })
 @MultipartConfig(
-        maxFileSize = 1024 * 1024 * 100,
-        maxRequestSize = 1024 * 1024 * 200
+	    fileSizeThreshold = 1024 * 1024,         // 1MB 메모리 임계
+	    maxFileSize = 1024 * 1024 * 200,         // 200MB
+	    maxRequestSize = 1024 * 1024 * 500       // 500MB
 )
 public class LectureController extends MskimRequestMapping {
 
@@ -43,8 +44,6 @@ public class LectureController extends MskimRequestMapping {
      * - 키워드 검색 / 카테고리 필터 / 정렬 조건 모두 지원
      * - 내부적으로 조건에 따라 적절한 DAO 메서드로 분기 처리
      */
-
-
 
 
     @RequestMapping("lecturedetail")
@@ -85,86 +84,97 @@ public class LectureController extends MskimRequestMapping {
         return "lecture/lecturePlay";
     }
 
-    @RequestMapping("lectureUpload")
-    public String lectureUploadForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return "lecture/lectureUpload";
-    }
+//    @RequestMapping("lectureUpload")
+//    public String lectureUploadForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        List<TagDTO> tagList = tagService.getAllTags();         // ✅ 전체 태그 목록 조회
+//        request.setAttribute("tagList", tagList);               // ✅ JSP에 전달
+//        return "lecture/lectureUpload";
+//    }
+////
+//    @RequestMapping("uploadSubmit")
+//    public String uploadSubmit(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
+//        if (loginUser == null || !"INSTRUCTOR".equals(loginUser.getRole())) {
+//            return "redirect:/user/loginform";
+//        }
+//        int userId = loginUser.getUserId();
+//
+//        String title = request.getParameter("lectureTitle");
+//        String description = request.getParameter("lectureDescription");
+//        String[] tagIds = request.getParameterValues("tags");
+//        String curriculum = request.getParameter("curriculum");
+//
+//        int price = Integer.parseInt(request.getParameter("price"));
+//        int orderNo = Integer.parseInt(request.getParameter("orderNo") != null ? request.getParameter("orderNo") : "1");
+//        int duration = Integer.parseInt(request.getParameter("duration") != null ? request.getParameter("duration") : "0");
+//
+//        Part contentPart = request.getPart("contentFile");
+//        Part thumbnailPart = request.getPart("thumbnailFile");
+//
+//        String contentFileName = Paths.get(contentPart.getSubmittedFileName()).getFileName().toString();
+//        String thumbnailFileName = Paths.get(thumbnailPart.getSubmittedFileName()).getFileName().toString();
+//
+//        String contentSavedName = UUID.randomUUID() + "_" + contentFileName;
+//        String thumbnailSavedName = UUID.randomUUID() + "_" + thumbnailFileName;
+//
+//        String contentDir = request.getServletContext().getRealPath("/upload/video/");
+//        String thumbDir = request.getServletContext().getRealPath("/upload/thumb/");
+//
+//        // ✅ 디렉토리 존재 확인 및 생성
+//        new java.io.File(contentDir).mkdirs();
+//        new java.io.File(thumbDir).mkdirs();
+//
+//        String contentPath = contentDir + contentSavedName;
+//        String thumbnailPath = thumbDir + thumbnailSavedName;
+//
+//        try {
+//            contentPart.write(contentPath);
+//            thumbnailPart.write(thumbnailPath);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            request.setAttribute("error", "파일 업로드 중 오류 발생: " + e.getMessage());
+//            return "error/errorPage";
+//        }
+//
+//        // DTO 구성
+//        LectureDTO lectureDTO = new LectureDTO();
+//        lectureDTO.setTitle(title);
+//        lectureDTO.setDescription(description);
+//        lectureDTO.setCurriculum(curriculum);
+//        lectureDTO.setThumbnail("/upload/thumb/" + thumbnailSavedName);
+//        lectureDTO.setPrice(price);
+//        lectureDTO.setInstructorId(userId);
+//
+//        ContentDTO contentDTO = new ContentDTO();
+//        contentDTO.setTitle(title + " - part 1");
+//        contentDTO.setUrl("/upload/video/" + contentSavedName);
+//        contentDTO.setType("VIDEO");
+//        contentDTO.setOrderNo(orderNo);
+//        contentDTO.setDuration(duration);
+//
+//        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+//            LectureDAO lectureDAO = new LectureDAO(session);
+//            TagDAO tagDAO = new TagDAO(session);
+//
+//            lectureDAO.insertLecture(lectureDTO);
+//            contentDTO.setLectureId(lectureDTO.getLectureId());
+//            lectureDAO.insertContent(contentDTO);
+//
+//            if (tagIds != null) {
+//                for (String tagIdStr : tagIds) {
+//                    int tagId = Integer.parseInt(tagIdStr);
+//                    tagDAO.insertMapping(lectureDTO.getLectureId(), "LECTURE", tagId);
+//                }
+//            }
+//
+//            session.commit();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            request.setAttribute("error", "DB 저장 중 오류 발생: " + e.getMessage());
+//            return "error/errorPage";
+//        }
+//
+//        return "lecture/lectureList";
+//    }
 
-    @RequestMapping("uploadSubmit")
-    public String uploadSubmit(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // ✅ 로그인 유저 확인
-        UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
-        if (loginUser == null || !"INSTRUCTOR".equals(loginUser.getRole())) {
-            return "redirect:/user/loginform";
-        }
-        int userId = loginUser.getUserId();
-
-        // ✅ 파라미터 수집
-        String title = request.getParameter("lectureTitle");
-        String description = request.getParameter("lectureDescription");
-        String[] tagIds = request.getParameterValues("tags");
-
-        int price = Integer.parseInt(request.getParameter("price"));
-        int orderNo = Integer.parseInt(request.getParameter("orderNo"));
-        int duration = Integer.parseInt(request.getParameter("duration"));
-        String curriculum = request.getParameter("curriculum");
-
-
-        // ✅ 파일 업로드 처리
-        Part contentPart = request.getPart("contentFile");
-        Part thumbnailPart = request.getPart("thumbnailFile");
-
-        String contentFileName = Paths.get(contentPart.getSubmittedFileName()).getFileName().toString();
-        String thumbnailFileName = Paths.get(thumbnailPart.getSubmittedFileName()).getFileName().toString();
-
-        String contentSavedName = UUID.randomUUID() + "_" + contentFileName;
-        String thumbnailSavedName = UUID.randomUUID() + "_" + thumbnailFileName;
-
-        String contentPath = request.getServletContext().getRealPath("/upload/video/") + contentSavedName;
-        String thumbnailPath = request.getServletContext().getRealPath("/upload/thumb/") + thumbnailSavedName;
-
-        contentPart.write(contentPath);
-        thumbnailPart.write(thumbnailPath);
-
-        // ✅ DTO 구성
-        LectureDTO lectureDTO = new LectureDTO();
-        lectureDTO.setTitle(title);
-        lectureDTO.setDescription(description);
-        lectureDTO.setCurriculum(curriculum);
-        lectureDTO.setThumbnail("/upload/thumb/" + thumbnailSavedName);
-        lectureDTO.setPrice(price);
-        lectureDTO.setInstructorId(userId); // 로그인한 강사 ID
-
-        ContentDTO contentDTO = new ContentDTO();
-        contentDTO.setTitle(title + " - part 1");
-        contentDTO.setUrl("/upload/video/" + contentSavedName);
-        contentDTO.setType("VIDEO");
-        contentDTO.setOrderNo(orderNo);
-        contentDTO.setDuration(duration);
-
-        // ✅ DB 트랜잭션 처리
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            LectureDAO lectureDAO = new LectureDAO(session);
-            TagDAO tagDAO = new TagDAO(session);
-
-            // 강의 등록 (lecture_id 자동 생성됨)
-            lectureDAO.insertLecture(lectureDTO);  // lectureDTO.setLectureId(...)가 내부에서 반영되어야 함
-
-            // 콘텐츠 등록 (lectureId 참조 필요)
-            contentDTO.setLectureId(lectureDTO.getLectureId());
-            lectureDAO.insertContent(contentDTO);
-
-            // 태그 매핑
-            if (tagIds != null) {
-                for (String tagIdStr : tagIds) {
-                    int tagId = Integer.parseInt(tagIdStr);
-                    tagDAO.insertMapping(lectureDTO.getLectureId(), "LECTURE", tagId);
-                }
-            }
-
-            session.commit();
-        }
-
-        return "redirect:/view/user/mainpage.jsp";
-    }
 }

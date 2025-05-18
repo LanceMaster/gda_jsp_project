@@ -1,15 +1,19 @@
 package model.dto;
 
+/**
+ * 🎞️ 강의 콘텐츠 DTO
+ * - lecture_contents 테이블과 매핑
+ */
 public class ContentDTO {
     private int contentId;
     private int lectureId;
-    private String type;         // VIDEO, PDF, etc.
     private String title;
     private String url;
-    private int duration;
+    private String type;     // VIDEO, PDF 등
     private int orderNo;
+    private int duration;
 
-    // 📦 Getter/Setter
+    // Getters & Setters
     public int getContentId() {
         return contentId;
     }
@@ -24,14 +28,6 @@ public class ContentDTO {
 
     public void setLectureId(int lectureId) {
         this.lectureId = lectureId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getTitle() {
@@ -50,12 +46,12 @@ public class ContentDTO {
         this.url = url;
     }
 
-    public int getDuration() {
-        return duration;
+    public String getType() {
+        return type;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public int getOrderNo() {
@@ -64,5 +60,13 @@ public class ContentDTO {
 
     public void setOrderNo(int orderNo) {
         this.orderNo = orderNo;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 }
