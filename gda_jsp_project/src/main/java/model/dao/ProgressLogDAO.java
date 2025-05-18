@@ -24,4 +24,15 @@ public class ProgressLogDAO {
     public List<ContentDTO> getAllContentsByLectureId(int lectureId) {
         return session.getMapper(LectureMapper.class).selectAllContents(lectureId);
     }
+    
+    public void saveOrUpdateProgress(int userId, int contentId, int progressPercent) {
+        session.getMapper(ProgressMapper.class)
+               .saveOrUpdateProgress(userId, contentId, progressPercent);
+    }
+
+    public boolean checkLectureCompletion(int lectureId, int userId) {
+        int incomplete = session.getMapper(ProgressMapper.class)
+                                .countIncompleteContents(lectureId, userId);
+        return incomplete == 0;
+    }
 }

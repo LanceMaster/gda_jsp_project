@@ -5,12 +5,14 @@ import model.dto.LectureDTO;
 import model.dto.UserDTO;
 import service.LectureUploadService;
 import utils.FileUploadUtil;
+import utils.FFmpegUtil;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -30,7 +32,6 @@ public class LectureUploadController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        // ✅ 로그인 확인
         HttpSession session = request.getSession();
         UserDTO loginUser = (UserDTO) session.getAttribute("user");
         if (loginUser == null || !"INSTRUCTOR".equals(loginUser.getRole())) {
@@ -38,7 +39,7 @@ public class LectureUploadController extends HttpServlet {
             return;
         }
 
-        // ✅ 파라미터 수집
+        // 📌 파라미터 수집
         String title = request.getParameter("lectureTitle");
         String description = request.getParameter("lectureDescription");
         String curriculum = request.getParameter("curriculum");
@@ -54,17 +55,38 @@ public class LectureUploadController extends HttpServlet {
             return;
         }
 
-        // ✅ 파일 업로드 처리
+        ServletContext context = request.getServletContext();
+
+        // 📌 파일 파트 수집
         Part videoPart = request.getPart("contentFile");
         Part thumbPart = request.getPart("thumbnailFile");
 
-        ServletContext context = request.getServletContext();
+        // ✅ 썸네일 저장
+        String thumbUrl = FileUploadUtil.saveFile(
+            "thumb",
+            thumbPart.getSubmittedFileName(),
+            thumbPart.getInputStream().readAllBytes(),
+            context
+        );
 
-        // 파일 저장 후 상대 URL 반환
-        String videoUrl = FileUploadUtil.saveFile("video", videoPart.getSubmittedFileName(), videoPart.getInputStream().readAllBytes(), context);
-        String thumbUrl = FileUploadUtil.saveFile("thumb", thumbPart.getSubmittedFileName(), thumbPart.getInputStream().readAllBytes(), context);
+        // ✅ 영상 저장 (임시) → HLS 변환
+        String uuid = UUID.randomUUID().toString();
+        String videoFileName = uuid + "_" + videoPart.getSubmittedFileName();
 
-        // ✅ DTO 생성
+        File tempFile = new File(context.getRealPath("/upload/temp"), videoFileName);
+        videoPart.write(tempFile.getAbsolutePath());
+
+        // 🔄 FFmpeg로 HLS 변환 → /upload/hls/UUID.m3u8 저장
+        String hlsUrl;
+        try {
+            hlsUrl = FFmpegUtil.convertToHLS(tempFile, uuid, context.getRealPath("/upload/hls"));
+        } catch (Exception e) {
+            request.setAttribute("error", "영상 변환 중 오류 발생: " + e.getMessage());
+            request.getRequestDispatcher("/view/error/errorPage.jsp").forward(request, response);
+            return;
+        }
+
+        // 📌 DTO 구성
         LectureDTO lecture = new LectureDTO();
         lecture.setTitle(title);
         lecture.setDescription(description);
@@ -76,13 +98,13 @@ public class LectureUploadController extends HttpServlet {
 
         ContentDTO content = new ContentDTO();
         content.setTitle(title + " - Part 1");
-        content.setLectureId(0); // FK는 서비스 내에서 처리
-        content.setUrl(videoUrl);
+        content.setLectureId(0); // 서비스에서 처리
+        content.setUrl(hlsUrl);  // ✅ .m3u8 경로
         content.setType("VIDEO");
         content.setDuration(duration);
         content.setOrderNo(orderNo);
 
-        // ✅ 서비스 호출 (트랜잭션 포함)
+        // 📌 트랜잭션 서비스 호출
         boolean result = lectureService.registerLectureWithContentAndTags(lecture, content, tagIds);
 
         if (result) {

@@ -14,5 +14,10 @@ public class EnrollmentDAO {
         EnrollmentMapper mapper = session.getMapper(EnrollmentMapper.class);
         Integer result = mapper.isUserEnrolled(userId, lectureId);
         return result != null;
+        
+    }
+    public void markLectureAsCompleted(int userId, int lectureId) {
+        session.getMapper(EnrollmentMapper.class)
+               .markLectureAsCompleted(userId, lectureId);
     }
 }

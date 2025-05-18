@@ -7,14 +7,11 @@
 <c:url var="progressUrl" value="/lecture/progress/update" />
 <c:url var="loginUrl" value="/user/login" />
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
   <meta charset="UTF-8" />
   <title>${lecture.title}</title>
   <link rel="stylesheet" href="<c:url value='/static/css/lecturePlay.css' />" />
-</head>
-<body>
+  <script src="<c:url value='/static/js/lecturePlay.js' />" defer></script> <%-- ✅ JS 외부 로딩 --%>
+
 <div class="lecture-container">
 
   <!-- ✅ 강의 제목 -->
@@ -23,6 +20,10 @@
   <!-- ✅ 강의 콘텐츠 (스트리밍 영상) -->
   <div class="video-wrapper">
     <video id="lecture-video" controls crossorigin="anonymous"
+           data-content-id="${content.contentId}"
+           data-user-id="${sessionScope.loginUser.userId}"
+           data-lecture-id="${lecture.lectureId}"
+           data-progress-url="${progressUrl}"
            <c:if test="${not empty lecture.thumbnail}">
              poster="${lecture.thumbnail}"
            </c:if>>
@@ -67,6 +68,7 @@
   </ul>
 </div>
 
+
 <!-- 
 <c:if test="${empty sessionScope.loginUser}">
   <script>
@@ -74,8 +76,7 @@
     location.href = '${loginUrl}';
   </script>
 </c:if>
-✅ 로그인 안 했을 때 차단 -->
-<!-- ✅ 수강 진도 저장 스크립트 -->
+
 <script>
   const video = document.getElementById("lecture-video");
   const seekBar = document.getElementById("seek-bar");
@@ -116,7 +117,19 @@
   seekBar.addEventListener("input", () => {
     video.currentTime = seekBar.value;
   });
+  
+ 
+//콘텐츠 시청 완료 시 AJAX 요청
+  fetch("/lecture/progress/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `lectureId=1001&contentId=2001&progress=100`
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      console.log("진도 저장 및 수료 확인 완료");
+    }
+  });
 </script>
-
-</body>
-</html>
+-->
