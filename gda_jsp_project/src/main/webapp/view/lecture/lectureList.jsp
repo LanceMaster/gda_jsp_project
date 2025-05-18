@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<link rel="stylesheet" href="<c:url value='/static/css/lectureList.css' />" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/lectureList.css" />
 <script src="<c:url value='/static/js/lectureList.js' />"></script>
 
 <h1>강의 목록</h1>
@@ -55,6 +55,7 @@
             <img src="<c:url value='${lec.thumbnail}' />" alt="${lec.title}" />
             <h4>${lec.title}</h4>
             <p><fmt:formatNumber value="${lec.price}" type="currency" currencySymbol="₩" /></p>
+            
             <p class="rating">
               ⭐ <c:choose>
                 <c:when test="${lec.avgRating != null}">

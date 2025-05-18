@@ -4,26 +4,20 @@ import model.dto.ContentDTO;
 import model.dto.LectureDTO;
 import model.dto.UserDTO;
 import service.LectureUploadService;
+import utils.FileUploadUtil;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.UUID;
 
-@WebServlet(
-    urlPatterns = {"/lecture/uploadSubmit"},
-    initParams = {
-        @WebInitParam(name = "view", value = "/view/")
-    }
-)
+@WebServlet("/lecture/uploadSubmit")
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024,  // 1MB
-    maxFileSize = 1024 * 1024 * 1000, // 1GB
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize = 1024 * 1024 * 1000,
     maxRequestSize = 1024 * 1024 * 1000
 )
 public class LectureUploadController extends HttpServlet {
@@ -34,16 +28,17 @@ public class LectureUploadController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ✅ 로그인 및 권한 확인
-        UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
+        request.setCharacterEncoding("UTF-8");
+
+        // ✅ 로그인 확인
+        HttpSession session = request.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("user");
         if (loginUser == null || !"INSTRUCTOR".equals(loginUser.getRole())) {
-            response.sendRedirect("/user/loginform");
+            response.sendRedirect(request.getContextPath() + "/user/loginform");
             return;
         }
 
-        int userId = loginUser.getUserId();
-
-        // ✅ 폼 파라미터 수집
+        // ✅ 파라미터 수집
         String title = request.getParameter("lectureTitle");
         String description = request.getParameter("lectureDescription");
         String curriculum = request.getParameter("curriculum");
@@ -51,60 +46,46 @@ public class LectureUploadController extends HttpServlet {
         int price = Integer.parseInt(request.getParameter("price"));
         int duration = Integer.parseInt(request.getParameter("duration"));
         int orderNo = Integer.parseInt(request.getParameter("orderNo"));
-        String[] tagIds = request.getParameterValues("tags");  // nullable
+        String[] tagIds = request.getParameterValues("tags");
 
-        if (orderNo < 1 || duration < 1) {
+        if (duration < 1 || orderNo < 1) {
             request.setAttribute("error", "재생 시간과 순서는 1 이상이어야 합니다.");
             request.getRequestDispatcher("/view/error/errorPage.jsp").forward(request, response);
             return;
         }
-        
+
         // ✅ 파일 업로드 처리
-        Part contentPart = request.getPart("contentFile");
+        Part videoPart = request.getPart("contentFile");
         Part thumbPart = request.getPart("thumbnailFile");
 
-        String contentFileName = Paths.get(contentPart.getSubmittedFileName()).getFileName().toString();
-        String thumbnailFileName = Paths.get(thumbPart.getSubmittedFileName()).getFileName().toString();
+        ServletContext context = request.getServletContext();
 
-        String contentUUID = UUID.randomUUID() + "_" + contentFileName;
-        String thumbUUID = UUID.randomUUID() + "_" + thumbnailFileName;
+        // 파일 저장 후 상대 URL 반환
+        String videoUrl = FileUploadUtil.saveFile("video", videoPart.getSubmittedFileName(), videoPart.getInputStream().readAllBytes(), context);
+        String thumbUrl = FileUploadUtil.saveFile("thumb", thumbPart.getSubmittedFileName(), thumbPart.getInputStream().readAllBytes(), context);
 
-        String videoSavePath = request.getServletContext().getRealPath("/upload/video/");
-        String thumbSavePath = request.getServletContext().getRealPath("/upload/thumb/");
+        // ✅ DTO 생성
+        LectureDTO lecture = new LectureDTO();
+        lecture.setTitle(title);
+        lecture.setDescription(description);
+        lecture.setCurriculum(curriculum);
+        lecture.setCategory(category);
+        lecture.setThumbnail(thumbUrl);
+        lecture.setInstructorId(loginUser.getUserId());
+        lecture.setPrice(price);
 
-        new File(videoSavePath).mkdirs();
-        new File(thumbSavePath).mkdirs();
-
-        try {
-            contentPart.write(videoSavePath + File.separator + contentUUID);
-            thumbPart.write(thumbSavePath + File.separator + thumbUUID);
-        } catch (Exception e) {
-            request.setAttribute("error", "파일 저장 중 오류 발생: " + e.getMessage());
-            request.getRequestDispatcher("/view/error/errorPage.jsp").forward(request, response);
-            return;
-        }
-
-        // ✅ DTO 구성
-        LectureDTO lectureDTO = new LectureDTO();
-        lectureDTO.setTitle(title);
-        lectureDTO.setDescription(description);
-        lectureDTO.setCurriculum(curriculum);
-        lectureDTO.setThumbnail("/upload/thumb/" + thumbUUID);
-        lectureDTO.setPrice(price);
-        lectureDTO.setInstructorId(userId);
-        lectureDTO.setCategory(category);
-
-        ContentDTO contentDTO = new ContentDTO();
-        contentDTO.setTitle(title + " - part 1");
-        contentDTO.setType("VIDEO");
-        contentDTO.setUrl("/upload/video/" + contentUUID);
-        contentDTO.setOrderNo(orderNo);
-        contentDTO.setDuration(duration);
+        ContentDTO content = new ContentDTO();
+        content.setTitle(title + " - Part 1");
+        content.setLectureId(0); // FK는 서비스 내에서 처리
+        content.setUrl(videoUrl);
+        content.setType("VIDEO");
+        content.setDuration(duration);
+        content.setOrderNo(orderNo);
 
         // ✅ 서비스 호출 (트랜잭션 포함)
-        boolean success = lectureService.registerLectureWithContentAndTags(lectureDTO, contentDTO, tagIds);
+        boolean result = lectureService.registerLectureWithContentAndTags(lecture, content, tagIds);
 
-        if (success) {
+        if (result) {
             response.sendRedirect(request.getContextPath() + "/lecture/lecturelist");
         } else {
             request.setAttribute("error", "강의 등록 중 문제가 발생했습니다.");

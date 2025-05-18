@@ -15,24 +15,6 @@ import java.util.Map;
 
 public interface LectureMapper {
 
-//    // ✅ 1. 강의 등록
-//    @Insert("""
-//        INSERT INTO lectures
-//        (title, description, thumbnail, category, price, status, avg_rating, published_at, created_at, updated_at, instructor_id)
-//        VALUES
-//        (#{title}, #{description}, #{thumbnail}, #{category}, #{price}, 'DRAFT', NULL, NULL, NOW(), NOW(), #{instructorId})
-//    """)
-//    @Options(useGeneratedKeys = true, keyProperty = "lectureId")
-//    int insertLecture(LectureDTO lectureDTO);
-//
-//    // ✅ 2. 콘텐츠 등록
-//    @Insert("""
-//        INSERT INTO lecture_contents
-//        (lecture_id, type, title, url, duration, order_no, created_at)
-//        VALUES
-//        (#{lectureId}, #{type}, #{title}, #{url}, #{duration}, #{orderNo}, NOW())
-//    """)
-//    int insertContent(ContentDTO contentDTO);
 
     // ✅ 3. 전체 강의 목록 조회
 	@Select("""
@@ -77,6 +59,10 @@ public interface LectureMapper {
     """)
     List<LectureDTO> selectByCategory(@Param("category") String category);
 
+    @Select("SELECT content_id, lecture_id, title, url, duration, sequence " +
+            "FROM contents WHERE lecture_id = #{lectureId} ORDER BY sequence ASC")
+    List<ContentDTO> selectAllContents(@Param("lectureId") int lectureId);
+    
     // ✅ 5. 키워드 검색 (제목 + 설명 LIKE)
     @Select("""
         SELECT 

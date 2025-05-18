@@ -47,7 +47,17 @@ public interface TagMapper {
     @Select("SELECT tag_id AS tagId, name FROM tags")
     List<TagDTO> getAllTags();
     
-    
+
+
+ // ✅ TagMapper.java
+ @Select("""
+     SELECT t.tag_id, t.name
+     FROM tag_mappings tm
+     JOIN tags t ON tm.tag_id = t.tag_id
+     WHERE tm.target_type = #{targetType} AND tm.target_id = #{targetId}
+ """)
+ List<TagDTO> selectTagsByTarget(@Param("targetType") String targetType, @Param("targetId") int targetId);
+
     /**
      * ✅ 태그 매핑 삽입
      */
