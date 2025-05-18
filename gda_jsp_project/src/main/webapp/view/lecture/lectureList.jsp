@@ -30,7 +30,7 @@
 
   <!-- ✅ 검색창 -->
   <div class="search-box">
-    <input type="text" name="keyword" value="${param.keyword}" placeholder="🔍 강의, 강사명을 입력하세요" class="search-input" />
+    <input type="text" name="keyword" value="${param.keyword}" placeholder="    강의, 카테고리를 입력하세요" class="search-input" />
     <button type="submit" class="search-btn">검색</button>
   </div>
 
