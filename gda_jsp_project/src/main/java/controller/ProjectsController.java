@@ -34,36 +34,53 @@ public class ProjectsController extends MskimRequestMapping {
 	public String list(HttpServletRequest request, HttpServletResponse response) {
 	    int pageNum = request.getParameter("pageNum") != null ? Integer.parseInt(request.getParameter("pageNum")) : 1;
 	    int pageSize = 10;
+	    String sort = request.getParameter("sort") != null ? request.getParameter("sort") : "recent";
+	    String status = request.getParameter("status");
 
 	    try (SqlSession session = MybatisConnection.getConnection()) {
 	        ProjectsDAO dao = new ProjectsDAO(session);
 	        PageHelper.startPage(pageNum, pageSize);
 
-	        List<ProjectsDTO> list = dao.listAll();
-	        PageInfo<ProjectsDTO> pageInfo = new PageInfo<>(list);
+	        List<ProjectsDTO> list;
+	        if (status != null && !status.isEmpty()) {
+	            if ("views".equals(sort)) {
+	                list = dao.listByStatusOrderByViews(status);
+	            } else {
+	                list = dao.listByStatusOrderByRecent(status);
+	            }
+	        } else {
+	            if ("views".equals(sort)) {
+	                list = dao.listOrderByViews();
+	            } else {
+	                list = dao.listOrderByRecent();
+	            }
+	        }
 
+	        PageInfo<ProjectsDTO> pageInfo = new PageInfo<>(list);
 	        request.setAttribute("projects", pageInfo.getList());
 	        request.setAttribute("pageInfo", pageInfo);
 	        PageHelper.clearPage();
 	        return "projects/projectsList";
-	        
-	    } 
+	    }
 	}
 
-	@RequestMapping("Detail")
+
+
+
+	@RequestMapping("detail")
 	public String detail(HttpServletRequest request, HttpServletResponse response) {
 	    try (SqlSession session = MybatisConnection.getConnection()) {
 	        int projectId = Integer.parseInt(request.getParameter("projectId"));
 
 	        ProjectsDAO projectsDAO = new ProjectsDAO(session);
+	        // ✅ 조회수 증가 먼저 호출
+	        projectsDAO.incrementViewCount(projectId);
+	        session.commit();  // 💡 반드시 commit 해야 실제 DB에 반영됨
+	        // ✅ 글 상세 조회
 	        ProjectsDTO project = projectsDAO.findProjectWithLeaderName(projectId);
 
-	        // ✅ 디버깅 로그 추가
-	        System.out.println("[DEBUG] 조회된 프로젝트 정보: " + project);
-	       
 	        if (project == null) {
-	            System.out.println("[ERROR] 프로젝트 조회 실패 - projectId: " + projectId);
-	            return "redirect:projectsList";  // ✅ 실패 시 목록으로 리다이렉트
+	            return "redirect:projectsList";
 	        }
 
 	        CommentDAO commentDAO = new CommentDAO(session);
@@ -72,16 +89,25 @@ public class ProjectsController extends MskimRequestMapping {
 	        TagDAO tagDAO = new TagDAO(session);
 	        List<TagDTO> projectTags = tagDAO.getTagsByProjectId(projectId);
 
+	        // 현재 로그인 유저 ID 전달
+	        UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
+	        if (loginUser != null) {
+	            request.setAttribute("loginUserId", loginUser.getUserId());
+	        }
+
 	        request.setAttribute("project", project);
 	        request.setAttribute("comments", comments);
 	        request.setAttribute("projectTags", projectTags);
 
-	        return "projects/projectsDetail";  // ✅ 정상 처리 시 상세 페이지
+	        return "projects/projectsDetail";
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        return "redirect:projectsList";  // ✅ 예외 발생 시 목록으로 리다이렉트
+	        return "redirect:projectsList";
 	    }
 	}
+
+
+
 
 
 
@@ -147,53 +173,80 @@ public class ProjectsController extends MskimRequestMapping {
 	    }
 
 
-    @RequestMapping("projectsEdit")
-    public String updateForm(HttpServletRequest request, HttpServletResponse response) {
-        try (SqlSession session = MybatisConnection.getConnection()) {
-            int projectId = Integer.parseInt(request.getParameter("projectId"));
-            ProjectsDAO dao = new ProjectsDAO(session);
-            ProjectsDTO project = dao.findProjectWithLeaderName(projectId);
-            request.setAttribute("project", project);
-            return "projects/projectsEdit";
-        }
-    }
+	    @RequestMapping("projectsEdit")
+	    public String updateForm(HttpServletRequest request, HttpServletResponse response) {
+	        try (SqlSession session = MybatisConnection.getConnection()) {
+	            int projectId = Integer.parseInt(request.getParameter("projectId"));
 
-    @RequestMapping("edit")
-    public String edit(HttpServletRequest request, HttpServletResponse response) {
-        try (SqlSession session = MybatisConnection.getConnection()) {
-            // 필수 파라미터 검증
-            String projectIdStr = request.getParameter("projectId");
-            if (projectIdStr == null || projectIdStr.trim().isEmpty()) {
-                throw new IllegalArgumentException("projectId는 필수입니다.");
-            }
+	            ProjectsDAO projectsDAO = new ProjectsDAO(session);
+	            TagDAO tagDAO = new TagDAO(session);
 
-            String leaderIdStr = request.getParameter("leaderId");
-            if (leaderIdStr == null || leaderIdStr.trim().isEmpty()) {
-                throw new IllegalArgumentException("leaderId는 필수입니다.");
-            }
+	            ProjectsDTO project = projectsDAO.findProjectWithLeaderName(projectId);
+	            List<TagDTO> tagList = tagDAO.getAllTags();
+	            List<TagDTO> projectTags = tagDAO.getTagsByProjectId(projectId);
 
-            String statusStr = request.getParameter("recruitStatus");
-            ProjectsDTO.RecruitStatus status;
-            try {
-                status = ProjectsDTO.RecruitStatus.valueOf(statusStr.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("잘못된 모집 상태입니다: " + statusStr);
-            }
+	            request.setAttribute("project", project);
+	            request.setAttribute("tagList", tagList);         // ✅ 드롭다운 출력용
+	            request.setAttribute("projectTags", projectTags); // ✅ 선택된 태그 출력용
 
-            ProjectsDTO project = new ProjectsDTO();
-            project.setProjectId(Integer.parseInt(projectIdStr));
-            project.setTitle(request.getParameter("title"));
-            project.setDescription(request.getParameter("description"));
-            project.setLeaderId(Integer.parseInt(leaderIdStr));
-            project.setRecruitStatus(status);
+	            return "projects/projectsEdit";
+	        }
+	    }
 
-            ProjectsDAO dao = new ProjectsDAO(session);
-            dao.update(project);
-            session.commit();
 
-            return "redirect:Detail?projectId=" + project.getProjectId();
-        }
-    }
+	    @RequestMapping("edit")
+	    public String edit(HttpServletRequest request, HttpServletResponse response) {
+	        try (SqlSession session = MybatisConnection.getConnection()) {
+	            // 필수 파라미터 검증
+	            String projectIdStr = request.getParameter("projectId");
+	            if (projectIdStr == null || projectIdStr.trim().isEmpty()) {
+	                throw new IllegalArgumentException("projectId는 필수입니다.");
+	            }
+
+	            String leaderIdStr = request.getParameter("leaderId");
+	            if (leaderIdStr == null || leaderIdStr.trim().isEmpty()) {
+	                throw new IllegalArgumentException("leaderId는 필수입니다.");
+	            }
+
+	            String statusStr = request.getParameter("recruitStatus");
+	            ProjectsDTO.RecruitStatus status;
+	            try {
+	                status = ProjectsDTO.RecruitStatus.valueOf(statusStr.toUpperCase());
+	            } catch (IllegalArgumentException e) {
+	                throw new IllegalArgumentException("잘못된 모집 상태입니다: " + statusStr);
+	            }
+
+	            // 프로젝트 기본 정보 설정
+	            ProjectsDTO project = new ProjectsDTO();
+	            project.setProjectId(Integer.parseInt(projectIdStr));
+	            project.setTitle(request.getParameter("title"));
+	            project.setDescription(request.getParameter("description"));
+	            project.setLeaderId(Integer.parseInt(leaderIdStr));
+	            project.setRecruitStatus(status);
+
+	            ProjectsDAO dao = new ProjectsDAO(session);
+	            dao.update(project);
+
+	            // 태그 매핑 갱신
+	            String[] tagIds = request.getParameterValues("tags");
+	            TagDAO tagDAO = new TagDAO(session);
+
+	            // 기존 태그 매핑 삭제
+	            tagDAO.deleteMappings(project.getProjectId(), "PROJECT");
+
+	            // 새로운 태그 매핑 추가
+	            if (tagIds != null) {
+	                for (String tagIdStr : tagIds) {
+	                    int tagId = Integer.parseInt(tagIdStr);
+	                    tagDAO.insertMapping(project.getProjectId(), "PROJECT", tagId);
+	                }
+	            }
+
+	            session.commit();
+	            return "redirect:detail?projectId=" + project.getProjectId();
+	        }
+	    }
+
 
     @RequestMapping("delete")
     public String delete(HttpServletRequest request, HttpServletResponse response) {
@@ -245,7 +298,7 @@ public class ProjectsController extends MskimRequestMapping {
             session.commit();
         }
 
-        return "redirect:Detail?projectId=" + projectId;
+        return "redirect:detail?projectId=" + projectId;
     }
 
  // 댓글 삭제 처리
@@ -259,7 +312,7 @@ public class ProjectsController extends MskimRequestMapping {
             commentDAO.softDelete(commentId);
             session.commit();
 
-            return "redirect:Detail?projectId=" + projectId;
+            return "redirect:detail?projectId=" + projectId;
         }
     }
 

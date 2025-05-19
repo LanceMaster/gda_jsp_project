@@ -2,6 +2,7 @@ package model.mapper;
 
 import model.dto.TagDTO;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -55,6 +56,10 @@ public interface TagMapper {
     void insertMapping(@Param("targetId") int targetId,
                        @Param("targetType") String targetType,
                        @Param("tagId") int tagId);
+    
+    @Delete("DELETE FROM tag_mappings WHERE target_id = #{targetId} AND target_type = #{targetType}")
+    void deleteMappings(@Param("targetId") int targetId, @Param("targetType") String targetType);
+
 
 }
 

@@ -22,6 +22,12 @@ public class ProjectsDAO {
         return mapper.findProjectWithLeaderName(projectId);
     }
 
+    
+    // ✅ 조회수 증가
+    public void incrementViewCount(int projectId) {
+        mapper.incrementViewCount(projectId);
+    }
+    
     public int insert(ProjectsDTO project) {
         return mapper.insert(project);
     }
@@ -33,4 +39,21 @@ public class ProjectsDAO {
     public int delete(int projectId) {
         return mapper.delete(projectId);
     }
+    
+    public List<ProjectsDTO> listOrderByRecent() {
+        return mapper.listOrderByRecent();
+    }
+
+    public List<ProjectsDTO> listOrderByViews() {
+        return mapper.listOrderByViews();
+    }
+
+    public List<ProjectsDTO> listByStatusOrderByRecent(String status) {
+        return mapper.listByStatusOrderByRecent(status);
+    }
+
+    public List<ProjectsDTO> listByStatusOrderByViews(String status) {
+        return mapper.listByStatusOrderByViews(status);
+    }
+
 }

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%> <!-- ✅ 추가 -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/projectsList.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -22,7 +22,6 @@
             <select name="sort">
                 <option value="recent" ${param.sort == 'recent' ? 'selected' : ''}>최신순</option>
                 <option value="views" ${param.sort == 'views' ? 'selected' : ''}>조회순</option>
-                <option value="popular" ${param.sort == 'popular' ? 'selected' : ''}>인기순</option>
             </select>
             <select name="status">
                 <option value="" ${empty param.status ? 'selected' : ''}>전체 상태</option>
@@ -46,7 +45,7 @@
                             <c:otherwise>모집완료</c:otherwise>
                         </c:choose>
                     </span>
-                    <h3><a href="Detail?projectId=${p.projectId}">${p.title}</a></h3>
+                  <h3><a href="detail?projectId=${p.projectId}">${p.title}</a></h3>
                 </div>
                 <div class="card-content">${p.description}</div>
                 <div class="card-meta">
@@ -79,3 +78,12 @@
     </div>
     <!-- 페이징 끝 -->
 </div>
+
+<!-- ✅ 뒤로 가기 캐시 새로고침 스크립트 추가 -->
+<script>
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            location.reload();
+        }
+    };
+</script>

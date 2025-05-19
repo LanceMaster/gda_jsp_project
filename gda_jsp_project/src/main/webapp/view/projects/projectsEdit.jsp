@@ -27,7 +27,7 @@
             <label for="recruitStatus">모집 상태</label>
             <select name="recruitStatus" id="recruitStatus">
                 <option value="RECRUITING" ${project.recruitStatus == 'RECRUITING' ? 'selected' : ''}>모집중</option>
-                <option value="COMPLETED" ${project.recruitStatus == 'COMPLETED' ? 'selected' : ''}>모집완료</option>
+                <option value="CLOSED" ${project.recruitStatus == 'CLOSED' ? 'selected' : ''}>모집완료</option>
             </select>
         </div>
 
