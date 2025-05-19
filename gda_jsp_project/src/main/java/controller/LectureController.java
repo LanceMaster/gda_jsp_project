@@ -50,7 +50,7 @@ public class LectureController extends MskimRequestMapping {
     public String lectureDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String param = request.getParameter("lectureId");
 
-
+        // 유효성 검사
         if (param == null || !param.matches("\\d+")) {
             request.setAttribute("error", "잘못된 요청입니다.");
             return "error/errorPage";
@@ -58,19 +58,39 @@ public class LectureController extends MskimRequestMapping {
 
         int lectureId = Integer.parseInt(param);
         LectureDTO lecture = lectureService.getLectureById(lectureId);
+
         if (lecture == null) {
             request.setAttribute("error", "존재하지 않는 강의입니다.");
-            
             return "error/errorPage";
         }
 
+        // 리뷰 목록 가져오기
         List<ReviewDTO> reviewList = reviewService.getReviewsByLectureId(lectureId);
-
         request.setAttribute("lecture", lecture);
         request.setAttribute("reviewList", reviewList);
 
+        // 사용자 세션 확인
+        HttpSession session = request.getSession(false);
+        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
+
+        boolean hasReviewed = false;
+        boolean hasEnrolled = false;
+        boolean canReview = false;
+
+        if (user != null && "STUDENT".equals(user.getRole())) {
+            hasEnrolled = reviewService.hasEnrolled(user.getUserId(), lectureId);
+            hasReviewed = reviewService.hasReviewed(user.getUserId(), lectureId);
+            boolean isCompleted = reviewService.hasCompletedWithFullProgress(user.getUserId(), lectureId);
+            canReview = hasEnrolled && !hasReviewed && isCompleted;
+        }
+
+        request.setAttribute("hasEnrolled", hasEnrolled);
+        request.setAttribute("hasReviewed", hasReviewed);
+        request.setAttribute("canReview", canReview);
+
         return "lecture/lectureDetail";
     }
+
 
     @RequestMapping("play")
     public String lecturePlay(HttpServletRequest request, HttpServletResponse response) throws Exception {
