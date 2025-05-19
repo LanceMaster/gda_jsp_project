@@ -10,8 +10,9 @@ public class CommentDTO {
     private Date created_at;
     private int project_id;
     private int user_id;
+    private String userName;  // ✅ 작성자 이름 필드 추가
 
-    // Getter / Setter - CamelCase 규칙 적용
+    // Getter / Setter
     public int getCommentId() { return comment_id; }
     public void setCommentId(int comment_id) { this.comment_id = comment_id; }
 
@@ -32,4 +33,7 @@ public class CommentDTO {
 
     public int getUserId() { return user_id; }
     public void setUserId(int user_id) { this.user_id = user_id; }
+
+    public String getUserName() { return userName; }  // ✅ 작성자 이름 Getter
+    public void setUserName(String userName) { this.userName = userName; }  // ✅ 작성자 이름 Setter
 }

@@ -12,7 +12,12 @@ public interface CommentMapper {
     @Options(useGeneratedKeys = true, keyProperty = "comment_id")
     int insert(CommentDTO comment);
 
-    @Select("SELECT * FROM project_comments WHERE project_id = #{project_id} AND is_deleted = 0 ORDER BY created_at ASC")
+    // ✅ 작성자 이름 조회를 포함한 댓글 목록 조회
+    @Select("SELECT c.comment_id, c.content, c.parent_id, c.is_deleted, c.created_at, c.project_id, c.user_id, u.name AS userName " +
+            "FROM project_comments c " +
+            "JOIN users u ON c.user_id = u.user_id " +
+            "WHERE c.project_id = #{project_id} AND c.is_deleted = 0 " +
+            "ORDER BY c.created_at ASC")
     List<CommentDTO> getCommentsByProjectId(int project_id);
 
     @Update("UPDATE project_comments SET is_deleted = 1 WHERE comment_id = #{comment_id}")
