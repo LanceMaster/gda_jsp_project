@@ -34,14 +34,28 @@ public class AdminController extends MskimRequestMapping {
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
 		int pageSize = 10;
+		
+		//keyword
+		String keyword = request.getParameter("keyword");
+		
 
 		// 1. PageHelper로 페이징 시작
 		PageHelper.startPage(pageNum, pageSize);
 
-		List<UserDTO> userList = adminDAO.userList();
-		PageInfo<UserDTO> pageInfo = new PageInfo<>(userList);
-		request.setAttribute("pageInfo", pageInfo);
-		request.setAttribute("userList", userList);
+		 List<UserDTO> userList;
+		    if (keyword != null && !keyword.trim().isEmpty()) {
+		        // 이름 기준 검색
+		        userList = adminDAO.searchUsersByName(keyword);
+		        request.setAttribute("keyword", keyword); // 검색어 유지용
+		    } else {
+		        // 전체 목록
+		        userList = adminDAO.userList();
+		    }
+		    
+		    // 2. PageInfo로 페이징 정보 가져오기
+		    PageInfo<UserDTO> pageInfo = new PageInfo<>(userList);
+		    request.setAttribute("pageInfo", pageInfo);
+		    request.setAttribute("userList", userList);
 		
 		return "/admin/userlist";
 

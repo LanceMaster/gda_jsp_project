@@ -23,6 +23,7 @@
     <filter-name>LoginCheckFilter</filter-name>
     <url-pattern>/projects/projectsForm</url-pattern>
     <url-pattern>/projects/projectsEdit</url-pattern>
+    <url-pattern>/admin/userlist</url-pattern>
     <!-- 로그인 필요 페이지만 지정 -->
 </filter-mapping>
   
