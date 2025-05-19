@@ -4,6 +4,10 @@
 <head>
   <title>${lecture.title} - 강의 상세</title>
   <link rel="stylesheet" href="<c:url value='/static/css/lectureDetail.css' />">
+  
+  <!-- 상단에 JSTL URL 정의 -->
+<c:url var="addCartUrl" value="/cart/add" />
+<c:url var="cartPageUrl" value="/lecture/cart" />
 </head>
 <body>
 <div class="lecture-container">
@@ -27,7 +31,7 @@
       <p class="lecture-category">"${lecture.category} - 배포까지 한 번에"</p>
       <div class="price-rating">
         <p class="lecture-price">₩${lecture.price}<fmt:formatNumber value="${lecture.price}" type="number" /></p>
-        <button class="start-btn">지금 시작하기</button>
+    <button class="start-btn" onclick="startNow(${lecture.lectureId})">지금 시작하기</button>
         <span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
       </div>
     </div>
@@ -116,5 +120,32 @@
 </ul>
 
 </div>
+<script>
+  const addCartUrl = '${addCartUrl}';
+  const cartPageUrl = '${cartPageUrl}';
+
+  function startNow(lectureId) {
+    fetch(addCartUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ lectureId: lectureId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("✅ 장바구니에 담겼습니다. 장바구니로 이동합니다.");
+        location.href = cartPageUrl;
+      } else {
+        alert("❌ 실패: " + data.message);
+      }
+    })
+    .catch(err => {
+      console.error("🚨 오류:", err);
+      alert("서버 통신 중 오류 발생");
+    });
+  }
+  </script>
 </body>
 </html>

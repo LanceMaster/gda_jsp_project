@@ -266,6 +266,14 @@ a.delete-link:hover {
 									<span class="star"><i class="fas fa-star"></i></span> <span
 										class="rating-text">${course.avgRating}</span>
 								</div>
+								<div class="progress" style="margin-top: 8px;">
+									<div class="progress-bar"
+										style="width: ${course.avgProgress}%; background: #6c6ce5;"></div>
+								</div>
+
+								<div style="font-size: 0.95rem;">진도율:
+									${course.avgProgress}%</div>
+
 							</div>
 							<button class="btn btn-primary"
 								style="background: #6c6ce5; border: none;">수강중</button>

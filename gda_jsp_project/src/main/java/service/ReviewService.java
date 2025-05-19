@@ -25,6 +25,8 @@ public class ReviewService {
     public void addReview(ReviewDTO dto) {
         reviewDAO.insertReview(dto);
     }
+    
+    
     /**
      * ✅ 리뷰 등록
      */
