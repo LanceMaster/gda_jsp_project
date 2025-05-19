@@ -63,17 +63,6 @@ public class ProjectsController extends MskimRequestMapping {
 	        }
 
 	        PageInfo<ProjectsDTO> pageInfo = new PageInfo<>(list);
-	        
-	     // ✅ description에서 태그 제거 및 줄바꿈 제거 처리
-	        for (ProjectsDTO project : pageInfo.getList()) {
-	            if (project.getDescription() != null) {
-	                String cleaned = project.getDescription()
-	                                        .replaceAll("<[^>]*>", "")  // 태그 제거
-	                                        .replaceAll("[\\n\\r]", ""); // 줄바꿈 제거
-	                project.setDescription(cleaned);
-	            }
-	        }
-	        
 	        request.setAttribute("projects", pageInfo.getList());
 	        request.setAttribute("pageInfo", pageInfo);
 	        PageHelper.clearPage();
