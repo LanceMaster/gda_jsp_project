@@ -33,6 +33,7 @@
     <input type="text" name="keyword" value="${param.keyword}" placeholder="    강의, 카테고리를 입력하세요" class="search-input" />
     <button type="submit" class="search-btn">검색</button>
   </div>
+  
 
   <!-- ✅ 정렬 드롭다운 -->
   <div class="sort-dropdown">
