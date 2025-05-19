@@ -5,12 +5,18 @@ import org.apache.ibatis.session.SqlSession;
 import utils.MyBatisUtil;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet("/checkout")
+@WebServlet(
+  urlPatterns = {"/cart/checkout"},
+  initParams = {
+    @WebInitParam(name = "view", value = "/view/")
+  }
+)
 public class CheckoutController extends HttpServlet {
 
     @Override
@@ -19,13 +25,13 @@ public class CheckoutController extends HttpServlet {
         UserDTO user = (UserDTO) session.getAttribute("user");
 
         if (user == null) {
-            resp.sendRedirect("/user/loginform");
+            resp.sendRedirect(req.getContextPath() + "/user/loginform");
             return;
         }
 
         String[] lectureIds = req.getParameterValues("lectureIds");
         if (lectureIds == null || lectureIds.length == 0) {
-            resp.sendRedirect("/view/lecture/cart.jsp?error=선택된 강의가 없습니다");
+            resp.sendRedirect(req.getContextPath() + "/view/lecture/cart.jsp?error=선택된 강의가 없습니다");
             return;
         }
 
@@ -49,6 +55,6 @@ public class CheckoutController extends HttpServlet {
             }
         }
 
-        resp.sendRedirect("/user/mypage");
+        resp.sendRedirect(req.getContextPath() + "/user/mypage");
     }
 }

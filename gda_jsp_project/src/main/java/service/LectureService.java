@@ -105,6 +105,7 @@ public class LectureService {
         // `%`를 포함시켜 LIKE 연산이 되도록 가공
         return lectureDAO.searchLecturesByKeyword("%" + keyword + "%");
     }
+    
 
     
     /**
