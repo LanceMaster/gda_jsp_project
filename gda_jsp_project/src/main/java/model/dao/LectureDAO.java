@@ -1,7 +1,9 @@
 package model.dao;
 
 import model.dto.ContentDTO;
+import model.dto.LectureCardDTO;
 import model.dto.LectureDTO;
+import model.dto.LectureSearchCondition;
 import model.mapper.LectureMapper;
 import org.apache.ibatis.session.SqlSession;
 import utils.MyBatisUtil;
@@ -26,7 +28,20 @@ public class LectureDAO {
     public LectureDAO(SqlSession session) {
         this.session = session;
     }
+    
+    
 
+    public List<LectureCardDTO> findLectures(LectureSearchCondition cond) {
+        LectureMapper mapper = session.getMapper(LectureMapper.class);
+        return mapper.findLectures(cond); // ✅ 이게 핵심
+    }
+
+    public int countLectures(LectureSearchCondition cond) {
+        LectureMapper mapper = session.getMapper(LectureMapper.class);
+        return mapper.countLectures(cond);
+    }
+
+    
     // ✅ 1. 전체 강의 목록 조회
     public List<LectureDTO> getAllLectures() {
         SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession();
@@ -70,12 +85,6 @@ public class LectureDAO {
         }
     }
     
-    public List<LectureDTO> searchLectures(List<String> keywords, String category, String sort) {
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            LectureMapper mapper = session.getMapper(LectureMapper.class);
-            return mapper.searchLectures(keywords, category, sort);
-        }
-    }
 
     
         public List<LectureDTO> selectLectures(String keyword, String category, String sort) {
@@ -114,28 +123,28 @@ public class LectureDAO {
         }
     }
 
-    // ✅ 6. 강의 등록 (세션 기반 트랜잭션)
-    public int insertLecture(LectureDTO lectureDTO) {
-        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
-        try {
-            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
-            mapper.insertLecture(lectureDTO); // @Options로 lectureId 자동 주입
-            return lectureDTO.getLectureId();
-        } finally {
-            if (session == null) useSession.close();
-        }
-    }
+//    // ✅ 6. 강의 등록 (세션 기반 트랜잭션)
+//    public int insertLecture(LectureDTO lectureDTO) {
+//        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
+//        try {
+//            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+//            mapper.insertLecture(lectureDTO); // @Options로 lectureId 자동 주입
+//            return lectureDTO.getLectureId();
+//        } finally {
+//            if (session == null) useSession.close();
+//        }
+//    }
 
     // ✅ 7. 콘텐츠 등록
-    public void insertContent(ContentDTO contentDTO) {
-        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
-        try {
-            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
-            mapper.insertContent(contentDTO);
-        } finally {
-            if (session == null) useSession.close();
-        }
-    }
+//    public void insertContent(ContentDTO contentDTO) {
+//        SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession(true);
+//        try {
+//            LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+//            mapper.insertContent(contentDTO);
+//        } finally {
+//            if (session == null) useSession.close();
+//        }
+//    }
 
     // ✅ 8. 강의 평점 평균 갱신
     public void updateLectureRating(int lectureId) {

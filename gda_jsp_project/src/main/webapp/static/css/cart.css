@@ -1,0 +1,101 @@
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  margin: 40px;
+  background-color: #f9f9fc;
+}
+
+h2 {
+  margin-bottom: 30px;
+  font-weight: bold;
+  font-size: 24px;
+  color: #333;
+}
+
+.cart-container {
+  display: flex;
+  gap: 40px;
+}
+
+.lecture-list {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lecture-item {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.lecture-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+}
+
+.lecture-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.lecture-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.lecture-price {
+  color: #777;
+  font-size: 14px;
+}
+
+.summary-box {
+  flex: 1;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 40px;
+}
+
+.summary-box h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.total-section {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+#checkoutBtn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}

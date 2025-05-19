@@ -142,6 +142,24 @@ body {
 					data-target="#emailModal">수정</button>
 			</form>
 
+			<c:if test="${user.role == 'INSTRUCTOR'}">
+				<div class="resume-section" style="margin-top: 24px;">
+					<h4>이력서</h4>
+					<c:choose>
+						<c:when test="${not empty user.resume}">
+							<button id="viewResumeBtn" type="button"
+								style="color: #6c6ce5; text-decoration: underline; background: none; border: none; cursor: pointer;">
+								이력서 보기</button>
+						</c:when>
+						<c:otherwise>
+							<p style="color: #888;">등록된 이력서가 없습니다.</p>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</c:if>
+
+
+
 			<div class="text-right mt-2">
 				<a href="#" data-toggle="modal" data-target="#deleteModal"
 					style="color: #6c6ce5; font-size: 0.95rem;">탈퇴하기</a>
@@ -199,6 +217,24 @@ body {
 			    role : "${user.role}"
 			  };
 			  console.log("로그인된 사용자 정보:", user);
+			  
+			  $(document).ready(function(){
+				  $("#viewResumeBtn").click(function(){
+				    const email = "${user.email}";
+				    $.post("${pageContext.request.contextPath}/AccountServlet", 
+				      { action: "checkResume", email: email },
+				      function(response) {
+				        if(response.trim() === "exist") {
+				          const downloadUrl = "${pageContext.request.contextPath}/AccountServlet?action=downloadResume&email=" + encodeURIComponent(email);
+				          window.open(downloadUrl, "_blank");
+				        } else {
+				          alert("이력서 파일이 없습니다.");
+				        }
+				      });
+				  });
+				});
+
+			  
 	
 function sendVerification() {
   const email = $("#emailInput").val();

@@ -1,63 +1,123 @@
 package controller;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Properties;
+import java.util.Random;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import model.dao.AdminDAO;
 import model.dao.UserDAO;
 import model.dto.UserDTO;
 
-@WebServlet("/admin/userdetail")
+@WebServlet("/AdminServlet")
 public class AdminServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
+	// DAO 객체 생성 (프로젝트에 맞게 조정)
 	private AdminDAO adminDAO = new AdminDAO();
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String userId = request.getParameter("userid");
+
+		// 요청 인코딩 설정 (필요시)
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/plain; charset=UTF-8");
+
+		String action = request.getParameter("action");
+
+		// 디버깅용 파라미터 출력
+		System.out.println("=== Request Parameters ===");
+		request.getParameterMap().forEach((key, value) -> {
+			System.out.println(key + ": " + String.join(", ", value));
+		});
+		System.out.println("=========================");
+
+		if ("getUserDetail".equals(action)) {
+			handleGetUserDetail(request, response);
+			return;
+		}
+
+		if ("deleteUser".equals(action)) {
+			handleDeleteUser(request, response);
+			return;
+		}
+
+		// 다른 action 처리 시 추가...
+	}
+
+	private void handleDeleteUser(HttpServletRequest request, HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		String userId = request.getParameter("userId");
+		System.out.println("userId: " + userId);
 		UserDTO user = adminDAO.getUserById(userId);
-
+		System.out.println("user: " + user);
 		if (user != null) {
-			response.setContentType("application/json; charset=UTF-8");
-
-			// 날짜 포맷 변환 (yyyy-MM-dd)
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			String birthdateStr = user.getBirthdate() != null ? sdf.format(user.getBirthdate()) : "";
-
-			// JSON 객체 생성
-			UserJson userJson = new UserJson(user.getUserId(), user.getName(), user.getEmail(), birthdateStr,
-					user.getPhone());
-
-			String json = new Gson().toJson(userJson);
-			response.getWriter().write(json);
+			boolean deleted = adminDAO.deleteUser(userId);
+			if (deleted) {
+				response.setStatus(HttpServletResponse.SC_OK);
+				try {
+					response.getWriter().write("User deleted successfully");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				try {
+					response.getWriter().write("Failed to delete user");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		} else {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			try {
+				response.getWriter().write("User not found");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
 
-	// JSON용 DTO 클래스 (필요한 데이터만 전달)
-	private static class UserJson {
-		private int userId;
-		private String name;
-		private String email;
-		private String birthdate;
-		private String phone;
+	private void handleGetUserDetail(HttpServletRequest request, HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		String userId = request.getParameter("userId");
+		System.out.println("userId: " + userId);
+		UserDTO user = adminDAO.getUserById(userId);
+		System.out.println("user: " + user);
+		if (user != null) {
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			String json = gson.toJson(user);
+			response.setContentType("application/json; charset=UTF-8");
+			try {
+				response.getWriter().write(json);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-		public UserJson(int i, String name, String email, String birthdate, String phone) {
-			this.userId = i;
-			this.name = name;
-			this.email = email;
-			this.birthdate = birthdate;
-			this.phone = phone;
+		} else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			try {
+				response.getWriter().write("User not found");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
+
 }

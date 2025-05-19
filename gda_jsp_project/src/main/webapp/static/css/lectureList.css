@@ -142,14 +142,41 @@ h1 {
   cursor: not-allowed;
 }
 
-/* ✅ 강의 목록 (4개 고정, 반응형 비활성화) */
 .lecture-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);  /* 고정 4열 */
+  grid-template-columns: repeat(4, 280px);  /* ✅ 가로 4개로 고정 */
   gap: 28px;
   justify-content: center;
   padding: 0 40px;
 }
+
+
+.lecture-card {
+  width: 100%;
+  max-width: unset;
+}
+
+
+.lecture-list-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+@media (max-width: 1199px) {
+  .lecture-list {
+    grid-template-columns: repeat(2, 1fr); /* ✅ 태블릿: 2열 */
+  }
+}
+
+@media (max-width: 767px) {
+  .lecture-list {
+    grid-template-columns: 1fr; /* ✅ 모바일: 1열 */
+    padding: 0 20px;
+  }
+}
+
+
 
 /* ✅ 정렬 드롭다운 전체 박스 우측 정렬 */
 .sort-dropdown {

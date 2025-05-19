@@ -48,7 +48,17 @@ public interface TagMapper {
     @Select("SELECT tag_id AS tagId, name FROM tags")
     List<TagDTO> getAllTags();
     
-    
+
+
+ // ✅ TagMapper.java
+ @Select("""
+     SELECT t.tag_id, t.name
+     FROM tag_mappings tm
+     JOIN tags t ON tm.tag_id = t.tag_id
+     WHERE tm.target_type = #{targetType} AND tm.target_id = #{targetId}
+ """)
+ List<TagDTO> selectTagsByTarget(@Param("targetType") String targetType, @Param("targetId") int targetId);
+
     /**
      * ✅ 태그 매핑 삽입
      */
@@ -57,8 +67,20 @@ public interface TagMapper {
                        @Param("targetType") String targetType,
                        @Param("tagId") int tagId);
     
+
+    @Select("""
+            SELECT t.tag_id AS tagId, t.name AS name
+            FROM tag_mappings tm
+            JOIN tags t ON tm.tag_id = t.tag_id
+            WHERE tm.target_type = 'LECTURE'
+            GROUP BY t.tag_id
+            ORDER BY COUNT(*) DESC
+            LIMIT #{limit}
+        """)
+        List<TagDTO> getTopTags(@Param("limit") int limit);
     @Delete("DELETE FROM tag_mappings WHERE target_id = #{targetId} AND target_type = #{targetType}")
     void deleteMappings(@Param("targetId") int targetId, @Param("targetType") String targetType);
+
 
 
 }
