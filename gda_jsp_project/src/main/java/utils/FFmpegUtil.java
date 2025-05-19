@@ -14,25 +14,17 @@ import java.util.logging.Logger;
 public class FFmpegUtil {
 
     private static final Logger logger = Logger.getLogger(FFmpegUtil.class.getName());
-
-    // ❗ 환경에 맞게 수정: ffmpeg 실행 파일의 절대 경로
     private static final String FFMPEG_PATH = "C:/ffmpeg/bin/ffmpeg.exe";
+    private static final String FFPROBE_PATH = "C:/ffmpeg/bin/ffprobe.exe"; // 🆕 추가
 
     /**
-     * ✅ mp4 파일을 HLS(.m3u8)로 변환
-     *
-     * @param inputFile 변환할 mp4 파일
-     * @param uuid 출력 파일 이름 (확장자 없이)
-     * @param outputDir 변환된 HLS 파일이 저장될 디렉토리 (절대경로)
-     * @return JSP에서 접근 가능한 상대경로 (/upload/hls/uuid.m3u8)
-     * @throws IOException 변환 실패 시 예외 발생
+     * ✅ mp4 → HLS 변환
      */
-    public static String convertToHLS(File inputFile, String uuid, String outputDir) throws IOException, InterruptedException
- {
+    public static String convertToHLS(File inputFile, String uuid, String outputDir)
+            throws IOException, InterruptedException {
         String m3u8FileName = uuid + ".m3u8";
         String fullOutputPath = Paths.get(outputDir, m3u8FileName).toString();
 
-        // ffmpeg 명령어 구성
         ProcessBuilder pb = new ProcessBuilder(
                 FFMPEG_PATH,
                 "-i", inputFile.getAbsolutePath(),
@@ -45,37 +37,51 @@ public class FFmpegUtil {
                 fullOutputPath
         );
 
-        pb.redirectErrorStream(true); // 에러 출력도 함께 읽음
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
 
-        try {
-            Process process = pb.start();
-
-            // 출력 로그 처리
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    logger.info("[ffmpeg] " + line);
-                }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                logger.info("[ffmpeg] " + line);
             }
+        }
 
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new IOException("FFmpeg 변환 실패. 종료 코드: " + exitCode);
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new IOException("FFmpeg 변환 실패. 종료 코드: " + exitCode);
+        }
+
+        return "/upload/hls/" + m3u8FileName;
+    }
+
+    /**
+     * ✅ ffprobe를 이용한 영상 길이(초) 추출
+     */
+    public static int getVideoDurationInSeconds(File videoFile) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(
+                FFPROBE_PATH,
+                "-v", "error",
+                "-select_streams", "v:0",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                videoFile.getAbsolutePath()
+        );
+
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line = reader.readLine();
+            if (line != null) {
+                double duration = Double.parseDouble(line);
+                return (int) Math.round(duration);
+            } else {
+                throw new IOException("영상 길이 분석 실패: 출력 없음");
             }
-
-            // 상대경로 리턴 (/upload/hls/uuid.m3u8)
-            return "/upload/hls/" + m3u8FileName;
-
-        } catch (Exception e) {
-            logger.severe("FFmpeg 변환 중 오류: " + e.getMessage());
-            throw new IOException("FFmpeg 변환 중 오류 발생", e);
-        } finally {
-            // 임시 mp4 파일 삭제
-            try {
-                Files.deleteIfExists(inputFile.toPath());
-            } catch (IOException ex) {
-                logger.warning("임시 파일 삭제 실패: " + inputFile.getName());
-            }
+        } catch (NumberFormatException e) {
+            throw new IOException("영상 길이 분석 실패: 숫자 형식 오류", e);
         }
     }
 }
+
