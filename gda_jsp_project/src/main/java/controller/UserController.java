@@ -2,7 +2,9 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
@@ -13,13 +15,26 @@ import com.oreilly.servlet.MultipartRequest;
 
 import gdu.mskim.MskimRequestMapping;
 import gdu.mskim.RequestMapping;
+import model.dao.LectureDAO;
 import model.dao.UserDAO;
 import model.dto.UserDTO;
+import model.dto.LectureDTO;
 
 @WebServlet(urlPatterns = { "/user/*" }, initParams = { @WebInitParam(name = "view", value = "/view/") })
 public class UserController extends MskimRequestMapping {
 
 	public UserDAO userDAO = new UserDAO();
+	public LectureDAO lectureDAO = new LectureDAO();
+
+	// 메인페이지 불러오기
+	@RequestMapping("mainpage")
+	public String mainpage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 메인 페이지를 보여주는 JSP 페이지로 이동
+		List<LectureDTO> topLectures = lectureDAO.getTopLectures(10); // 상위 10개 강의
+		request.setAttribute("topLectures", topLectures);
+
+		return "user/mainpage"; // JSP 페이지 경로
+	}
 
 	// 로그인폼 불러오기
 	@RequestMapping("loginform")
@@ -33,7 +48,7 @@ public class UserController extends MskimRequestMapping {
 	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		String id = request.getParameter("id");
-		
+
 		String password = request.getParameter("password");
 
 		UserDTO userDTO = userDAO.login(id, password);
@@ -74,16 +89,14 @@ public class UserController extends MskimRequestMapping {
 	 */
 	@RequestMapping("signup")
 	public String signup(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// 업로드 폴더 경로 설정
-		String path = request.getServletContext().getRealPath("/") + "/upload/user/";
-		File dir = new File(path);
-		if (!dir.exists())
-			dir.mkdirs();
+		String path = request.getServletContext().getRealPath("/") + "/upload/resume/";
+		File uploadDir = new File(path);
+		if (!uploadDir.exists())
+			uploadDir.mkdirs();
 
-		int maxSize = 10 * 1024 * 1024; // 10MB
-		MultipartRequest multi = null;
-
+		MultipartRequest multi;
 		try {
+			int maxSize = 10 * 1024 * 1024; // 10MB
 			multi = new MultipartRequest(request, path, maxSize, "UTF-8");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -94,38 +107,41 @@ public class UserController extends MskimRequestMapping {
 		// 파라미터 추출
 		String email = multi.getParameter("email");
 		String password = multi.getParameter("password");
-		String role = multi.getParameter("role"); // "STUDENT" 또는 "INSTRUCTOR"
-		String resumeFileName = multi.getFilesystemName("resume"); // 업로드된 이력서 파일 이름
+		String role = multi.getParameter("role");
+		String resumeFileName = multi.getFilesystemName("resume");
+		String birthdateStr = multi.getParameter("birthdate");
 
 		// 필수 항목 체크
-		if (email == null || password == null || role == null || email.trim().isEmpty() || password.trim().isEmpty()) {
+		if (isNullOrEmpty(email) || isNullOrEmpty(password) || isNullOrEmpty(role)) {
 			request.setAttribute("signupError", "이메일, 비밀번호, 역할은 필수 입력입니다.");
-			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
-
+			return "redirect:" + request.getContextPath() + "/user/signupform";
 		}
 
-		// 이력서 파일 체크 (강사만 필수)
-		if ("INSTRUCTOR".equalsIgnoreCase(role) && (resumeFileName == null || resumeFileName.trim().isEmpty())) {
+		// 이력서 파일 필수 체크 (강사인 경우)
+		if ("INSTRUCTOR".equalsIgnoreCase(role) && isNullOrEmpty(resumeFileName)) {
 			request.setAttribute("signupError", "강사 신청 시 이력서 파일은 필수입니다.");
-			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
-
+			return "redirect:" + request.getContextPath() + "/user/signupform";
 		}
 
-		// DTO 설정
+		// 사용자 DTO 생성
 		UserDTO userDTO = new UserDTO();
 		userDTO.setEmail(email);
 		userDTO.setPassword(password);
 		userDTO.setName(multi.getParameter("name"));
 		userDTO.setPhone(multi.getParameter("phone"));
-		userDTO.setRole(role.toUpperCase()); // "STUDENT" or "INSTRUCTOR"
+		userDTO.setRole(role.toUpperCase());
 		userDTO.setResume(resumeFileName != null ? resumeFileName : "");
-		userDTO.setAgreedTerms(true); // 약관 동의 여부
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		userDTO.setAgreedTerms(true);
+
 		try {
-			userDTO.setBirthdate(sdf.parse(multi.getParameter("birthdate")));
-		} catch (Exception e) {
+			if (!isNullOrEmpty(birthdateStr)) {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				userDTO.setBirthdate(sdf.parse(birthdateStr));
+			}
+		} catch (ParseException e) {
 			e.printStackTrace();
-			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
+			request.setAttribute("signupError", "생년월일 형식이 잘못되었습니다.");
+			return "redirect:" + request.getContextPath() + "/user/signupform";
 		}
 
 		int result = userDAO.signup(userDTO);
@@ -136,6 +152,10 @@ public class UserController extends MskimRequestMapping {
 			request.setAttribute("signupError", "회원가입 실패");
 			return "user/signupform";
 		}
+	}
+
+	private boolean isNullOrEmpty(String str) {
+		return str == null || str.trim().isEmpty();
 	}
 
 	// 아이디찾기폼 불러오기
@@ -169,6 +189,31 @@ public class UserController extends MskimRequestMapping {
 	public String logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.getSession().invalidate(); // 세션 무효화
 		return "redirect:" + request.getContextPath() + "/user/mainpage"; // 로그인 폼으로 리다이렉트
+	}
+
+	// 마이페이지 불러오기 프로필페이지
+
+	@RequestMapping("mypage")
+	public String mypage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserDTO userDTO = (UserDTO) request.getSession().getAttribute("user");
+		if (userDTO == null) {
+			return "redirect:" + request.getContextPath() + "/user/loginform"; // 로그인 폼으로 리다이렉트
+		}
+
+		System.out.println(userDTO.toString());
+
+		//
+
+		// 자기가 등록한 강의 목록 갖고오기
+		List<LectureDTO> myLectures = lectureDAO.getMyLectures(userDTO.getUserId());
+		// 내가 신청한 강의 목록 갖고오기
+		List<LectureDTO> myCourses = lectureDAO.getMyCourses(userDTO.getUserId());
+
+		System.out.println(myLectures);
+		request.setAttribute("myLectures", myLectures);
+		request.setAttribute("myCourses", myCourses);
+
+		return "user/mypage"; // JSP 페이지 경로
 	}
 
 	// 이메일 중복확인

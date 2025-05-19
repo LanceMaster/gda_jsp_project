@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <c:set var="pageCss" value="/static/css/projectsDetail.css" />
 <!DOCTYPE html>
 <html>
@@ -11,15 +12,18 @@
 <body>
 <div class="project-container">
 
-    <!-- 제목 + 수정 링크 -->
+    <!-- 제목 + 본인만 수정 링크 -->
     <div class="project-header">
         ${project.title}
-        <a href="${pageContext.request.contextPath}/projects/projectsEdit?projectId=${project.projectId}" class="edit-link">수정하기</a>
+        <c:if test="${loginUserId == project.leaderId}">
+            <a href="${pageContext.request.contextPath}/projects/projectsEdit?projectId=${project.projectId}" class="edit-link">수정하기</a>
+        </c:if>
     </div>
 
     <!-- 작성자, 등록일, 조회수 -->
     <div class="project-meta">
-        ${project.leaderName} | 게시물등록일 : ${project.createdAt}
+        ${project.leaderName} | 게시물등록일 :
+        <fmt:formatDate value="${project.createdAt}" pattern="yyyy-MM-dd" />
         <br> 조회수 ${project.viewCount} Views
     </div>
 
@@ -48,8 +52,15 @@
     <div class="comment-list">
         <c:forEach var="comment" items="${comments}">
             <div class="comment-item">
-                <strong>${comment.userId}</strong> <br/>
+                <strong>${comment.userName}</strong> <br/>
                 ${comment.content}
+                <c:if test="${loginUserId == comment.userId}">
+                    <form method="post" action="${pageContext.request.contextPath}/projects/deleteComment" style="display:inline;">
+                        <input type="hidden" name="commentId" value="${comment.commentId}" />
+                        <input type="hidden" name="projectId" value="${project.projectId}" />
+                        <button type="submit" class="comment-delete-button">삭제</button>
+                    </form>
+                </c:if>
             </div>
         </c:forEach>
     </div>

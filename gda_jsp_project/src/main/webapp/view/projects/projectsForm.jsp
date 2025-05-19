@@ -20,14 +20,8 @@
         <!-- 내용 입력 (Summernote) -->
         <textarea name="description" id="summernote" required></textarea>
 
-        <!-- 썸네일 파일 업로드 -->
-        <div class="file-section">
-            <label>썸네일 업로드</label>
-            <input type="file" name="thumbnail" accept="image/*" />
-        </div>
 
         <!-- 태그 선택 + 추가 버튼 -->
-        <h3>태그 목록 (테스트)</h3>
 
         <div class="tag-section">
             <label>태그 선택</label>

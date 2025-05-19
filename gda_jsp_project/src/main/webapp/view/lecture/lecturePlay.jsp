@@ -3,14 +3,15 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="java.net.URLEncoder" %>
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
+<%-- ✅ URL 변수 미리 정의 --%>
+<c:url var="progressUrl" value="/lecture/progress/update" />
+<c:url var="loginUrl" value="/user/login" />
+
   <meta charset="UTF-8" />
   <title>${lecture.title}</title>
-  <link rel="stylesheet" href="<c:url value='/static/css/lecturePlay.css'/>" />
-</head>
-<body>
+  <link rel="stylesheet" href="<c:url value='/static/css/lecturePlay.css' />" />
+  <script src="<c:url value='/static/js/lecturePlay.js' />" defer></script> <%-- ✅ JS 외부 로딩 --%>
+
 <div class="lecture-container">
 
   <!-- ✅ 강의 제목 -->
@@ -18,9 +19,15 @@
 
   <!-- ✅ 강의 콘텐츠 (스트리밍 영상) -->
   <div class="video-wrapper">
-    <video id="lecture-video" controls crossorigin="anonymous" poster="${lecture.thumbnail}">
+    <video id="lecture-video" controls crossorigin="anonymous"
+           data-content-id="${content.contentId}"
+           data-user-id="${sessionScope.loginUser.userId}"
+           data-lecture-id="${lecture.lectureId}"
+           data-progress-url="${progressUrl}"
+           <c:if test="${not empty lecture.thumbnail}">
+             poster="${lecture.thumbnail}"
+           </c:if>>
       <source src="${content.url}" type="application/x-mpegURL" />
-      <!-- HLS 형식 스트리밍 (예: m3u8), DASH 사용 시 타입 변경 필요 -->
       자바스크립트를 활성화해야 강의를 볼 수 있습니다.
     </video>
   </div>
@@ -48,34 +55,54 @@
 
 </div>
 
+<!-- ✅ 콘텐츠 리스트 (좌측 사이드바) -->
+<div class="content-list">
+  <ul>
+    <c:forEach var="item" items="${contentList}">
+      <li>
+        <a href="${pageContext.request.contextPath}/lecture/play?lectureId=${lecture.lectureId}&contentId=${item.contentId}">
+          ${item.title} (${item.duration}초)
+        </a>
+      </li>
+    </c:forEach>
+  </ul>
+</div>
+
+
+<!-- 
+<c:if test="${empty sessionScope.loginUser}">
+  <script>
+    alert('로그인 후 시청 가능합니다.');
+    location.href = '${loginUrl}';
+  </script>
+</c:if>
+
 <script>
   const video = document.getElementById("lecture-video");
   const seekBar = document.getElementById("seek-bar");
-  const contentId = "${content.contentId}";  // 콘텐츠 PK
-  const userId = "${sessionScope.loginUser.userId}"; // 세션 로그인 유저 PK
+  const currentTimeDisplay = document.getElementById("current-time");
 
-  // ⏱ 10초 간격 저장
+  const contentId = "${content.contentId}";
+  const userId = "${sessionScope.loginUser.userId}";
+  const progressUrl = "${progressUrl}";
+
+  // 10초마다 진도 저장
   setInterval(() => {
-    const percent = Math.floor((video.currentTime / video.duration) * 100);
-    if (percent >= 0 && video.duration > 0) {
-      fetch("<c:url value='/lecture/saveProgress' />", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `contentId=${contentId}&userId=${userId}&progress=${percent}`
-      });
+    if (video.duration > 0) {
+      const percent = Math.floor((video.currentTime / video.duration) * 100);
+      if (percent >= 0) {
+        fetch(progressUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: `contentId=${contentId}&userId=${userId}&progress=${percent}&lectureId=${lecture.lectureId}`
+        });
+      }
     }
   }, 10000);
-</script>
 
-
-<!-- ✅ 자바스크립트: 재생 시간 표시 -->
-<script>
-  const video = document.getElementById("lecture-video");
-  const currentTimeDisplay = document.getElementById("current-time");
-  const seekBar = document.getElementById("seek-bar");
-
+  // 재생 위치 표시 + 슬라이더 바 연동
   video.addEventListener("timeupdate", () => {
     const minutes = Math.floor(video.currentTime / 60).toString().padStart(2, '0');
     const seconds = Math.floor(video.currentTime % 60).toString().padStart(2, '0');
@@ -90,7 +117,19 @@
   seekBar.addEventListener("input", () => {
     video.currentTime = seekBar.value;
   });
+  
+ 
+//콘텐츠 시청 완료 시 AJAX 요청
+  fetch("/lecture/progress/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `lectureId=1001&contentId=2001&progress=100`
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      console.log("진도 저장 및 수료 확인 완료");
+    }
+  });
 </script>
-
-</body>
-</html>
+-->
