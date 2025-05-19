@@ -45,9 +45,20 @@
                             <c:otherwise>모집완료</c:otherwise>
                         </c:choose>
                     </span>
-                  <h3><a href="detail?projectId=${p.projectId}">${p.title}</a></h3>
+                    <h3><a href="detail?projectId=${p.projectId}">${p.title}</a></h3>
                 </div>
-                <div class="card-content">${p.description}</div>
+                <!-- ✅ 태그 제거 + 30자 제한 -->
+               <div class="card-content">
+                     <c:choose>
+                      <c:when test="${fn:length(p.description) > 30}">
+                              ${fn:substring(p.description, 0, 30)}...
+                      </c:when>
+                  <c:otherwise>
+                  ${p.description}
+                  </c:otherwise>
+                     </c:choose>
+              </div>
+
                 <div class="card-meta">
                     <span>작성자: ${p.leaderName}</span> | 
                     <span>등록일: <fmt:formatDate value="${p.createdAt}" pattern="yyyy-MM-dd"/></span> |
@@ -56,6 +67,7 @@
             </div>
         </c:forEach>
     </div>
+    <!-- 프로젝트 카드 목록 끝 -->
 
     <!-- 페이징 -->
     <div class="pagination">

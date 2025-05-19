@@ -1,6 +1,8 @@
 package controller;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,9 +21,13 @@ import model.dto.TagDTO;
 import model.dto.UserDTO;
 import org.apache.ibatis.session.SqlSession;
 import utils.MybatisConnection;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
-
+@MultipartConfig // ✅ 여기에 추가
 @WebServlet(urlPatterns = {"/projects/*"}, initParams = {@WebInitParam(name = "view", value = "/view/")})
 public class ProjectsController extends MskimRequestMapping {
 
@@ -57,6 +63,17 @@ public class ProjectsController extends MskimRequestMapping {
 	        }
 
 	        PageInfo<ProjectsDTO> pageInfo = new PageInfo<>(list);
+	        
+	     // ✅ description에서 태그 제거 및 줄바꿈 제거 처리
+	        for (ProjectsDTO project : pageInfo.getList()) {
+	            if (project.getDescription() != null) {
+	                String cleaned = project.getDescription()
+	                                        .replaceAll("<[^>]*>", "")  // 태그 제거
+	                                        .replaceAll("[\\n\\r]", ""); // 줄바꿈 제거
+	                project.setDescription(cleaned);
+	            }
+	        }
+	        
 	        request.setAttribute("projects", pageInfo.getList());
 	        request.setAttribute("pageInfo", pageInfo);
 	        PageHelper.clearPage();
@@ -127,6 +144,32 @@ public class ProjectsController extends MskimRequestMapping {
 	            return "projects/projectsForm";
 	        }
 	    }
+	    
+	    @RequestMapping("uploadImage")
+	    public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	        Part filePart = request.getPart("file"); // ✅ 'file'로 변경
+	        if (filePart == null) {
+	            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	            response.getWriter().write("파일이 없습니다.");
+	            return;
+	        }
+
+	        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+	        String uploadPath = "C:/java_lec/workspace/gda_jsp_project/src/main/webapp/static/images";
+
+	        File uploadDir = new File(uploadPath);
+	        if (!uploadDir.exists()) uploadDir.mkdirs();
+
+	        String filePath = uploadPath + File.separator + fileName;
+	        filePart.write(filePath);
+
+	        String imageUrl = request.getContextPath() + "/static/images/" + fileName;
+	        response.setContentType("text/plain;charset=UTF-8");
+	        response.getWriter().write(imageUrl);
+
+	        System.out.println("파일 저장 경로: " + filePath);
+	    }
+
 
 	    @RequestMapping("write")
 	    public String write(HttpServletRequest request, HttpServletResponse response) throws Exception {
