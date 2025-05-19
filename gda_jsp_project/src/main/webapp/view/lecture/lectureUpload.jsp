@@ -2,14 +2,33 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-  <title>강의 콘텐츠 업로드</title>
+  <title>강의 업로드</title>
   <link rel="stylesheet" href="<c:url value='/static/css/lecture_upload.css' />" />
+  <script>
+    let contentIndex = 0;
+    function addContentField() {
+      const container = document.getElementById("contentContainer");
+      const block = document.createElement("div");
+      block.innerHTML = `
+        <label>영상 제목</label>
+        <input type="text" name="contentTitles" required />
+        <label>비디오 파일</label>
+        <input type="file" name="contentFiles" accept="video/*" required />
+        <label>재생 시간(초)</label>
+        <input type="number" name="durations" min="1" required />
+        <label>순서</label>
+        <input type="number" name="orderNos" min="1" required />
+        <hr/>
+      `;
+      container.appendChild(block);
+      contentIndex++;
+    }
+  </script>
 </head>
 <body>
 <div class="upload-container">
   <h2>강의 업로드</h2>
   <form method="post" action="${pageContext.request.contextPath}/lecture/uploadSubmit" enctype="multipart/form-data">
-
     <input type="text" name="lectureTitle" placeholder="강의 제목" required />
     <textarea name="lectureDescription" placeholder="강의 설명" required></textarea>
     <textarea name="curriculum" placeholder="커리큘럼 HTML" required></textarea>
@@ -36,51 +55,39 @@
     <label>썸네일 이미지</label>
     <input type="file" name="thumbnailFile" accept="image/*" required />
 
-    <label>강의 비디오</label>
-    <input type="file" name="contentFile" accept="video/*" required />
+    <h3>📽️ 강의 콘텐츠 추가</h3>
+    <div id="contentContainer"></div>
+    <button type="button" onclick="addContentField()">+ 콘텐츠 추가</button>
 
-    <input type="number" name="duration" placeholder="재생시간(초)" required min="1" />
-    <input type="number" name="orderNo" placeholder="순서" required min="1" />
+    <br><br>
     <button type="submit">강의 등록</button>
   </form>
 </div>
 
 <script>
   const selectedTagIds = new Set();
-
   function addSelectedTag() {
     const select = document.getElementById("tagSelect");
     const tagId = select.value;
     const tagName = select.options[select.selectedIndex].text;
-
     if (selectedTagIds.has(tagId)) {
-      alert("이미 추가된 태그입니다.");
-      return;
+      alert("이미 추가된 태그입니다."); return;
     }
-
     selectedTagIds.add(tagId);
-
-    const tagLabel = document.createElement("span");
-    tagLabel.className = "tag-label";
-    tagLabel.textContent = tagName;
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.type = "button";
-    deleteBtn.textContent = "x";
-    deleteBtn.onclick = () => {
-      tagLabel.remove();
-      document.getElementById("tagHidden_" + tagId).remove();
+    const label = document.createElement("span");
+    label.className = "tag-label";
+    label.textContent = tagName;
+    const delBtn = document.createElement("button");
+    delBtn.type = "button"; delBtn.textContent = "x";
+    delBtn.onclick = () => {
+      label.remove(); document.getElementById("tagHidden_" + tagId).remove();
       selectedTagIds.delete(tagId);
     };
-
-    tagLabel.appendChild(deleteBtn);
-    document.getElementById("tagContainer").appendChild(tagLabel);
-
+    label.appendChild(delBtn);
+    document.getElementById("tagContainer").appendChild(label);
     const hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.name = "tags";
-    hiddenInput.id = "tagHidden_" + tagId;
-    hiddenInput.value = tagId;
+    hiddenInput.type = "hidden"; hiddenInput.name = "tags";
+    hiddenInput.id = "tagHidden_" + tagId; hiddenInput.value = tagId;
     document.getElementById("hiddenTags").appendChild(hiddenInput);
   }
 </script>
