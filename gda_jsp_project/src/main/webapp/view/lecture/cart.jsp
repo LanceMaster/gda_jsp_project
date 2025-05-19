@@ -45,6 +45,7 @@
     </div>
   </form>
 
+
   <script>
     function updateTotal() {
       let total = 0;
