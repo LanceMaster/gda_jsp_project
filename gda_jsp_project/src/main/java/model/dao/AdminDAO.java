@@ -78,4 +78,31 @@ public class AdminDAO {
 		return null;
 	}
 
+	public List<UserDTO> searchInstructorsByName(String keyword) {
+		// TODO Auto-generated method stub
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			return session.getMapper(mapperClass).searchInstructorByName(keyword);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+
+		return null;
+	}
+
+	public List<UserDTO> instructorList() {
+		// TODO Auto-generated method stub
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			return session.getMapper(mapperClass).instructorList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
 }

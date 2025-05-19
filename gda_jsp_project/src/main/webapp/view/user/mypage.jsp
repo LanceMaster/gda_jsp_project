@@ -7,6 +7,11 @@
 <head>
 <meta charset="UTF-8">
 <title>마이페이지</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
 <style>
 body {
 	background: #fff;
@@ -26,12 +31,18 @@ body {
 	margin-right: 40px;
 }
 
+/* 카드 스타일 */
 .profile-card, .lecture-card {
 	background: #fff;
 	border-radius: 16px;
 	box-shadow: 0 2px 8px #eee;
 	padding: 20px;
 	margin-bottom: 24px;
+}
+
+.lecture-card {
+	display: flex;
+	align-items: center;
 }
 
 .lecture-img {
@@ -49,6 +60,14 @@ body {
 .progress {
 	height: 8px;
 	margin-bottom: 8px;
+	background-color: #e9ecef;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.progress-bar {
+	background: #6c6ce5;
+	transition: width 0.6s ease;
 }
 
 .profile-form input, .profile-form select {
@@ -57,6 +76,105 @@ body {
 
 .profile-form label {
 	font-weight: 500;
+}
+
+/* 버튼 커스텀 hover 애니메이션 */
+.btn-custom-primary {
+	background-color: #6c6ce5;
+	color: white;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	border: none;
+}
+
+.btn-custom-primary:hover, .btn-custom-primary:focus,
+	.btn-custom-primary:active {
+	background-color: #5757c7;
+	color: white;
+	transform: scale(1.05);
+	box-shadow: 0 4px 12px rgba(108, 108, 229, 0.6);
+	outline: none;
+}
+
+/* 이력서 보기 버튼 스타일 */
+#viewResumeBtn {
+	color: #6c6ce5;
+	text-decoration: underline;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-weight: 500;
+	transition: color 0.3s ease;
+}
+
+#viewResumeBtn:hover {
+	color: #5757c7;
+}
+
+/* 회원탈퇴 링크 스타일 */
+a.delete-link {
+	color: #6c6ce5;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+a.delete-link:hover {
+	color: #5757c7;
+	text-decoration: underline;
+}
+
+/* 모달 버튼 스타일 통일 */
+.modal .btn-danger, .modal .btn-secondary, .modal .btn-primary {
+	transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modal .btn-danger:hover {
+	background-color: #c82333;
+	transform: scale(1.05);
+}
+
+.modal .btn-primary:hover {
+	background-color: #5757c7;
+	transform: scale(1.05);
+}
+
+.modal .btn-secondary:hover {
+	background-color: #6c757d;
+	transform: scale(1.05);
+}
+
+/* 비밀번호 일치 메시지 */
+#passwordMatchMessage {
+	font-weight: 500;
+	margin-top: 6px;
+}
+
+/* 탭 메뉴 스타일 */
+.mypage-left ul {
+	display: flex;
+	list-style: none;
+	padding: 0;
+	margin-bottom: 16px;
+}
+
+.mypage-left ul li {
+	margin-right: 16px;
+}
+
+.mypage-left ul li a {
+	text-decoration: none;
+	color: #6c6ce5;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.mypage-left ul li a.active {
+	border-bottom: 2px solid #6c6ce5;
+	padding-bottom: 2px;
+}
+
+.lecture-card {
+	margin-bottom: 12px;
 }
 </style>
 </head>
@@ -70,50 +188,103 @@ body {
 				<div style="color: #888;">
 					직급:
 					<c:choose>
-						<c:when test="${user.role == 'STUDENT'}">수강생</c:when>
-						<c:when test="${user.role == 'INSTRUCTOR'}">강사</c:when>
+						<c:when test="${user.role eq 'STUDENT'}">수강생</c:when>
+						<c:when test="${user.role eq 'INSTRUCTOR'}">강사</c:when>
 						<c:otherwise>회원</c:otherwise>
 					</c:choose>
 				</div>
-				<a href="#"
+
+				<!-- <a href="#"
 					style="font-size: 0.95rem; color: #6c6ce5; text-decoration: underline;">수강강의
-					전체</a>
+					전체</a> -->
+				<ul class="nav nav-tabs" id="lectureTabs" role="tablist">
+					<c:if test="${user.role == 'INSTRUCTOR'}">
+						<li class="nav-item" role="presentation"><a
+							class="nav-link active" id="myLectures-tab" data-toggle="tab"
+							href="#myLectures" role="tab" aria-controls="myLectures"
+							aria-selected="true">등록한 강의</a></li>
+					</c:if>
+					<li class="nav-item" role="presentation"><a
+						class="nav-link <c:if test='${user.role != "INSTRUCTOR"}'>active</c:if>'"
+						id="ongoingLectures-tab" data-toggle="tab" href="#ongoingLectures"
+						role="tab" aria-controls="ongoingLectures" aria-selected="false">수강중인
+							강의</a></li>
+				</ul>
+
 			</div>
-			<div class="lecture-card d-flex align-items-center">
-				<img
-					src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
-					class="lecture-img" alt="강의 이미지" />
-				<div class="lecture-info">
-					<div style="font-weight: 600;">CSS</div>
-					<div style="font-size: 0.95rem; color: #888;">전체수강일: 50회</div>
-					<div class="progress">
-						<div class="progress-bar" style="width: 30%; background: #6c6ce5;"></div>
+
+			<div class="tab-content">
+				<c:if test="${user.role == 'INSTRUCTOR'}">
+					<div class="tab-pane fade show active" id="myLectures"
+						role="tabpanel" aria-labelledby="myLectures-tab">
+
+						<c:if test="${empty myLectures}">
+							<p class="text-muted">등록한 강의가 없습니다.</p>
+						</c:if>
+
+						<c:forEach var="lecture" items="${myLectures}">
+							<div class="lecture-card d-flex align-items-center">
+								<img
+									src="${pageContext.request.contextPath}${lecture.thumbnail}"
+									class="lecture-img" alt="강의 이미지" />
+								<div class="lecture-info">
+									<div style="font-weight: 600;">${lecture.title}</div>
+									<div class="lecture-instructor"
+										style="font-size: 0.95rem; color: #888;">${lecture.description}</div>
+
+									<div class="lecture-rating">
+										<span class="star"><i class="fas fa-star"></i></span> <span
+											class="rating-text">${lecture.avgRating}</span>
+									</div>
+								</div>
+								<button class="btn btn-primary"
+									style="background: #6c6ce5; border: none;">관리</button>
+							</div>
+						</c:forEach>
 					</div>
-					<div style="font-size: 0.95rem;">진도율: 30%</div>
+				</c:if>
+
+				<div
+					class="tab-pane fade <c:if test='${user.role != "INSTRUCTOR"}'>show active</c:if>"
+					id="ongoingLectures" role="tabpanel"
+					aria-labelledby="ongoingLectures-tab">
+
+					<c:if test="${empty myCourses}">
+						<p class="text-muted">수강 중인 강의가 없습니다.</p>
+					</c:if>
+
+					<c:forEach var="course" items="${myCourses}">
+						<div class="lecture-card d-flex align-items-center">
+							<img src="${pageContext.request.contextPath}${course.thumbnail}"
+								class="lecture-img" alt="강의 이미지" />
+							<div class="lecture-info">
+								<div style="font-weight: 600;">${course.title}</div>
+								<div class="lecture-instructor"
+									style="font-size: 0.95rem; color: #888;">${course.description}</div>
+
+								<div class="lecture-rating">
+									<span class="star"><i class="fas fa-star"></i></span> <span
+										class="rating-text">${course.avgRating}</span>
+								</div>
+							</div>
+							<button class="btn btn-primary"
+								style="background: #6c6ce5; border: none;">수강중</button>
+						</div>
+					</c:forEach>
 				</div>
-				<button class="btn btn-primary"
-					style="background: #6c6ce5; border: none;">수강</button>
 			</div>
+
 		</div>
 
 		<!-- 오른쪽 프로필 -->
 		<div class="mypage-right">
 
-			<c:if test="${user.role == 'INSTRUCTOR'}">
-				<div style="margin-bottom: 16px;">
-					<ul
-						style="display: flex; list-style: none; padding: 0; margin: 0; border-bottom: 2px solid #6c6ce5;">
-						<li style="margin-right: 24px;"><a
-							href="${pageContext.request.contextPath}/lecture/lecturelist"
-							style="text-decoration: none; padding: 8px 0; display: inline-block; color: #6c6ce5; font-weight: bold; border-bottom: 3px solid #6c6ce5;">
-								나의 강의 </a></li>
-					</ul>
-				</div>
-			</c:if>
+
 
 
 
 			<h3 style="font-weight: 700; margin-bottom: 32px;">프로필</h3>
+
 			<form class="profile-form">
 				<div class="form-group">
 					<label>이름</label> <input type="text" class="form-control"
@@ -207,6 +378,18 @@ body {
 	<!-- 회원탈퇴 모달 (생략 가능) -->
 
 	<!-- ✅ 스크립트 (jQuery 포함 후 실행) -->
+
+	<script>
+  $('#lectureTabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    var target = $(e.target).attr("href"); // activated tab-pane id
+    $(target).addClass('animate__animated animate__fadeIn');
+    
+    // 애니메이션 클래스 제거 (재사용 위해)
+    setTimeout(function() {
+      $(target).removeClass('animate__animated animate__fadeIn');
+    }, 1000);
+  });
+</script>
 	<script>
 	 const user = {
 			    id: "${user.userId}",

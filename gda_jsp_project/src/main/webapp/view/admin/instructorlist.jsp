@@ -39,7 +39,7 @@
 			placeholder="Search users..."> -->
 
 		<form method="get"
-			action="${pageContext.request.contextPath}/admin/userlist">
+			action="${pageContext.request.contextPath}/admin/instructorlist">
 			<input type="text" name="keyword" class="form-control mb-3"
 				placeholder="이름으로 검색..." value="${param.keyword}">
 		</form>
@@ -122,6 +122,11 @@
 					<p>
 						<strong>연락처:</strong> <span id="modalPhone"></span>
 					</p>
+
+					<!-- JSP 모달 resume 영역 -->
+					<p id="resumeSection" style="display: none;">
+						<strong>이력서 파일:</strong> <a id="modalResumeLink" href="#" download>다운로드</a>
+					</p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-danger" id="deleteUserBtn">삭제</button>
@@ -153,6 +158,16 @@ document.addEventListener("DOMContentLoaded", function () {
           $("#modalEmail").text(data.email);
           $("#modalBirthdate").text(data.birthdate);
           $("#modalPhone").text(data.phone);
+          
+          if (data.role === "INSTRUCTOR" && data.resume) {
+        	  const contextPath = "${pageContext.request.contextPath}";
+        	  const downloadUrl = contextPath + "/AdminServlet?action=downloadResume&fileName=" + encodeURIComponent(data.resume);
+        	  $("#modalResumeLink").attr("href", downloadUrl).text(data.resume);
+        	  $("#resumeSection").show();
+        	} else {
+        	  $("#resumeSection").hide();
+        	}
+
 
           $("#userDetailModal").modal("show");
         }
