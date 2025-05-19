@@ -2,6 +2,7 @@ package model.mapper;
 
 import model.dto.TagDTO;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -66,6 +67,7 @@ public interface TagMapper {
                        @Param("targetType") String targetType,
                        @Param("tagId") int tagId);
     
+
     @Select("""
             SELECT t.tag_id AS tagId, t.name AS name
             FROM tag_mappings tm
@@ -76,6 +78,9 @@ public interface TagMapper {
             LIMIT #{limit}
         """)
         List<TagDTO> getTopTags(@Param("limit") int limit);
+    @Delete("DELETE FROM tag_mappings WHERE target_id = #{targetId} AND target_type = #{targetType}")
+    void deleteMappings(@Param("targetId") int targetId, @Param("targetType") String targetType);
+
 
 
 }

@@ -67,9 +67,9 @@ public class UserDAO {
 
 	}
 
-	
 	/**
 	 * 비밀번호 변경 메서드
+	 * 
 	 * @param email
 	 * @param newPassword
 	 * @return
@@ -95,8 +95,6 @@ public class UserDAO {
 		return false;
 	}
 
-	
-
 	public boolean deleteAccount(String email) {
 		// TODO Auto-generated method stub
 		SqlSession session = MybatisConnection.getConnection();
@@ -118,7 +116,92 @@ public class UserDAO {
 		return false;
 	}
 
-	
-	
+	/**
+	 * 아이디 찾기 메서드
+	 * 
+	 * @param name
+	 * @param email
+	 * @return
+	 */
+	public String findId(String name, String email) {
+		// TODO Auto-generated method stub
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			String id = session.getMapper(mapperClass).findId(name, email);
+			if (id != null) {
+				return id; // 아이디 찾기 성공
+			} else {
+				return null; // 아이디 찾기 실패
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
+	public boolean findPassword(String email, String name) {
+		// TODO Auto-generated method stub
+
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			int resultCount = session.getMapper(mapperClass).findPassword(email, name);
+			if (resultCount > 0) {
+				return true; // 비밀번호 찾기 성공
+			} else {
+				return false; // 비밀번호 찾기 실패
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return false;
+
+	}
+
+	public String findIdByNameAndBirth(String name, String birth) {
+		// TODO Auto-generated method stub
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			String id = session.getMapper(mapperClass).findId(name, birth);
+			if (id != null) {
+				return id; // 아이디 찾기 성공
+			} else {
+				return null; // 아이디 찾기 실패
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+
+		return null;
+	}
+
+	/**
+	 * 이력서 파일명 가져오기 메서드
+	 * 
+	 * @param parameter
+	 * @return
+	 */
+	public String getResumeFilename(String email) {
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			String resumeFilename = session.getMapper(mapperClass).getResumeFilename(email);
+			if (resumeFilename != null) {
+				return resumeFilename; // 이력서 파일명 가져오기 성공
+			} else {
+				return null; // 이력서 파일명 가져오기 실패
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+
+		return null;
+	}
 
 }

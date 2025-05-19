@@ -2,6 +2,7 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.annotation.WebInitParam;
@@ -74,69 +75,76 @@ public class UserController extends MskimRequestMapping {
 	 */
 	@RequestMapping("signup")
 	public String signup(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// 업로드 폴더 경로 설정
-		String path = request.getServletContext().getRealPath("/") + "/upload/user/";
-		File dir = new File(path);
-		if (!dir.exists())
-			dir.mkdirs();
+	    String path = request.getServletContext().getRealPath("/") + "/upload/resume/";
+	    File uploadDir = new File(path);
+	    if (!uploadDir.exists()) uploadDir.mkdirs();
 
-		int maxSize = 10 * 1024 * 1024; // 10MB
-		MultipartRequest multi = null;
+	    MultipartRequest multi;
+	    try {
+	        int maxSize = 10 * 1024 * 1024; // 10MB
+	        multi = new MultipartRequest(request, path, maxSize, "UTF-8");
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        request.setAttribute("signupError", "파일 업로드 실패");
+	        return "user/signupform";
+	    }
 
-		try {
-			multi = new MultipartRequest(request, path, maxSize, "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-			request.setAttribute("signupError", "파일 업로드 실패");
-			return "user/signupform";
-		}
+	    // 파라미터 추출
+	    String email = multi.getParameter("email");
+	    String password = multi.getParameter("password");
+	    String role = multi.getParameter("role");
+	    String resumeFileName = multi.getFilesystemName("resume");
+	    String birthdateStr = multi.getParameter("birthdate");
 
-		// 파라미터 추출
-		String email = multi.getParameter("email");
-		String password = multi.getParameter("password");
-		String role = multi.getParameter("role"); // "STUDENT" 또는 "INSTRUCTOR"
-		String resumeFileName = multi.getFilesystemName("resume"); // 업로드된 이력서 파일 이름
+	    // 필수 항목 체크
+	    if (isNullOrEmpty(email) || isNullOrEmpty(password) || isNullOrEmpty(role)) {
+	        request.setAttribute("signupError", "이메일, 비밀번호, 역할은 필수 입력입니다.");
+	        return "redirect:" + request.getContextPath() + "/user/signupform";
+	    }
 
-		// 필수 항목 체크
-		if (email == null || password == null || role == null || email.trim().isEmpty() || password.trim().isEmpty()) {
-			request.setAttribute("signupError", "이메일, 비밀번호, 역할은 필수 입력입니다.");
-			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
+	    // 이력서 파일 필수 체크 (강사인 경우)
+	    if ("INSTRUCTOR".equalsIgnoreCase(role) && isNullOrEmpty(resumeFileName)) {
+	        request.setAttribute("signupError", "강사 신청 시 이력서 파일은 필수입니다.");
+	        return "redirect:" + request.getContextPath() + "/user/signupform";
+	    }
 
-		}
+	    // 사용자 DTO 생성
+	    UserDTO userDTO = new UserDTO();
+	    userDTO.setEmail(email);
+	    userDTO.setPassword(password);
+	    userDTO.setName(multi.getParameter("name"));
+	    userDTO.setPhone(multi.getParameter("phone"));
+	    userDTO.setRole(role.toUpperCase());
+	    userDTO.setResume(resumeFileName != null ? resumeFileName : "");
+	    userDTO.setAgreedTerms(true);
 
-		// 이력서 파일 체크 (강사만 필수)
-		if ("INSTRUCTOR".equalsIgnoreCase(role) && (resumeFileName == null || resumeFileName.trim().isEmpty())) {
-			request.setAttribute("signupError", "강사 신청 시 이력서 파일은 필수입니다.");
-			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
+	    try {
+	        if (!isNullOrEmpty(birthdateStr)) {
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	            userDTO.setBirthdate(sdf.parse(birthdateStr));
+	        }
+	    } catch (ParseException e) {
+	        e.printStackTrace();
+	        request.setAttribute("signupError", "생년월일 형식이 잘못되었습니다.");
+	        return "redirect:" + request.getContextPath() + "/user/signupform";
+	    }
 
-		}
+	    int result = userDAO.signup(userDTO);
 
-		// DTO 설정
-		UserDTO userDTO = new UserDTO();
-		userDTO.setEmail(email);
-		userDTO.setPassword(password);
-		userDTO.setName(multi.getParameter("name"));
-		userDTO.setPhone(multi.getParameter("phone"));
-		userDTO.setRole(role.toUpperCase()); // "STUDENT" or "INSTRUCTOR"
-		userDTO.setResume(resumeFileName != null ? resumeFileName : "");
-		userDTO.setAgreedTerms(true); // 약관 동의 여부
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		try {
-			userDTO.setBirthdate(sdf.parse(multi.getParameter("birthdate")));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "redirect:" + request.getContextPath() + "/user/signupform"; // 로그인 폼으로 리다이렉트
-		}
-
-		int result = userDAO.signup(userDTO);
-
-		if (result > 0) {
-			return "redirect:" + request.getContextPath() + "/user/loginform";
-		} else {
-			request.setAttribute("signupError", "회원가입 실패");
-			return "user/signupform";
-		}
+	    if (result > 0) {
+	        return "redirect:" + request.getContextPath() + "/user/loginform";
+	    } else {
+	        request.setAttribute("signupError", "회원가입 실패");
+	        return "user/signupform";
+	    }
 	}
+
+	private boolean isNullOrEmpty(String str) {
+	    return str == null || str.trim().isEmpty();
+	}
+
+	
+	
 
 	// 아이디찾기폼 불러오기
 	@RequestMapping("findidform")
