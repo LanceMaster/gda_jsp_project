@@ -245,7 +245,8 @@ public interface LectureMapper {
 	
 	// 내가 신청한 강의 목록
 	@Select("""
-			    SELECT l.*
+			    SELECT l.*,
+			    e.avg_progress AS avgProgress
 			    FROM enrollments e
 			    JOIN lectures l ON e.lecture_id = l.lecture_id
 			    WHERE e.user_id = #{userId}

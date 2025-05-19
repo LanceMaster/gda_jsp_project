@@ -6,18 +6,31 @@
 <body>
 	<!-- Tags -->
 	<div class="mt-5 mb-5 d-flex flex-wrap justify-content-center">
-		<button class="tag-btn">JavaScript</button>
-		<button class="tag-btn">Spring Boot</button>
-		<button class="tag-btn">Python</button>
-		<button class="tag-btn">CSS</button>
-		<button class="tag-btn">정보보안</button>
+		<a class="tag-btn"
+			href="${pageContext.request.contextPath}/lecture/lecturelist?category=javascript">JavaScript</a>
+		<a class="tag-btn"
+			href="${pageContext.request.contextPath}/lecture/lecturelist?category=Spring+Boot">Spring
+			Boot</a> <a class="tag-btn"
+			href="${pageContext.request.contextPath}/lecture/lecturelist?category=python">Python</a>
+		<a class="tag-btn"
+			href="${pageContext.request.contextPath}/lecture/lecturelist?category=css">CSS</a>
+		<a class="tag-btn"
+			href="${pageContext.request.contextPath}/lecture/lecturelist?category=정보보안">정보보안</a>
 	</div>
 
 	<!-- Search -->
 	<div class="search-bar-area">
-		<input type="text" class="search-bar"
-			placeholder="검색하고 싶은 강의, 강사명을 입력해주세요" />
+		<form action="${pageContext.request.contextPath}/lecture/lecturelist"
+			method="get"
+			style="width: 100%; max-width: 1000px; display: flex; gap: 10px;">
+			<input type="text" name="keyword" class="search-bar"
+				placeholder="검색하고 싶은 강의, 강사명을 입력해주세요" />
+			<button type="submit" class="btn btn-primary"
+				style="border-radius: 25px; padding: 14px 28px;">검색</button>
+		</form>
 	</div>
+
+
 
 	<!-- Carousel -->
 	<section class="mb-5 mt-5">
@@ -62,8 +75,7 @@
 		<c:forEach var="lecture" items="${topLectures}">
 			<div class="col-md-3 mb-4">
 				<div class="card lecture-card-custom h-100 shadow-sm border-0">
-					<img
-						src="${pageContext.request.contextPath}${lecture.thumbnail}"
+					<img src="${pageContext.request.contextPath}${lecture.thumbnail}"
 						class="card-img-top p-3" alt="강의 이미지" style="border-radius: 18px" />
 					<div class="card-body text-center">
 						<div class="font-weight-bold mb-2">
@@ -81,6 +93,28 @@
 		</c:forEach>
 	</div>
 
+	<%-- <h3 class="font-weight-bold mb-4 mt-5">최신강의</h3>
+	<div class="row">
+		<c:forEach var="lecture" items="${newLectures}">
+			<div class="col-md-3 mb-4">
+				<div class="card lecture-card-custom h-100 shadow-sm border-0">
+					<img src="${pageContext.request.contextPath}${lecture.thumbnail}"
+						class="card-img-top p-3" alt="강의 이미지" style="border-radius: 18px" />
+					<div class="card-body text-center">
+						<div class="font-weight-bold mb-2">
+							[${lecture.category}] <span style="color: #f0b400">⭐
+								${lecture.avgRating}</span>
+						</div>
+						<div class="mb-2 text-muted" style="font-size: 0.97rem">
+							${lecture.title} <br /> ${lecture.description}
+						</div>
+						<button class="btn btn-outline-primary btn-block"
+							style="border-radius: 12px">수강 하러가기</button>
+					</div>
+				</div>
+			</div>
+		</c:forEach>
+	</div> --%>
 
 
 </body>

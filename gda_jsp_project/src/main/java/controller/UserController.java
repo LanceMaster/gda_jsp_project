@@ -30,7 +30,11 @@ public class UserController extends MskimRequestMapping {
 	@RequestMapping("mainpage")
 	public String mainpage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 메인 페이지를 보여주는 JSP 페이지로 이동
-		List<LectureDTO> topLectures = lectureDAO.getTopLectures(10); // 상위 10개 강의
+		List<LectureDTO> topLectures = lectureDAO.getTopLectures(8); // 상위 8개 강의
+		// 최신강의 8개 가져오기
+	
+		//List<LectureDTO> latestLectures = lectureDAO.getLatestLectures(8); // 최신 8개 강의
+	
 		request.setAttribute("topLectures", topLectures);
 
 		return "user/mainpage"; // JSP 페이지 경로
