@@ -16,11 +16,19 @@ public class LectureDTO {
     private float avgRating;
     private int instructorId;
     private Integer reviewCount;
-    
+    private String curriculum;
 
     // ✅ Getter & Setter
 
-    public Integer getReviewCount() {
+    public String getCurriculum() {
+		return curriculum;
+	}
+
+	public void setCurriculum(String curriculum) {
+		this.curriculum = curriculum;
+	}
+
+	public Integer getReviewCount() {
         return reviewCount;
     }
 

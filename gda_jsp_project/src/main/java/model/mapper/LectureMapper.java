@@ -1,8 +1,12 @@
 package model.mapper;
 
 import model.dto.ContentDTO;
-
+import model.dto.LectureCardDTO;
 import model.dto.LectureDTO;
+import model.dto.LectureSearchCondition;
+import model.provider.LectureSqlProvider;
+import sql.LectureSqlBuilder;
+
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Param;
@@ -11,44 +15,28 @@ import java.util.Map;
 
 public interface LectureMapper {
 
-    // ✅ 1. 강의 등록
-    @Insert("""
-        INSERT INTO lectures
-        (title, description, thumbnail, category, price, status, avg_rating, published_at, created_at, updated_at, instructor_id)
-        VALUES
-        (#{title}, #{description}, #{thumbnail}, #{category}, #{price}, 'DRAFT', NULL, NULL, NOW(), NOW(), #{instructorId})
-    """)
-    @Options(useGeneratedKeys = true, keyProperty = "lectureId")
-    int insertLecture(LectureDTO lectureDTO);
-
-    // ✅ 2. 콘텐츠 등록
-    @Insert("""
-        INSERT INTO lecture_contents
-        (lecture_id, type, title, url, duration, order_no, created_at)
-        VALUES
-        (#{lectureId}, #{type}, #{title}, #{url}, #{duration}, #{orderNo}, NOW())
-    """)
-    int insertContent(ContentDTO contentDTO);
 
     // ✅ 3. 전체 강의 목록 조회
-    @Select("""
-        SELECT 
-            l.lecture_id AS lectureId,
-            l.title,
-            l.description,
-            l.thumbnail,
-            l.category,
-            l.price,
-            l.avg_rating AS avgRating,
-            l.instructor_id AS instructorId,
-            l.published_at AS publishedAt,
-            l.created_at AS createdAt,
-            l.updated_at AS updatedAt
-        FROM lectures l
-        WHERE l.status = 'PUBLISHED'
-        ORDER BY l.created_at DESC
-    """)
-    List<LectureDTO> getAllLectures();
+	@Select("""
+		    SELECT 
+		        l.lecture_id AS lectureId,
+		        l.title,
+		        l.description,
+		        l.thumbnail,
+		        l.category,
+		        l.price,
+		        l.avg_rating AS avgRating,
+		        l.instructor_id AS instructorId,
+		        (SELECT COUNT(*) FROM user_interactions
+		         WHERE target_type = 'LECTURE'
+		           AND target_id = l.lecture_id
+		           AND interaction_kind = 'FEEDBACK') AS reviewCount
+		    FROM lectures l
+		    WHERE l.status = 'PUBLISHED'
+		    ORDER BY l.created_at DESC
+		""")
+		List<LectureDTO> getAllLectures();
+
 
     // ✅ 4. 카테고리별 조회
     @Select("""
@@ -71,6 +59,10 @@ public interface LectureMapper {
     """)
     List<LectureDTO> selectByCategory(@Param("category") String category);
 
+    @Select("SELECT content_id, lecture_id, title, url, duration, sequence " +
+            "FROM contents WHERE lecture_id = #{lectureId} ORDER BY sequence ASC")
+    List<ContentDTO> selectAllContents(@Param("lectureId") int lectureId);
+    
     // ✅ 5. 키워드 검색 (제목 + 설명 LIKE)
     @Select("""
         SELECT 
@@ -93,6 +85,7 @@ public interface LectureMapper {
     """)
     List<LectureDTO> searchByKeyword(@Param("keyword") String keyword);
 
+    
     @Select("""
     	    SELECT 
     	        lecture_id AS lectureId,
@@ -176,40 +169,6 @@ public interface LectureMapper {
     	List<LectureDTO> searchLectureList(@Param("keyword") String keyword, @Param("category") String category, @Param("sort") String sort);
 
     
-    @Select("""
-    	    <script>
-    	        SELECT l.*, 
-    	               (SELECT ROUND(AVG(r.rating), 1) FROM user_interactions r 
-    	                WHERE r.target_type = 'LECTURE' AND r.target_id = l.lecture_id) AS avgRating,
-    	               (SELECT COUNT(*) FROM user_interactions r 
-    	                WHERE r.target_type = 'LECTURE' AND r.target_id = l.lecture_id) AS reviewCount
-    	        FROM lectures l
-    	        WHERE l.status = 'PUBLISHED'
-    	        <if test="keywords != null and keywords.size > 0">
-    	            AND (
-    	                <foreach collection="keywords" item="kw" separator=" OR ">
-    	                    l.title LIKE CONCAT('%', #{kw}, '%')
-    	                    OR l.description LIKE CONCAT('%', #{kw}, '%')
-    	                </foreach>
-    	            )
-    	        </if>
-    	        <if test="category != null and category != ''">
-    	            AND l.category = #{category}
-    	        </if>
-    	        <choose>
-    	            <when test="sort == 'popular'">
-    	                ORDER BY avgRating DESC
-    	            </when>
-    	            <otherwise>
-    	                ORDER BY l.created_at DESC
-    	            </otherwise>
-    	        </choose>
-    	    </script>
-    	""")
-    	List<LectureDTO> searchLectures(@Param("keywords") List<String> keywords,
-    	                                @Param("category") String category,
-    	                                @Param("sort") String sort);
-    
     @Select({
         "<script>",
         "SELECT l.*, IFNULL(AVG(ui.rating), 0) AS avgRating, COUNT(ui.interaction_id) AS reviewCount",
@@ -241,5 +200,47 @@ public interface LectureMapper {
     List<LectureDTO> selectLectures(@Param("keyword") String keyword,
                                      @Param("category") String category,
                                      @Param("sort") String sort);
+
+    @SelectProvider(type = LectureSqlProvider.class, method = "findLectures")
+    List<LectureCardDTO> findLectures(LectureSearchCondition cond);
+    
+    
+        @SelectProvider(type = LectureSqlProvider.class, method = "countLectures")
+        int countLectures(LectureSearchCondition cond);
+
+        
+        @Select("""
+        	    SELECT lecture_id, title, avg_rating, (
+        	      SELECT COUNT(*) FROM user_interactions
+        	      WHERE target_type = 'LECTURE' AND target_id = l.lecture_id
+        	    ) AS reviewCount
+        	    FROM lectures l
+        	    WHERE status = 'PUBLISHED' AND avg_rating IS NOT NULL
+        	    ORDER BY avg_rating DESC
+        	    LIMIT #{limit}
+        	""")
+        	List<LectureCardDTO> getRecommendedLectures(@Param("limit") int limit);
+        
+        @SelectProvider(type = LectureSqlBuilder.class, method = "buildSearchQuery")
+        List<LectureDTO> searchLectures(@Param("category") String category,
+                                         @Param("keyword") String keyword,
+                                         @Param("sort") String sort,
+                                         @Param("offset") int offset,
+                                         @Param("size") int size);
+        
+        @Insert("""
+                INSERT INTO lectures (title, description, thumbnail, price, instructor_id)
+                VALUES (#{title}, #{description}, #{thumbnail}, #{price}, #{instructorId})
+            """)
+            @Options(useGeneratedKeys = true, keyProperty = "lectureId")
+            void insertLecture(LectureDTO lecture);
+
+            @Insert("""
+                INSERT INTO lecture_contents (lecture_id, title, url, type, order_no, duration)
+                VALUES (#{lectureId}, #{title}, #{url}, #{type}, #{orderNo}, #{duration})
+            """)
+            void insertContent(ContentDTO content);
+
 }
+
 
