@@ -253,4 +253,14 @@ public interface LectureMapper {
 			""")
 	List<LectureDTO> getMyCourses(int userId);
 
+	// 최신 강의 목록
+	@Select("""
+			    SELECT *
+			    FROM lectures
+			    WHERE status = 'PUBLISHED'
+			    ORDER BY created_at DESC
+			    LIMIT #{i}
+			""")
+	List<LectureDTO> getLatestLectures(int i);
+
 }

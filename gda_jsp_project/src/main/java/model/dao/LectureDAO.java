@@ -168,7 +168,7 @@ public class LectureDAO {
 	}
 
 	/**
-	 * 김준희 추가 (2025-05-19) 인기 강의 10개 조회
+	 * 김준희 추가 (2025-05-19) 인기 강의 8개 조회
 	 * 
 	 * @param limit
 	 * @return
@@ -178,6 +178,24 @@ public class LectureDAO {
 		try {
 			LectureMapper mapper = useSession.getMapper(LectureMapper.class);
 			return mapper.getTopLectures(limit);
+		} finally {
+			if (session == null)
+				useSession.close();
+		}
+	}
+
+	/**
+	 * 김준희 추가 (2025-05-19) 최신 강의 8개 조회
+	 * 
+	 * @param limit
+	 * @return
+	 */
+	public List<LectureDTO> getLatestLectures(int limit) {
+		// TODO Auto-generated method stub
+		SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession();
+		try {
+			LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+			return mapper.getLatestLectures(limit);
 		} finally {
 			if (session == null)
 				useSession.close();

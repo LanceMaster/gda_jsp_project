@@ -237,8 +237,11 @@ a.delete-link:hover {
 											class="rating-text">${lecture.avgRating}</span>
 									</div>
 								</div>
-								<button class="btn btn-primary"
-									style="background: #6c6ce5; border: none;">관리</button>
+<a class="btn btn-primary"
+   href="${pageContext.request.contextPath}/lecture/management">
+   관리
+</a>
+
 							</div>
 						</c:forEach>
 					</div>
@@ -275,8 +278,9 @@ a.delete-link:hover {
 									${course.avgProgress}%</div>
 
 							</div>
-							<button class="btn btn-primary"
-								style="background: #6c6ce5; border: none;">수강중</button>
+							
+							<a href="${pageContext.request.contextPath}/lecture/management" class="btn btn-primary">관리</a>
+
 						</div>
 					</c:forEach>
 				</div>

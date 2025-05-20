@@ -46,7 +46,7 @@ public class CartViewController extends HttpServlet {
         System.out.println("✅ [CartController-GET] 로그인 사용자 ID: " + userId);
 
         try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            CartDAO cartDAO = new CartDAO(sqlSession);
+            CartDAO cartDAO = new CartDAO();
             List<LectureDTO> cartLectures = cartDAO.getCartLectures(userId);
 
             System.out.println("📦 [CartController-GET] 장바구니 강의 수: " +

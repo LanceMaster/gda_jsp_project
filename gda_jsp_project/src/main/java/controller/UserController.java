@@ -33,9 +33,10 @@ public class UserController extends MskimRequestMapping {
 		List<LectureDTO> topLectures = lectureDAO.getTopLectures(8); // 상위 8개 강의
 		// 최신강의 8개 가져오기
 	
-		//List<LectureDTO> latestLectures = lectureDAO.getLatestLectures(8); // 최신 8개 강의
+		List<LectureDTO> latestLectures = lectureDAO.getLatestLectures(8); // 최신 8개 강의
 	
 		request.setAttribute("topLectures", topLectures);
+		request.setAttribute("latestLectures", latestLectures);
 
 		return "user/mainpage"; // JSP 페이지 경로
 	}
