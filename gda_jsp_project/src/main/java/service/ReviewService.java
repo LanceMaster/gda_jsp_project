@@ -3,6 +3,7 @@ package service;
 import model.dao.ReviewDAO;
 import model.dto.ReviewDTO;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -21,9 +22,20 @@ public class ReviewService {
      * ✅ 강의 ID로 모든 리뷰 조회
      */
     public List<ReviewDTO> getReviewsByLectureId(int lectureId) {
-        return reviewDAO.getReviewsByLectureId(lectureId);
-    }
+        List<ReviewDTO> list = reviewDAO.getReviewsByLectureId(lectureId);
+        
+        // ✅ LocalDateTime → 문자열 포맷 세팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        for (ReviewDTO dto : list) {
+            if (dto.getCreatedAt() != null) {
+                dto.setCreatedAtFormatted(dto.getCreatedAt().format(formatter));
+            } else {
+                dto.setCreatedAtFormatted(""); // 혹시 모를 null 처리
+            }
+        }
 
+        return list;
+    }
     /**
      * ✅ 리뷰 등록
      */
@@ -59,12 +71,10 @@ public class ReviewService {
         return reviewDAO.hasCompletedWithFullProgress(userId, lectureId);
     }
 
-    /**
-     * ✅ 리뷰 작성 가능 여부 (수강 완료 + 미작성 상태)
-     */
+ // 변경: 진도율 100% 조건 제거 → 수강 여부만 체크
     public boolean canWriteReview(int userId, int lectureId) {
-        boolean hasEnrolled = hasCompletedWithFullProgress(userId, lectureId);
-        boolean hasReviewed = hasReviewed(userId, lectureId);
-        return hasEnrolled && !hasReviewed;
+        return hasEnrolled(userId, lectureId) && !hasReviewed(userId, lectureId);
     }
+    
+    
 }

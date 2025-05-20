@@ -74,4 +74,6 @@ public class ReviewDAO {
             mapper.updateLectureRating(lectureId);
         }
     }
+    
+    
 }
