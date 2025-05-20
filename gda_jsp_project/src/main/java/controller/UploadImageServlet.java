@@ -7,6 +7,7 @@ import javax.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @WebServlet("/projects/uploadImage")
 @MultipartConfig
@@ -20,15 +21,24 @@ public class UploadImageServlet extends HttpServlet {
             return;
         }
 
-        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-        String uploadPath = "C:/java_lec/workspace/gda_jsp_project/src/main/webapp/static/images";
+        String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+        String extension = "";
+        int dotIndex = originalFileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            extension = originalFileName.substring(dotIndex);
+        }
+
+        String safeFileName = UUID.randomUUID().toString() + extension;
+
+        // ✅ 톰캣 webapps/static/images 경로 기준
+        String uploadPath = getServletContext().getRealPath("/static/images");
         File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) uploadDir.mkdirs();
 
-        String filePath = uploadPath + File.separator + fileName;
+        String filePath = uploadPath + File.separator + safeFileName;
         filePart.write(filePath);
 
-        String imageUrl = request.getContextPath() + "/static/images/" + fileName;
+        String imageUrl = request.getContextPath() + "/static/images/" + safeFileName;
         response.setContentType("text/plain;charset=UTF-8");
         response.getWriter().write(imageUrl);
     }

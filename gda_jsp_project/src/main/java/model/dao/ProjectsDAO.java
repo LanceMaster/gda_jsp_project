@@ -12,22 +12,18 @@ public class ProjectsDAO {
         this.mapper = session.getMapper(ProjectsMapper.class);
     }
 
-    // ✅ 리더 이름 포함 목록 조회
     public List<ProjectsDTO> listAll() {
         return mapper.listAllWithLeaderName();
     }
 
-    // ✅ 리더 이름 포함 상세 조회
     public ProjectsDTO findProjectWithLeaderName(int projectId) {
         return mapper.findProjectWithLeaderName(projectId);
     }
 
-    
-    // ✅ 조회수 증가
     public void incrementViewCount(int projectId) {
         mapper.incrementViewCount(projectId);
     }
-    
+
     public int insert(ProjectsDTO project) {
         return mapper.insert(project);
     }
@@ -39,7 +35,7 @@ public class ProjectsDAO {
     public int delete(int projectId) {
         return mapper.delete(projectId);
     }
-    
+
     public List<ProjectsDTO> listOrderByRecent() {
         return mapper.listOrderByRecent();
     }
@@ -56,4 +52,8 @@ public class ProjectsDAO {
         return mapper.listByStatusOrderByViews(status);
     }
 
+    // ✅ 제목 기반 검색 - 최신순
+    public List<ProjectsDTO> searchByTitleOrderByRecent(String keyword) {
+        return mapper.searchByTitleOrderByRecent(keyword);
+    }
 }

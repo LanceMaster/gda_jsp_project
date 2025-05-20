@@ -25,6 +25,7 @@ import utils.MybatisConnection;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @MultipartConfig // ✅ 여기에 추가
@@ -38,33 +39,56 @@ public class ProjectsController extends MskimRequestMapping {
 
 	@RequestMapping("list")
 	public String list(HttpServletRequest request, HttpServletResponse response) {
+	    request.getSession().removeAttribute("viewedProjects");
+
 	    int pageNum = request.getParameter("pageNum") != null ? Integer.parseInt(request.getParameter("pageNum")) : 1;
 	    int pageSize = 10;
 	    String sort = request.getParameter("sort") != null ? request.getParameter("sort") : "recent";
 	    String status = request.getParameter("status");
+	    String keyword = request.getParameter("keyword") != null ? request.getParameter("keyword").trim() : "";
+
+	    boolean hasKeyword = !keyword.isEmpty();
+	    boolean isKeywordValid = keyword.length() >= 2;
 
 	    try (SqlSession session = MybatisConnection.getConnection()) {
 	        ProjectsDAO dao = new ProjectsDAO(session);
+	        TagDAO tagDAO = new TagDAO(session);
+
 	        PageHelper.startPage(pageNum, pageSize);
 
 	        List<ProjectsDTO> list;
-	        if (status != null && !status.isEmpty()) {
-	            if ("views".equals(sort)) {
-	                list = dao.listByStatusOrderByViews(status);
+
+	        if (hasKeyword) {
+	            if (!isKeywordValid) {
+	                request.setAttribute("errorMessage", "검색어는 최소 2글자 이상 입력해주세요.");
+	                list = dao.listOrderByRecent();  // 경고 출력 후 전체 최신순
 	            } else {
-	                list = dao.listByStatusOrderByRecent(status);
+	                list = dao.searchByTitleOrderByRecent(keyword);  // 제목 검색
 	            }
 	        } else {
-	            if ("views".equals(sort)) {
-	                list = dao.listOrderByViews();
+	            if (status != null && !status.isEmpty()) {
+	                list = "views".equals(sort) ? dao.listByStatusOrderByViews(status) : dao.listByStatusOrderByRecent(status);
 	            } else {
-	                list = dao.listOrderByRecent();
+	                list = "views".equals(sort) ? dao.listOrderByViews() : dao.listOrderByRecent();
+	            }
+	        }
+
+	        for (ProjectsDTO project : list) {
+	            List<TagDTO> tags = tagDAO.getTagsByProjectId(project.getProjectId());
+	            project.setTags(tags);
+	            if (project.getDescription() != null) {
+	                String cleaned = project.getDescription()
+	                                        .replaceAll("<[^>]*>", "")
+	                                        .replaceAll("[\\n\\r]", "");
+	                project.setDescription(cleaned);
 	            }
 	        }
 
 	        PageInfo<ProjectsDTO> pageInfo = new PageInfo<>(list);
 	        request.setAttribute("projects", pageInfo.getList());
 	        request.setAttribute("pageInfo", pageInfo);
+	        request.setAttribute("keyword", keyword);  // 검색어 유지
+
 	        PageHelper.clearPage();
 	        return "projects/projectsList";
 	    }
@@ -72,19 +96,29 @@ public class ProjectsController extends MskimRequestMapping {
 
 
 
-
 	@RequestMapping("detail")
 	public String detail(HttpServletRequest request, HttpServletResponse response) {
 	    try (SqlSession session = MybatisConnection.getConnection()) {
 	        int projectId = Integer.parseInt(request.getParameter("projectId"));
-
 	        ProjectsDAO projectsDAO = new ProjectsDAO(session);
-	        // ✅ 조회수 증가 먼저 호출
-	        projectsDAO.incrementViewCount(projectId);
-	        session.commit();  // 💡 반드시 commit 해야 실제 DB에 반영됨
+
+	        // ✅ 세션에 조회 기록 확인 및 초기화
+	        @SuppressWarnings("unchecked")
+	        List<Integer> viewedProjects = (List<Integer>) request.getSession().getAttribute("viewedProjects");
+	        if (viewedProjects == null) {
+	            viewedProjects = new ArrayList<>();
+	            request.getSession().setAttribute("viewedProjects", viewedProjects);
+	        }
+
+	        // ✅ 같은 세션에서 최초 접근일 때만 조회수 증가
+	        if (!viewedProjects.contains(projectId)) {
+	            projectsDAO.incrementViewCount(projectId);
+	            session.commit();
+	            viewedProjects.add(projectId);
+	        }
+
 	        // ✅ 글 상세 조회
 	        ProjectsDTO project = projectsDAO.findProjectWithLeaderName(projectId);
-
 	        if (project == null) {
 	            return "redirect:projectsList";
 	        }
@@ -112,11 +146,6 @@ public class ProjectsController extends MskimRequestMapping {
 	    }
 	}
 
-
-
-
-
-
 	    @RequestMapping("projectsForm")
 	    public String Form(HttpServletRequest request, HttpServletResponse response) {
 	        // ✅ 현재 로그인 유저 정보 출력 (테스트용)
@@ -134,32 +163,6 @@ public class ProjectsController extends MskimRequestMapping {
 	        }
 	    }
 	    
-	    @RequestMapping("uploadImage")
-	    public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	        Part filePart = request.getPart("file"); // ✅ 'file'로 변경
-	        if (filePart == null) {
-	            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	            response.getWriter().write("파일이 없습니다.");
-	            return;
-	        }
-
-	        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-	        String uploadPath = "C:/java_lec/workspace/gda_jsp_project/src/main/webapp/static/images";
-
-	        File uploadDir = new File(uploadPath);
-	        if (!uploadDir.exists()) uploadDir.mkdirs();
-
-	        String filePath = uploadPath + File.separator + fileName;
-	        filePart.write(filePath);
-
-	        String imageUrl = request.getContextPath() + "/static/images/" + fileName;
-	        response.setContentType("text/plain;charset=UTF-8");
-	        response.getWriter().write(imageUrl);
-
-	        System.out.println("파일 저장 경로: " + filePath);
-	    }
-
-
 	    @RequestMapping("write")
 	    public String write(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	        // ✅ 일반 텍스트 파라미터 수집
@@ -203,7 +206,7 @@ public class ProjectsController extends MskimRequestMapping {
 	            return "redirect:projectsList";
 	        }
 	    }
-
+	    
 
 	    @RequestMapping("projectsEdit")
 	    public String updateForm(HttpServletRequest request, HttpServletResponse response) {
@@ -279,7 +282,6 @@ public class ProjectsController extends MskimRequestMapping {
 	        }
 	    }
 
-
     @RequestMapping("delete")
     public String delete(HttpServletRequest request, HttpServletResponse response) {
         try (SqlSession session = MybatisConnection.getConnection()) {
@@ -297,7 +299,7 @@ public class ProjectsController extends MskimRequestMapping {
         UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
         if (loginUser == null) {
             // 로그인하지 않았으면 로그인 페이지로 이동
-            return "redirect:/user/loginform";
+        	return "redirect:" + request.getContextPath() + "/user/loginform";
         }
         
         UserDTO loginUser1 = (UserDTO) request.getSession().getAttribute("user");

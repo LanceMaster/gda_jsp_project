@@ -95,6 +95,30 @@
   color: #999;
 }
 
+/* 프로젝트 카드의 태그 목록 */
+.card-tags {
+  margin-top: 10px;
+}
+
+/* ✅ 태그 버튼 스타일 우선순위 명확화 */
+.card-tags .tag-button {
+  display: inline-block;
+  padding: 4px 12px;
+  margin: 2px 4px 0 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  font-size: 0.85rem;
+  color: #333;
+  cursor: default;
+}
+
+.card-tags .tag-button::before {
+  content: '#';
+  margin-right: 2px;
+  color: #999;
+}
+
 /* 페이징 */
 .pagination {
   display: flex;
@@ -116,6 +140,8 @@
   color: #fff;
   border: 1px solid #6c6ce5;
 }
+
+/* 태그 입력 컨테이너 */
 #tagContainer span {
   display: inline-block;
   background-color: #e0e0e0;
@@ -132,3 +158,17 @@
   cursor: pointer;
   font-size: 0.85rem;
 }
+
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-right: 5px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.color0 { background-color: #f0f0f0; color: #333; }
+.color1 { background-color: #d6eaff; color: #007bff; }
+.color2 { background-color: #ffe5e5; color: #dc3545; }
+.color3 { background-color: #e6f4ea; color: #28a745; }
+.color4 { background-color: #fff9db; color: #ffc107; }

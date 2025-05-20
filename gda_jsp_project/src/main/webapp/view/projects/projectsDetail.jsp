@@ -12,13 +12,18 @@
 <body>
 <div class="project-container">
 
-    <!-- 제목 + 본인만 수정 링크 -->
-    <div class="project-header">
-        ${project.title}
-        <c:if test="${loginUserId == project.leaderId}">
+<div class="project-header">
+    <span class="project-title">${project.title}</span>
+    <c:if test="${loginUserId eq project.leaderId}">
+        <div class="action-buttons">
             <a href="${pageContext.request.contextPath}/projects/projectsEdit?projectId=${project.projectId}" class="edit-link">수정하기</a>
-        </c:if>
-    </div>
+            <a href="${pageContext.request.contextPath}/projects/delete?projectId=${project.projectId}" 
+               class="delete-link" 
+               onclick="return confirm('정말 삭제하시겠습니까?');">삭제하기</a>
+        </div>
+    </c:if>
+</div>
+
 
     <!-- 작성자, 등록일, 조회수 -->
     <div class="project-meta">
@@ -27,12 +32,12 @@
         <br> 조회수 ${project.viewCount} Views
     </div>
 
-    <!-- 태그 출력 -->
-    <div>
-        <c:forEach var="tag" items="${projectTags}">
-            <span class="tag">${tag.name}</span>
-        </c:forEach>
-    </div>
+<!-- ✅ 태그 출력 (색상 순환 적용) -->
+<div>
+    <c:forEach var="tag" items="${projectTags}" varStatus="status">
+        <span class="tag color${status.index % 5}">${tag.name}</span>
+    </c:forEach>
+</div><br/>
 
     <!-- 본문 내용 (Summernote HTML 지원) -->
     <div class="project-description">
