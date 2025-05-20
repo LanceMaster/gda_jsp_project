@@ -1,6 +1,7 @@
 package model.dto;
 
 import java.util.Date;
+import java.util.List;
 
 public class ProjectsDTO {
     // ✅ 모집 상태 ENUM 정의
@@ -14,6 +15,9 @@ public class ProjectsDTO {
     private int viewCount = 0;                    // 기본 조회수 0
     private Date createdAt;                       // 생성 일시
     private int leaderId;                         // 리더 ID
+    private String leaderName;                    // 리더 이름
+
+    private List<TagDTO> tags;                    // ✅ 태그 목록 추가
 
     // ✅ Getter / Setter
 
@@ -41,12 +45,10 @@ public class ProjectsDTO {
         this.description = description;
     }
 
-    // ✅ Enum을 문자열로 변환하여 반환
     public String getRecruitStatus() {
         return recruitStatus.name();
     }
 
-    // ✅ Enum 설정 메서드
     public void setRecruitStatus(RecruitStatus recruitStatus) {
         this.recruitStatus = recruitStatus;
     }
@@ -74,7 +76,6 @@ public class ProjectsDTO {
     public void setLeaderId(int leaderId) {
         this.leaderId = leaderId;
     }
-    private String leaderName;  // ✅ 추가
 
     public String getLeaderName() {
         return leaderName;
@@ -84,12 +85,21 @@ public class ProjectsDTO {
         this.leaderName = leaderName;
     }
 
+    // ✅ 태그 Getter / Setter
+    public List<TagDTO> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagDTO> tags) {
+        this.tags = tags;
+    }
+
     // ✅ 디버깅용 toString 메서드
     @Override
     public String toString() {
         return "ProjectsDTO [projectId=" + projectId + ", title=" + title + ", description=" + description
                 + ", recruitStatus=" + recruitStatus + ", viewCount=" + viewCount
                 + ", createdAt=" + createdAt + ", leaderId=" + leaderId
-                + ", leaderName=" + leaderName + "]";
+                + ", leaderName=" + leaderName + ", tags=" + tags + "]";
     }
 }

@@ -3,15 +3,22 @@
     margin: 0 auto;
 }
 .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
-    position: relative;
 }
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+
+/* 수정 버튼 스타일 유지 */
 .edit-link {
-    position: absolute;
-    right: 0;
-    top: 0;
     font-size: 14px;
     color: #6c63ff;
     text-decoration: none;
@@ -19,6 +26,19 @@
     padding: 4px 8px;
     border-radius: 4px;
 }
+
+/* 삭제 버튼 */
+.delete-link {
+    font-size: 14px;
+    color: #ff4d4d;
+    text-decoration: none;
+    border: 1px solid #ff4d4d;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+}
+
 .project-meta {
     color: gray;
     font-size: 14px;
@@ -31,6 +51,14 @@
     margin-right: 5px;
     border-radius: 4px;
 }
+
+/* ✅ 파스텔톤 색상 5종 추가 */
+.color0 { background-color: #f0f0f0; color: #333; }
+.color1 { background-color: #d6eaff; color: #007bff; }
+.color2 { background-color: #ffe5e5; color: #dc3545; }
+.color3 { background-color: #e6f4ea; color: #28a745; }
+.color4 { background-color: #fff9db; color: #ffc107; }
+
 .comment-box {
     width: 100%;
     margin-top: 20px;
@@ -62,4 +90,3 @@
     margin-left: 10px;
     font-size: 12px;
 }
-
