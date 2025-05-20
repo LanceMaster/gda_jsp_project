@@ -64,12 +64,12 @@ public class ReviewService {
         return reviewDAO.hasReviewed(userId, lectureId);
     }
 
-    /**
-     * ✅ 수강 완료 여부 확인 (진도율 100% 기준)
-     */
-    public boolean hasCompletedWithFullProgress(int userId, int lectureId) {
-        return reviewDAO.hasCompletedWithFullProgress(userId, lectureId);
-    }
+//    /**
+//     * ✅ 수강 완료 여부 확인 (진도율 100% 기준)
+//     */
+//    public boolean hasCompletedWithFullProgress(int userId, int lectureId) {
+//        return reviewDAO.hasCompletedWithFullProgress(userId, lectureId);
+//    }
 
  // 변경: 진도율 100% 조건 제거 → 수강 여부만 체크
     public boolean canWriteReview(int userId, int lectureId) {
