@@ -1,77 +1,95 @@
 package controller;
 
+import com.google.gson.*;
 import model.dao.CheckoutDAO;
 import model.dto.UserDTO;
 import org.apache.ibatis.session.SqlSession;
+import utils.IamportUtils;
 import utils.MyBatisUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 @WebServlet(urlPatterns = { "/cart/checkout" }, initParams = { @WebInitParam(name = "view", value = "/view/") })
 public class CheckoutController extends HttpServlet {
 
-	public CheckoutDAO checkoutDAO = new CheckoutDAO();
+    private final CheckoutDAO checkoutDAO = new CheckoutDAO();
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		HttpSession session = req.getSession();
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+        HttpSession session = req.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("user");
 
-		UserDTO user = (UserDTO) session.getAttribute("user");
+        if (user == null) {
+            resp.getWriter().write("{\"success\": false, \"message\": \"로그인이 필요합니다.\"}");
+            return;
+        }
 
-		if (user == null) {
-			resp.sendRedirect(req.getContextPath() + "/user/loginform");
-			return;
-		}
+        // 1. JSON 요청 파싱
+        BufferedReader reader = req.getReader();
+        StringBuilder jsonBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonBuilder.append(line);
+        }
 
-		String[] lectureIds = req.getParameterValues("lectureIds");
-		String[] amounts = req.getParameterValues("amounts");
+        JsonObject json = JsonParser.parseString(jsonBuilder.toString()).getAsJsonObject();
+        String impUid = json.get("imp_uid").getAsString();
+        JsonArray lectureIdsJson = json.getAsJsonArray("lectureIds");
+        JsonArray amountsJson = json.getAsJsonArray("amounts");
 
-		if (lectureIds == null || amounts == null || lectureIds.length != amounts.length) {
-			resp.sendRedirect(req.getContextPath() + "/view/lecture/cart.jsp?error=선택된 강의 또는 금액 정보가 올바르지 않습니다");
-			return;
-		}
+        if (lectureIdsJson.size() != amountsJson.size()) {
+            resp.getWriter().write("{\"success\": false, \"message\": \"강의 정보와 결제 정보 불일치.\"}");
+            return;
+        }
 
-		try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
-			for (int i = 0; i < lectureIds.length; i++) {
-				int lectureId = Integer.parseInt(lectureIds[i]);
-				int amountPaid = Integer.parseInt(amounts[i]);
+        // 2. 총 결제 금액 계산
+        int expectedAmount = 0;
+        for (JsonElement amountElem : amountsJson) {
+            expectedAmount += amountElem.getAsInt();
+        }
 
-				Map<String, Object> enrollmentParam = new HashMap<>();
-				enrollmentParam.put("userId", user.getUserId());
-				enrollmentParam.put("lectureId", lectureId);
-				enrollmentParam.put("amountPaid", amountPaid);
-				enrollmentParam.put("paymentMethod", "CARD");
+        // 3. 아임포트 결제 검증
+        boolean valid = IamportUtils.verifyPayment(impUid, expectedAmount);
+        if (!valid) {
+            resp.getWriter().write("{\"success\": false, \"message\": \"결제 검증 실패.\"}");
+            return;
+        }
 
-				boolean success = checkoutDAO.insertEnrollment(sqlSession, enrollmentParam);
+        // 4. DB 처리
+        try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
+            for (int i = 0; i < lectureIdsJson.size(); i++) {
+                int lectureId = lectureIdsJson.get(i).getAsInt();
+                int amount = amountsJson.get(i).getAsInt();
 
-				if (!success) {
-					sqlSession.rollback();
-					resp.sendRedirect(req.getContextPath() + "/view/lecture/cart.jsp?error=결제 처리 중 오류가 발생했습니다");
-					return;
-				}
+                Map<String, Object> param = new HashMap<>();
+                param.put("userId", user.getUserId());
+                param.put("lectureId", lectureId);
+                param.put("amountPaid", amount);
+                param.put("paymentMethod", "KAKAO");
 
-				Map<String, Object> cartParam = new HashMap<>();
+                boolean enrolled = checkoutDAO.insertEnrollment(sqlSession, param);
+                if (!enrolled) {
+                    sqlSession.rollback();
+                    resp.getWriter().write("{\"success\": false, \"message\": \"수강 등록 실패.\"}");
+                    return;
+                }
 
-				cartParam.put("userId", user.getUserId());
-				cartParam.put("lectureId", lectureId);
+                boolean deleted = checkoutDAO.deleteCartItem(sqlSession, param);
+                if (!deleted) {
+                    sqlSession.rollback();
+                    resp.getWriter().write("{\"success\": false, \"message\": \"장바구니 삭제 실패.\"}");
+                    return;
+                }
+            }
 
-				boolean deleteSuccess = checkoutDAO.deleteCartItem(sqlSession, cartParam);
-
-				if (!deleteSuccess) {
-					sqlSession.rollback();
-					resp.sendRedirect(req.getContextPath() + "/view/lecture/cart.jsp?error=장바구니에서 강의 삭제 중 오류가 발생했습니다");
-					return;
-				}
-			}
-
-			resp.sendRedirect(req.getContextPath() + "/user/mypage");
-		}
-
-	}
+            resp.getWriter().write("{\"success\": true}");
+        }
+    }
 }

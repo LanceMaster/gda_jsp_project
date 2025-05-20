@@ -54,16 +54,16 @@ public class ReviewDAO {
             return mapper.hasReviewed(userId, lectureId);
         }
     }
-
     /**
-     * ✅ 수강 진도율 100% 완료 여부 (progress_logs 기준)
+     * ✅ 수강 진도율 30% 이상 여부 확인 (enrollments.avg_progress 기준)
      */
     public boolean hasCompletedWithFullProgress(int userId, int lectureId) {
         try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
             ReviewMapper mapper = session.getMapper(ReviewMapper.class);
-            return mapper.hasCompletedWithFullProgress(userId, lectureId);
+            return mapper.hasCompletedWithEnoughProgress(userId, lectureId); // 💡 변경된 메서드 호출
         }
     }
+
 
     /**
      * ✅ 강의 평균 평점 갱신 (lectures 테이블)
@@ -74,4 +74,6 @@ public class ReviewDAO {
             mapper.updateLectureRating(lectureId);
         }
     }
+    
+    
 }

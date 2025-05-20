@@ -12,8 +12,15 @@ public class ReviewDTO {
     private int rating;
     private LocalDateTime createdAt;
     private String formattedCreatedAt;
+    private String createdAtFormatted;
 
-    public int getInteractionId() { return interactionId; }
+	public String getCreatedAtFormatted() {
+		return createdAtFormatted;
+	}
+	public void setCreatedAtFormatted(String createdAtFormatted) {
+		this.createdAtFormatted = createdAtFormatted;
+	}
+	public int getInteractionId() { return interactionId; }
     public void setInteractionId(int interactionId) { this.interactionId = interactionId; }
 
     public int getUserId() { return userId; }

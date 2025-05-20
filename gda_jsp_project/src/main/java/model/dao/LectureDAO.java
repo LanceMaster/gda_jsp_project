@@ -239,4 +239,22 @@ public class LectureDAO {
 		}
 	}
 
+	/**
+	 * 김준희 추가
+	 * @param userId
+	 * @param lectureId
+	 * @return
+	 */
+	public int hasPurchasedLecture(int userId, int lectureId) {
+		SqlSession useSession = (session != null) ? session : MyBatisUtil.getSqlSessionFactory().openSession();
+		try {
+			LectureMapper mapper = useSession.getMapper(LectureMapper.class);
+			return mapper.hasPurchasedLecture(userId, lectureId);
+		} finally {
+			if(session == null)
+				useSession.close();
+		}
+
+	}
+
 }

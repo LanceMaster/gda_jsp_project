@@ -36,35 +36,6 @@ public class LectureService {
         this.lectureMapper = session.getMapper(LectureMapper.class); // 직접 주입
     }
 
-//    public List<LectureCardDTO> getLectures(LectureSearchCondition cond) {
-//        StringBuilder sql = new StringBuilder();
-//        sql.append("SELECT l.*, ");
-//        sql.append(" (SELECT COUNT(*) FROM user_interactions ");
-//        sql.append("  WHERE target_type='LECTURE' AND target_id=l.lecture_id) AS reviewCount, ");
-//        sql.append(" (SELECT ROUND(AVG(rating),1) FROM user_interactions ");
-//        sql.append("  WHERE target_type='LECTURE' AND target_id=l.lecture_id) AS avgRating ");
-//        sql.append("FROM lectures l ");
-//        sql.append("WHERE l.status = 'PUBLISHED' ");
-//
-//        if (cond.getCategory() != null && !cond.getCategory().isBlank()) {
-//            sql.append("AND l.category = '").append(cond.getCategory()).append("' ");
-//        }
-//
-//        if (cond.getKeyword() != null && !cond.getKeyword().isBlank()) {
-//            sql.append("AND (l.title LIKE '%").append(cond.getKeyword()).append("%' ");
-//            sql.append("OR l.description LIKE '%").append(cond.getKeyword()).append("%') ");
-//        }
-//
-//        if ("popular".equalsIgnoreCase(cond.getSort())) {
-//            sql.append("ORDER BY avgRating DESC ");
-//        } else {
-//            sql.append("ORDER BY l.published_at DESC ");
-//        }
-//
-//        sql.append("LIMIT ").append(cond.getOffset()).append(", ").append(cond.getSize());
-//
-//        return lectureMapper.findLecturesWithRawSql(sql.toString());
-//    }
     /**
      * ✅ 전체 강의 목록 조회
      * - status = 'PUBLISHED' 조건 포함
@@ -188,6 +159,13 @@ public class LectureService {
 
         return result.stream().distinct().toList();
     }
+
+	public boolean hasPurchasedLecture(int userId, int lectureId) {
+		
+		return lectureDAO.hasPurchasedLecture(userId , lectureId) > 0 ;
+		
+		
+	}
 
 //
 //    /**
