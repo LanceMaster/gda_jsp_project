@@ -60,7 +60,7 @@
     </div>
 
 <!-- ✅ 리뷰 작성 조건: 로그인 + 수강자 + 리뷰 미작성자 -->
-<c:if test="${hasEnrolled and not hasReviewed}">
+<c:if test="${canReview}">
   <form id="reviewForm" method="post">
     <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
 
@@ -80,14 +80,21 @@
   </form>
 </c:if>
 
-<!-- ✅ 비로그인 또는 조건 미충족 시 안내 메시지 -->
-<c:if test="${not hasEnrolled}">
-  <p class="review-guide">※ 수강 완료 후에만 리뷰를 작성할 수 있습니다.</p>
+<!-- ✅ 리뷰 작성 불가 조건 안내 -->
+<c:if test="${not canReview}">
+  <c:choose>
+    <c:when test="${not hasEnrolled}">
+      <p class="review-guide">※ 리뷰를 작성하려면 강의를 수강 중이어야 합니다.</p>
+    </c:when>
+    <c:when test="${hasReviewed}">
+      <p class="review-guide">※ 이미 리뷰를 작성하셨습니다.</p>
+    </c:when>
+    <c:otherwise>
+      <p class="review-guide">※ 리뷰 작성 조건이 충족되지 않았습니다.</p>
+    </c:otherwise>
+  </c:choose>
 </c:if>
 
-<c:if test="${hasReviewed}">
-  <p class="review-guide">※ 이미 리뷰를 작성하셨습니다.</p>
-</c:if>
 
 <!-- ✅ 리뷰 목록 -->
 <ul class="review-list" id="reviewList">
