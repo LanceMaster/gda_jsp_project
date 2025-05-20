@@ -32,7 +32,7 @@ public interface CartMapper {
         DELETE FROM carts
         WHERE user_id = #{userId} AND lecture_id = #{lectureId}
     """)
-    void deleteCartItem(@Param("userId") int userId, @Param("lectureId") int lectureId);
+    int deleteCartItem(@Param("userId") int userId, @Param("lectureId") int lectureId);
 
     // ✅ 장바구니에 동일 강의가 존재하는지 확인 (중복 체크)
     @Select("""

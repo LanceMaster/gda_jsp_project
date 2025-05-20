@@ -85,8 +85,36 @@
 						<div class="mb-2 text-muted" style="font-size: 0.97rem">
 							${lecture.title} <br /> ${lecture.description}
 						</div>
-						<button class="btn btn-outline-primary btn-block"
-							style="border-radius: 12px">수강 하러가기</button>
+
+						<a
+							href="${pageContext.request.contextPath}/lecture/lecturedetail?lectureId=${lecture.lectureId}"
+							class="btn btn-outline-primary btn-block"
+							style="border-radius: 12px;"> 수강 하러가기 </a>
+					</div>
+				</div>
+			</div>
+		</c:forEach>
+	</div>
+
+	<h3 class="font-weight-bold mb-4 mt-5">최신강의</h3>
+	<div class="row">
+		<c:forEach var="lecture" items="${latestLectures}">
+			<div class="col-md-3 mb-4">
+				<div class="card lecture-card-custom h-100 shadow-sm border-0">
+					<img src="${pageContext.request.contextPath}${lecture.thumbnail}"
+						class="card-img-top p-3" alt="강의 이미지" style="border-radius: 18px" />
+					<div class="card-body text-center">
+						<div class="font-weight-bold mb-2">
+							[${lecture.category}] <span style="color: #f0b400">⭐
+								${lecture.avgRating}</span>
+						</div>
+						<div class="mb-2 text-muted" style="font-size: 0.97rem">
+							${lecture.title} <br /> ${lecture.description}
+						</div>
+						<a
+							href="${pageContext.request.contextPath}/lecture/lecturedetail?lectureId=${lecture.lectureId}"
+							class="btn btn-outline-primary btn-block"
+							style="border-radius: 12px;"> 수강 하러가기 </a>
 					</div>
 				</div>
 			</div>

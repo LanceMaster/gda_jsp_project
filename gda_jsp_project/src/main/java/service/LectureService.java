@@ -160,6 +160,13 @@ public class LectureService {
         return result.stream().distinct().toList();
     }
 
+	public boolean hasPurchasedLecture(int userId, int lectureId) {
+		
+		return lectureDAO.hasPurchasedLecture(userId , lectureId) > 0 ;
+		
+		
+	}
+
 //
 //    /**
 //     * ✅ 강의 등록 + 콘텐츠 등록

@@ -1,17 +1,21 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
+
 <html>
 <head>
-  <title>${lecture.title} - 강의 상세</title>
-  <link rel="stylesheet" href="<c:url value='/static/css/lectureDetail.css' />">
-  
-  <!-- 상단에 JSTL URL 정의 -->
+<title>${lecture.title}-강의 상세</title>
+<link rel="stylesheet"
+	href="<c:url value='/static/css/lectureDetail.css' />">
+
+<!-- 상단에 JSTL URL 정의 -->
 <c:url var="addCartUrl" value="/cart/add" />
 <c:url var="cartPageUrl" value="/lecture/cart" />
 </head>
 <body>
+
 <div class="lecture-container">
 
   <!-- 썸네일 -->
@@ -146,6 +150,7 @@
 
 </div>
 <script>
+
   const addCartUrl = '${addCartUrl}';
   const cartPageUrl = '${cartPageUrl}';
 

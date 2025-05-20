@@ -1,0 +1,72 @@
+/* 전체 폼 정렬 및 여백 */
+.form-container {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 */
+.form-container h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+/* 입력 필드 */
+.form-container input[type="text"],
+.form-container textarea,
+.form-container select {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Summernote 에디터 크기 조정 */
+.note-editor {
+    margin-bottom: 20px;
+}
+
+/* 태그 영역 */
+.tag-section {
+    margin-bottom: 20px;
+}
+
+/* 버튼 기본 스타일 */
+.form-actions button {
+    padding: 12px 24px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 취소 버튼 */
+.form-actions button[type="button"] {
+    background: #ddd;
+    color: #333;
+}
+
+/* 제출 버튼 */
+.form-actions button[type="submit"] {
+    background: #6C63FF;
+    color: #fff;
+}
+
+/* 태그 박스 스타일 */
+#tagContainer span {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 4px 8px;
+    margin: 4px;
+    border-radius: 8px;
+}

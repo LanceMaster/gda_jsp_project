@@ -233,7 +233,6 @@ public interface LectureMapper {
 			""")
 	List<LectureDTO> getTopLectures(int limit);
 
-	
 	// 내가 등록한 강의 목록
 	@Select("""
 			    SELECT *
@@ -242,7 +241,6 @@ public interface LectureMapper {
 			""")
 	List<LectureDTO> getMyLectures(@Param("userId") int userId);
 
-	
 	// 내가 신청한 강의 목록
 	@Select("""
 			    SELECT l.*,
@@ -252,5 +250,22 @@ public interface LectureMapper {
 			    WHERE e.user_id = #{userId}
 			""")
 	List<LectureDTO> getMyCourses(int userId);
+
+	// 최신 강의 목록
+	@Select("""
+			    SELECT *
+			    FROM lectures
+			    WHERE status = 'PUBLISHED'
+			    ORDER BY created_at DESC
+			    LIMIT #{i}
+			""")
+	List<LectureDTO> getLatestLectures(int i);
+
+	// OrderMapper.java
+	@Select("""
+			    SELECT COUNT(*) FROM enrollments
+			    WHERE user_id = #{userId} AND lecture_id = #{lectureId}
+			""")
+	int hasPurchasedLecture(@Param("userId") int userId, @Param("lectureId") int lectureId);
 
 }

@@ -43,6 +43,12 @@ public class CartAjaxController extends HttpServlet {
 
         try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
             CartMapper mapper = sqlSession.getMapper(CartMapper.class);
+            
+            if(mapper.existsInCart(userId, lectureId) > 0) {
+                out.print("{\"success\": false, \"message\": \"이미 장바구니에 있는 강의입니다.\"}");
+                return;
+            }
+            
             mapper.insertCart(userId, lectureId); // ✅ 실제 SQL 실행
             out.print("{\"success\": true}");
         } catch (Exception e) {
