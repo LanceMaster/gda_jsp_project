@@ -91,17 +91,17 @@ public class LectureController extends MskimRequestMapping {
     }
 
 
-    @RequestMapping("play")
-    public String lecturePlay(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-        LectureDTO lecture = lectureService.getLectureById(lectureId);
-        ContentDTO content = lectureService.getFirstContentByLectureId(lectureId);
-        List<TagDTO> tagList = tagService.getTagsByLectureId(lectureId);
-        request.setAttribute("lecture", lecture);
-        request.setAttribute("content", content);
-        request.setAttribute("tagList", tagList);
-        return "lecture/lecturePlay";
-    }
+//    @RequestMapping("play")
+//    public String lecturePlay(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
+//        LectureDTO lecture = lectureService.getLectureById(lectureId);
+//        ContentDTO content = lectureService.getFirstContentByLectureId(lectureId);
+//        List<TagDTO> tagList = tagService.getTagsByLectureId(lectureId);
+//        request.setAttribute("lecture", lecture);
+//        request.setAttribute("content", content);
+//        request.setAttribute("tagList", tagList);
+//        return "lecture/lecturePlay";
+//    }
 
 
 }
