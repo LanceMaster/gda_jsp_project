@@ -1,0 +1,103 @@
+/* lecture_upload.css */
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  background-color: #f9fafb;
+  margin: 0;
+  padding: 40px;
+  color: #111827;
+}
+
+.upload-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+.upload-container h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.upload-container label {
+  display: block;
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.upload-container input[type="text"],
+.upload-container input[type="number"],
+.upload-container input[type="file"],
+.upload-container textarea,
+.upload-container select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.upload-container textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.upload-container button {
+  margin-top: 24px;
+  padding: 12px 24px;
+  background-color: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.upload-container button:hover {
+  background-color: #1e6ce6;
+}
+
+.content-block {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background-color: #fefefe;
+}
+
+/* 드래그 앤 드롭 파일 업로드 */
+.drop-zone {
+  margin-top: 10px;
+  padding: 20px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #fafafa;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.drop-zone--active {
+  background-color: #f0f9ff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.drop-zone span {
+  display: block;
+  font-weight: 500;
+}
+

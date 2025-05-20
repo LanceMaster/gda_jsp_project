@@ -80,12 +80,15 @@ public interface ReviewMapper {
      * 📌 수강 완료 여부 확인 (lecture_contents + progress_logs 기준)
      * - 진도율 평균이 100%여야 함
      */
+    /**
+     * ✅ avg_progress가 30 이상인지 확인
+     */
     @Select("""
-        SELECT AVG(progress_percent) = 100
-        FROM progress_logs pl
-        JOIN lecture_contents lc ON pl.content_id = lc.content_id
-        WHERE pl.user_id = #{userId}
-          AND lc.lecture_id = #{lectureId}
+        SELECT avg_progress >= 30
+        FROM enrollments
+        WHERE user_id = #{userId}
+          AND lecture_id = #{lectureId}
     """)
-    boolean hasCompletedWithFullProgress(@Param("userId") int userId, @Param("lectureId") int lectureId);
+    boolean hasCompletedWithEnoughProgress(@Param("userId") int userId, @Param("lectureId") int lectureId);
+
 }

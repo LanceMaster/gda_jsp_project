@@ -80,8 +80,7 @@ public class LectureController extends MskimRequestMapping {
         if (user != null && "STUDENT".equals(user.getRole())) {
             hasEnrolled = reviewService.hasEnrolled(user.getUserId(), lectureId);
             hasReviewed = reviewService.hasReviewed(user.getUserId(), lectureId);
-            boolean isCompleted = reviewService.hasCompletedWithFullProgress(user.getUserId(), lectureId);
-            canReview = hasEnrolled && !hasReviewed && isCompleted;
+            canReview = hasEnrolled && !hasReviewed; // ✅ 진도율 조건 제거
         }
 
         request.setAttribute("hasEnrolled", hasEnrolled);
