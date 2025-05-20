@@ -1,16 +1,7 @@
 package controller;
 
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Random;
-
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import java.io.*;
+import java.net.URLEncoder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -19,27 +10,23 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import model.dao.AdminDAO;
-import model.dao.UserDAO;
 import model.dto.UserDTO;
 
 @WebServlet("/AdminServlet")
 public class AdminServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	// DAO 객체 생성 (프로젝트에 맞게 조정)
 	private AdminDAO adminDAO = new AdminDAO();
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// 요청 인코딩 설정 (필요시)
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/plain; charset=UTF-8");
 
 		String action = request.getParameter("action");
 
-		// 디버깅용 파라미터 출력
 		System.out.println("=== Request Parameters ===");
 		request.getParameterMap().forEach((key, value) -> {
 			System.out.println(key + ": " + String.join(", ", value));
@@ -48,23 +35,61 @@ public class AdminServlet extends HttpServlet {
 
 		if ("getUserDetail".equals(action)) {
 			handleGetUserDetail(request, response);
-			return;
-		}
-
-		if ("deleteUser".equals(action)) {
+		} else if ("deleteUser".equals(action)) {
 			handleDeleteUser(request, response);
-			return;
+		} else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().write("Invalid POST action");
 		}
+	}
 
-		// 다른 action 처리 시 추가...
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		String action = request.getParameter("action");
+
+		if ("downloadResume".equals(action)) {
+			handleDownloadResume(request, response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().write("Invalid GET action");
+		}
+	}
+
+	private void handleGetUserDetail(HttpServletRequest request, HttpServletResponse response) {
+		String userId = request.getParameter("userId");
+		System.out.println("userId: " + userId);
+
+		UserDTO user = adminDAO.getUserById(userId);
+		System.out.println("user: " + user);
+
+		if (user != null) {
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			String json = gson.toJson(user);
+			response.setContentType("application/json; charset=UTF-8");
+			try {
+				response.getWriter().write(json);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			try {
+				response.getWriter().write("User not found");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void handleDeleteUser(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
 		String userId = request.getParameter("userId");
 		System.out.println("userId: " + userId);
+
 		UserDTO user = adminDAO.getUserById(userId);
 		System.out.println("user: " + user);
+
 		if (user != null) {
 			boolean deleted = adminDAO.deleteUser(userId);
 			if (deleted) {
@@ -90,34 +115,37 @@ public class AdminServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
-	private void handleGetUserDetail(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		String userId = request.getParameter("userId");
-		System.out.println("userId: " + userId);
-		UserDTO user = adminDAO.getUserById(userId);
-		System.out.println("user: " + user);
-		if (user != null) {
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-			String json = gson.toJson(user);
-			response.setContentType("application/json; charset=UTF-8");
-			try {
-				response.getWriter().write(json);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private void handleDownloadResume(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String fileName = request.getParameter("fileName");
 
-		} else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			try {
-				response.getWriter().write("User not found");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (fileName == null || fileName.isEmpty()) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing file name");
+			return;
 		}
 
-	}
+		String uploadPath = getServletContext().getRealPath("/upload/resume");
+		File file = new File(uploadPath, fileName);
 
+		if (!file.exists()) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resume file not found");
+			return;
+		}
+
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition",
+				"attachment;filename=\"" + URLEncoder.encode(fileName, "UTF-8") + "\"");
+		response.setContentLengthLong(file.length());
+
+		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+			 BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream())) {
+
+			byte[] buffer = new byte[4096];
+			int bytesRead;
+			while ((bytesRead = in.read(buffer)) != -1) {
+				out.write(buffer, 0, bytesRead);
+			}
+		}
+	}
 }

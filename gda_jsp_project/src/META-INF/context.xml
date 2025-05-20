@@ -3,6 +3,13 @@
     docBase="gda_jsp_project" 
     path="/gda_jsp_project" 
     reloadable="true">
-    
-    <!-- 정적 리소스 설정이 필요한 경우 여기에 추가 -->
+
+    <!-- ✅ C:/lecture_uploads 경로를 /upload URL로 매핑 -->
+    <Resources>
+        <PreResources className="org.apache.catalina.webresources.DirResourceSet"
+                      base="C:/lecture_uploads"
+                      webAppMount="/upload"
+                      internalPath="/" />
+    </Resources>
+
 </Context>

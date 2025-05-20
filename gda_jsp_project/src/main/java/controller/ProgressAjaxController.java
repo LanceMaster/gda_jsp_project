@@ -1,21 +1,24 @@
 package controller;
 
 import com.google.gson.Gson;
-import model.dao.EnrollmentDAO;
-import model.dao.ProgressLogDAO;
 import model.dto.UserDTO;
-import org.apache.ibatis.session.SqlSession;
-import utils.MyBatisUtil;
-
+import service.ProgressService;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 📡 /lecture/progress/update
+ * - 강의 콘텐츠 진도율 업데이트 처리 (JSON 기반)
+ */
 @WebServlet("/lecture/progress/update")
 public class ProgressAjaxController extends HttpServlet {
+
+    private final ProgressService progressService = new ProgressService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -24,8 +27,9 @@ public class ProgressAjaxController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json; charset=UTF-8");
         Map<String, Object> result = new HashMap<>();
+        Gson gson = new Gson();
 
-        // ✅ 세션 로그인 확인
+        // ✅ 로그인 여부 확인
         HttpSession session = req.getSession();
         UserDTO user = (UserDTO) session.getAttribute("user");
 
@@ -33,52 +37,36 @@ public class ProgressAjaxController extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             result.put("success", false);
             result.put("message", "로그인이 필요합니다.");
-            resp.getWriter().write(new Gson().toJson(result));
+            resp.getWriter().write(gson.toJson(result));
             return;
         }
 
         try {
-            // ✅ 파라미터 파싱
-            int userId = user.getUserId();
-            int contentId = Integer.parseInt(req.getParameter("contentId"));
-            int lectureId = Integer.parseInt(req.getParameter("lectureId"));
-            int progress = Integer.parseInt(req.getParameter("progress"));
-
-            try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
-                ProgressLogDAO progressLogDAO = new ProgressLogDAO(sqlSession);
-                EnrollmentDAO enrollmentDAO = new EnrollmentDAO(sqlSession);
-
-                // ✅ 수강 여부 확인
-                if (!enrollmentDAO.isUserEnrolled(userId, lectureId)) {
-                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    result.put("success", false);
-                    result.put("message", "수강 중인 강의가 아닙니다.");
-                    resp.getWriter().write(new Gson().toJson(result));
-                    return;
-                }
-
-                // ✅ 1. 진도 저장
-                progressLogDAO.saveOrUpdateProgress(userId, contentId, progress);
-
-                // ✅ 2. 수료 처리 조건 체크
-                if (progress == 100) {
-                    boolean completed = progressLogDAO.checkLectureCompletion(lectureId, userId);
-                    if (completed) {
-                        enrollmentDAO.markLectureAsCompleted(userId, lectureId);
-                    }
-                }
-
-                // ✅ 성공 응답
-                result.put("success", true);
-                resp.getWriter().write(new Gson().toJson(result));
+            // ✅ JSON 요청 바디 파싱
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = req.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
             }
 
+            Map<String, Object> data = gson.fromJson(sb.toString(), Map.class);
+
+            int contentId = ((Double) data.get("contentId")).intValue();
+            int progress = ((Double) data.get("progress")).intValue();
+
+            // ✅ 진도율 저장/갱신
+            progressService.saveOrUpdateProgress(user.getUserId(), contentId, progress);
+
+            result.put("success", true);
+            result.put("message", "진도율 업데이트 성공");
+
         } catch (Exception e) {
-            e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
-            result.put("message", "서버 오류: " + e.getMessage());
-            resp.getWriter().write(new Gson().toJson(result));
+            result.put("message", "진도율 처리 중 오류 발생");
         }
+
+        resp.getWriter().write(gson.toJson(result));
     }
 }

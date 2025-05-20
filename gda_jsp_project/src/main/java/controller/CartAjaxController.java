@@ -2,6 +2,8 @@ package controller;
 
 import model.dao.CartDAO;
 import model.dto.UserDTO;
+import model.mapper.CartMapper;
+
 import org.apache.ibatis.session.SqlSession;
 import org.json.JSONObject;
 import utils.MyBatisUtil;
@@ -15,50 +17,44 @@ import java.io.PrintWriter;
 
 @WebServlet("/cart/add")
 public class CartAjaxController extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        PrintWriter out = resp.getWriter();
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-	    resp.setContentType("application/json;charset=UTF-8");
-	    req.setCharacterEncoding("UTF-8"); // ✅ JSON 인코딩 처리
-	    PrintWriter out = resp.getWriter();
+        HttpSession session = req.getSession(false);
+        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
-	    HttpSession session = req.getSession();
-	    UserDTO user = (UserDTO) session.getAttribute("user");
+        if (user == null) {
+            out.print("{\"success\": false, \"message\": \"로그인이 필요합니다.\"}");
+            return;
+        }
 
-	    if (user == null) {
-	        out.print("{\"success\": false, \"message\": \"로그인이 필요합니다.\"}");
-	        return;
-	    }
+        // JSON 파싱
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = req.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+        }
 
-	    StringBuilder sb = new StringBuilder();
-	    try (BufferedReader reader = req.getReader()) {
-	        String line;
-	        while ((line = reader.readLine()) != null) {
-	            sb.append(line);
-	        }
-	    } catch (IOException e) {
-	        out.print("{\"success\": false, \"message\": \"요청을 읽는 중 오류 발생.\"}");
-	        return;
-	    }
+        int lectureId = new JSONObject(sb.toString()).getInt("lectureId");
+        int userId = user.getUserId();
 
-	    int lectureId;
-	    try {
-	        JSONObject json = new JSONObject(sb.toString());
-	        lectureId = json.getInt("lectureId"); // ✅ 존재 여부 검증도 가능
-	    } catch (Exception e) {
-	        out.print("{\"success\": false, \"message\": \"잘못된 JSON 형식입니다.\"}");
-	        return;
-	    }
-
-	    int userId = user.getUserId();
-
-	    try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
-	        CartDAO cartDAO = new CartDAO(sqlSession);
-	        cartDAO.addToCart(userId, lectureId);
-	        out.print("{\"success\": true}");
-	    } catch (Exception e) {
-	        out.print("{\"success\": false, \"message\": \"오류 발생: " + e.getMessage().replace("\"", "'") + "\"}");
-	    }
-	}
+        try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
+            CartMapper mapper = sqlSession.getMapper(CartMapper.class);
+            
+            if(mapper.existsInCart(userId, lectureId) > 0) {
+                out.print("{\"success\": false, \"message\": \"이미 장바구니에 있는 강의입니다.\"}");
+                return;
+            }
+            
+            mapper.insertCart(userId, lectureId); // ✅ 실제 SQL 실행
+            out.print("{\"success\": true}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.print("{\"success\": false, \"message\": \"" + e.getMessage().replace("\"", "'") + "\"}");
+        }
+    }
 
 }

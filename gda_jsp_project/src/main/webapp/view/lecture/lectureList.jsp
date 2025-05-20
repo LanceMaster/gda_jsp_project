@@ -7,7 +7,7 @@
 <script src="<c:url value='/static/js/lectureList.js' />"></script>
 
 <h1>강의 목록</h1>
-
+<c:url var="addCartUrl" value="/cart/add" />
 <!-- ✅ 하나의 필터 통합 form + 안전한 action 경로 -->
 <form method="get" action="${pageContext.request.contextPath}/lecture/lecturelist" class="filter-form">
 
@@ -33,6 +33,7 @@
     <input type="text" name="keyword" value="${param.keyword}" placeholder="    강의, 카테고리를 입력하세요" class="search-input" />
     <button type="submit" class="search-btn">검색</button>
   </div>
+  
 
   <!-- ✅ 정렬 드롭다운 -->
   <div class="sort-dropdown">
@@ -72,8 +73,8 @@
                 </c:choose>)
               </span>
             </p>
-            <button type="button" class="add-cart-btn" onclick="addToCart(${lec.lectureId})">장바구니에 담기</button>
           </a>
+           <button type="button" class="add-cart-btn" onclick="addToCart(${lec.lectureId})">장바구니에 담기</button>
         </div>
       </c:if>
     </c:forEach>
@@ -100,3 +101,7 @@
     <a href="?page=${page + 1}&category=${param.category}&keyword=${param.keyword}&sort=${param.sort}">다음 &gt;</a>
   </c:if>
 </div>
+
+<script>
+  const addCartUrl = '${addCartUrl}';
+</script>

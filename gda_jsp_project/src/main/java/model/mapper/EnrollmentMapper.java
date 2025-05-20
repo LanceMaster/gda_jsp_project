@@ -1,5 +1,6 @@
 package model.mapper;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -19,4 +20,12 @@ public interface EnrollmentMapper {
               AND lecture_id = #{lectureId}
         """)
         void markLectureAsCompleted(@Param("userId") int userId, @Param("lectureId") int lectureId);
+    
+    @Insert("""
+			INSERT INTO enrollments (user_id, lecture_id, amount_paid, payment_method)
+			VALUES (#{userId}, #{lectureId}, #{amountPaid}, #{paymentMethod})
+		""")
+		int insertEnrollment(@Param("userId") int userId, @Param("lectureId") int lectureId,
+							  @Param("amountPaid") int amountPaid, @Param("paymentMethod") String paymentMethod);
+    
 }

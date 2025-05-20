@@ -31,7 +31,7 @@
 		<div class="d-flex mb-3">
 			<a href="${pageContext.request.contextPath}/admin/userlist"
 				class="btn btn-outline-primary mr-2">회원목록</a> <a
-				href="${pageContext.request.contextPath}/admin/teacherlist"
+				href="${pageContext.request.contextPath}/admin/instructorlist"
 				class="btn btn-outline-primary">강사목록</a>
 		</div>
 

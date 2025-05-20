@@ -11,27 +11,26 @@ import java.util.List;
 public interface ReviewMapper {
 
     /**
-     * 📌 특정 강의의 리뷰 목록 조회 (유저 이름 포함)
+     * 📌 특정 강의의 리뷰 목록 조회 (user_interactions 기반)
      */
-	@Select("""
-		    SELECT 
-		        interaction_id AS reviewId,
-		        target_id AS lectureId,
-		        title AS reviewer,
-		        rating,
-		        content,
-		        created_at
-		    FROM user_interactions
-		    WHERE target_type = 'LECTURE'
-		      AND target_id = #{lectureId}
-		      AND interaction_kind = 'FEEDBACK'
-		    ORDER BY created_at DESC
-		""")
-		List<ReviewDTO> getReviewsByLectureId(@Param("lectureId") int lectureId);
-
+    @Select("""
+        SELECT 
+            interaction_id AS reviewId,
+            target_id AS lectureId,
+            title AS reviewer,
+            rating,
+            content,
+            created_at
+        FROM user_interactions
+        WHERE target_type = 'LECTURE'
+          AND target_id = #{lectureId}
+          AND interaction_kind = 'FEEDBACK'
+        ORDER BY created_at DESC
+    """)
+    List<ReviewDTO> getReviewsByLectureId(@Param("lectureId") int lectureId);
 
     /**
-     * 📌 리뷰 등록
+     * 📌 리뷰 등록 (reviews 테이블 기준)
      */
     @Insert("""
         INSERT INTO reviews (target_id, content, rating, user_id, created_at)
@@ -40,7 +39,7 @@ public interface ReviewMapper {
     void insertReview(ReviewDTO dto);
 
     /**
-     * 📌 해당 강의의 평균 평점을 계산하여 lectures 테이블에 반영
+     * 📌 평균 평점 갱신
      */
     @Update("""
         UPDATE lectures l
@@ -52,6 +51,44 @@ public interface ReviewMapper {
         WHERE l.lecture_id = #{lectureId}
     """)
     void updateLectureRating(@Param("lectureId") int lectureId);
-    
-    
-} 
+
+    /**
+     * 📌 수강 여부 확인 (enrollments 기준)
+     */
+    @Select("""
+        SELECT COUNT(*) > 0
+        FROM enrollments
+        WHERE user_id = #{userId}
+          AND lecture_id = #{lectureId}
+    """)
+    boolean hasEnrolled(@Param("userId") int userId, @Param("lectureId") int lectureId);
+
+    /**
+     * 📌 리뷰 작성 여부 확인 (user_interactions 기준)
+     */
+    @Select("""
+        SELECT COUNT(*) > 0
+        FROM user_interactions
+        WHERE user_id = #{userId}
+          AND target_id = #{lectureId}
+          AND target_type = 'LECTURE'
+          AND interaction_kind = 'FEEDBACK'
+    """)
+    boolean hasReviewed(@Param("userId") int userId, @Param("lectureId") int lectureId);
+
+    /**
+     * 📌 수강 완료 여부 확인 (lecture_contents + progress_logs 기준)
+     * - 진도율 평균이 100%여야 함
+     */
+    /**
+     * ✅ avg_progress가 30 이상인지 확인
+     */
+    @Select("""
+        SELECT avg_progress >= 30
+        FROM enrollments
+        WHERE user_id = #{userId}
+          AND lecture_id = #{lectureId}
+    """)
+    boolean hasCompletedWithEnoughProgress(@Param("userId") int userId, @Param("lectureId") int lectureId);
+
+}

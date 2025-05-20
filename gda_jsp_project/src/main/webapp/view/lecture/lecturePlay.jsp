@@ -1,135 +1,244 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="java.net.URLEncoder" %>
+<html>
+<head>
+  <title>${lecture.title} - 강의 시청</title>
+  <link rel="stylesheet" href="<c:url value='/static/css/lecturePlay.css'/>" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      font-family: 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+      background-color: #f9fafb;
+      color: #111;
+    }
+    .video-section {
+      flex: 3;
+      min-width: 720px;
+      padding: 40px;
+      background: white;
+    }
+    .sidebar {
+      flex: 1;
+      min-width: 300px;
+      background: #f1f3f5;
+      border-left: 1px solid #e5e8eb;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 24px;
+    }
+    .lecture-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .lecture-instructor {
+      font-size: 16px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+    .lecture-description {
+      font-size: 15px;
+      color: #374151;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    #loadingMessage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 12px;
+      padding: 20px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 16px;
+      display: none;
+      z-index: 1000;
+    }
+    video {
+      width: 100%;
+      max-width: 960px;
+      border-radius: 12px;
+      background: black;
+      border: 1px solid #d1d5db;
+    }
+    .sidebar h4 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sidebar li:hover {
+      background: #e0f2fe;
+    }
+    .sidebar li.active {
+      background: #dbeafe;
+      border-left: 4px solid #2563eb;
+    }
+    .sidebar li.completed {
+      color: #10b981;
+      font-weight: 600;
+    }
+    .progress-percent {
+      font-size: 13px;
+      color: #6b7280;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+    #currentContentTitle {
+      font-size: 16px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
 
-<%-- ✅ URL 변수 미리 정의 --%>
-<c:url var="progressUrl" value="/lecture/progress/update" />
-<c:url var="loginUrl" value="/user/login" />
+<div class="video-section">
+  <div class="lecture-title">${lecture.title}</div>
+  <div class="lecture-instructor">강사: ${instructor.name}</div>
+  <div class="lecture-description">${lecture.description}</div>
 
-  <meta charset="UTF-8" />
-  <title>${lecture.title}</title>
-  <link rel="stylesheet" href="<c:url value='/static/css/lecturePlay.css' />" />
-  <script src="<c:url value='/static/js/lecturePlay.js' />" defer></script> <%-- ✅ JS 외부 로딩 --%>
+  <div id="loadingMessage">⏳ 콘텐츠 로딩 중입니다...</div>
 
-<div class="lecture-container">
-
-  <!-- ✅ 강의 제목 -->
-  <h1 class="lecture-title">${lecture.title}</h1>
-
-  <!-- ✅ 강의 콘텐츠 (스트리밍 영상) -->
-  <div class="video-wrapper">
-    <video id="lecture-video" controls crossorigin="anonymous"
-           data-content-id="${content.contentId}"
-           data-user-id="${sessionScope.loginUser.userId}"
-           data-lecture-id="${lecture.lectureId}"
-           data-progress-url="${progressUrl}"
-           <c:if test="${not empty lecture.thumbnail}">
-             poster="${lecture.thumbnail}"
-           </c:if>>
-      <source src="${content.url}" type="application/x-mpegURL" />
-      자바스크립트를 활성화해야 강의를 볼 수 있습니다.
-    </video>
-  </div>
-
-  <!-- ✅ 재생 컨트롤 하단 바 -->
-  <div class="video-controls">
-    <span class="time-display">
-      🕒 <span id="current-time">00:00</span>
-    </span>
-    <input type="range" id="seek-bar" value="0" />
-  </div>
-
-  <!-- ✅ 태그 리스트 -->
-  <div class="tags">
-    <c:forEach var="tag" items="${tags}">
-      <span class="tag">${tag.name}</span>
-    </c:forEach>
-  </div>
-
-  <!-- ✅ 강의 설명 -->
-  <div class="lecture-description">
-    <h3>📌 기획의도: 왜 이 조합인가?</h3>
-    <p><c:out value="${lecture.description}" /></p>
-  </div>
-
+  <video id="lectureVideo" controls></video>
+  <div id="currentContentTitle">📺 콘텐츠를 준비 중입니다...</div>
 </div>
 
-<!-- ✅ 콘텐츠 리스트 (좌측 사이드바) -->
-<div class="content-list">
-  <ul>
-    <c:forEach var="item" items="${contentList}">
-      <li>
-        <a href="${pageContext.request.contextPath}/lecture/play?lectureId=${lecture.lectureId}&contentId=${item.contentId}">
-          ${item.title} (${item.duration}초)
-        </a>
+<div class="sidebar">
+  <h4>📑 콘텐츠 목록</h4>
+  <ul id="contentList">
+    <c:forEach var="content" items="${contents}" varStatus="status">
+      <li id="content-${content.contentId}" tabindex="0"
+          onclick="playContent(${status.index})"
+          onkeydown="if(event.key==='Enter') playContent(${status.index})">
+        <span>[${content.orderNo}] ${content.title}</span>
+        <span class="progress-percent" id="progress-${content.contentId}">0%</span>
       </li>
     </c:forEach>
   </ul>
 </div>
 
-
-<!-- 
-<c:if test="${empty sessionScope.loginUser}">
-  <script>
-    alert('로그인 후 시청 가능합니다.');
-    location.href = '${loginUrl}';
-  </script>
-</c:if>
-
 <script>
-  const video = document.getElementById("lecture-video");
-  const seekBar = document.getElementById("seek-bar");
-  const currentTimeDisplay = document.getElementById("current-time");
+  const contents = [
+    <c:forEach var="c" items="${contents}" varStatus="loop">
+      {
+        contentId: ${c.contentId},
+        title: '${c.title}',
+        url: '${c.url}',
+        duration: ${c.duration},
+        progress: 0
+      }<c:if test="${!loop.last}">,</c:if>
+    </c:forEach>
+  ];
 
-  const contentId = "${content.contentId}";
-  const userId = "${sessionScope.loginUser.userId}";
-  const progressUrl = "${progressUrl}";
+  const video = document.getElementById("lectureVideo");
+  const loadingMessage = document.getElementById("loadingMessage");
+  const titleDisplay = document.getElementById("currentContentTitle");
 
-  // 10초마다 진도 저장
-  setInterval(() => {
-    if (video.duration > 0) {
-      const percent = Math.floor((video.currentTime / video.duration) * 100);
-      if (percent >= 0) {
-        fetch(progressUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: `contentId=${contentId}&userId=${userId}&progress=${percent}&lectureId=${lecture.lectureId}`
-        });
-      }
+  let currentIndex = 0;
+  let lastSentPercent = 0;
+  let lastReportedTime = 0;
+  let hls = null;
+
+  function playContent(index) {
+    currentIndex = index;
+    const content = contents[index];
+    titleDisplay.innerText = "📺 현재 콘텐츠: " + content.title;
+    loadingMessage.style.display = 'block';
+
+    if (Hls.isSupported()) {
+      if (hls) hls.destroy();
+      hls = new Hls();
+      hls.loadSource(content.url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play();
+        loadingMessage.style.display = 'none';
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = content.url;
+      video.addEventListener('loadedmetadata', () => {
+        video.play();
+        loadingMessage.style.display = 'none';
+      });
+    } else {
+      alert("⚠️ 브라우저에서 HLS를 지원하지 않습니다.");
+      loadingMessage.style.display = 'none';
     }
-  }, 10000);
 
-  // 재생 위치 표시 + 슬라이더 바 연동
+    updateActiveUI(content.contentId);
+    lastSentPercent = 0;
+    lastReportedTime = 0;
+  }
+
+  function updateActiveUI(contentId) {
+    document.querySelectorAll("#contentList li").forEach(li => li.classList.remove("active"));
+    const li = document.getElementById("content-" + contentId);
+    if (li) li.classList.add("active");
+  }
+
   video.addEventListener("timeupdate", () => {
-    const minutes = Math.floor(video.currentTime / 60).toString().padStart(2, '0');
-    const seconds = Math.floor(video.currentTime % 60).toString().padStart(2, '0');
-    currentTimeDisplay.textContent = `${minutes}:${seconds}`;
-    seekBar.value = video.currentTime;
-  });
+    const currentTime = Math.floor(video.currentTime);
+    const percent = Math.round((video.currentTime / video.duration) * 100);
 
-  video.addEventListener("loadedmetadata", () => {
-    seekBar.max = video.duration;
-  });
+    if (currentTime - lastReportedTime >= 5 && percent <= 100) {
+      lastReportedTime = currentTime;
+      lastSentPercent = percent;
+      const content = contents[currentIndex];
 
-  seekBar.addEventListener("input", () => {
-    video.currentTime = seekBar.value;
-  });
-  
- 
-//콘텐츠 시청 완료 시 AJAX 요청
-  fetch("/lecture/progress/update", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `lectureId=1001&contentId=2001&progress=100`
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      console.log("진도 저장 및 수료 확인 완료");
+      fetch("${pageContext.request.contextPath}/lecture/progress/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lectureId: "${lecture.lectureId}",
+          contentId: content.contentId,
+          progress: percent
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          contents[currentIndex].progress = percent;
+          document.getElementById("progress-" + content.contentId).innerText = percent + "%";
+
+          const li = document.getElementById("content-" + content.contentId);
+          if (percent === 100 && li) {
+            li.classList.add("completed");
+          }
+        }
+      })
+      .catch(err => {
+        console.error("진도율 전송 실패:", err);
+      });
     }
   });
+
+  video.addEventListener("ended", () => {
+    if (currentIndex < contents.length - 1) {
+      playContent(currentIndex + 1);
+    }
+  });
+
+  window.onload = () => {
+    playContent(0);
+  };
 </script>
--->
+
+</body>
+</html>

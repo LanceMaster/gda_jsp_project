@@ -33,7 +33,7 @@ public class ProgressService {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("⚠️ 진도율 저장/갱신 실패: " + e.getMessage(), e);
+            throw new RuntimeException("⚠️ 진도율 저장/갱신 중 오류 발생", e);
         } finally {
             if (session != null) session.close();
         }

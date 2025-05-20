@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
                              http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-	id="WebApp_ID" version="4.0">
 
-	<display-name>gda_jsp_project</display-name>
+     id="WebApp_ID" version="4.0">
 
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>index.htm</welcome-file>
-		<welcome-file>default.html</welcome-file>
-		<welcome-file>default.jsp</welcome-file>
-		<welcome-file>default.htm</welcome-file>
-	</welcome-file-list>
+    <display-name>gda_jsp_project</display-name>
 
-	<!-- ✅ 로그인 체크 필터 -->
-	<filter>
-		<filter-name>LoginCheckFilter</filter-name>
-		<filter-class>filter.LoginCheckFilter</filter-class>
-	</filter>
+    <!-- ✅ 웰컴 페이지 설정 -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+        <welcome-file>default.html</welcome-file>
+        <welcome-file>default.jsp</welcome-file>
+        <welcome-file>default.htm</welcome-file>
+    </welcome-file-list>
 
-	<filter-mapping>
-		<filter-name>LoginCheckFilter</filter-name>
-		<url-pattern>/user/mypage</url-pattern>
-	</filter-mapping>
+    <!-- ✅ 로그인 체크 필터 설정 -->
+    <filter>
+        <filter-name>LoginCheckFilter</filter-name>
+        <filter-class>filter.LoginCheckFilter</filter-class>
+    </filter>
 
-	<filter-mapping>
-		<filter-name>LoginCheckFilter</filter-name>
-		<url-pattern>/projects/projectsForm</url-pattern>
-		<url-pattern>/projects/projectsEdit</url-pattern>
-	</filter-mapping>
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/user/mypage</url-pattern>
+    </filter-mapping>
 
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/static/*</url-pattern>
-	</servlet-mapping>
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/projects/projectsForm</url-pattern>
+        <url-pattern>/projects/projectsEdit</url-pattern>
+    </filter-mapping>
+
+    <!-- ✅ 정적 자원 매핑: /static/* (CSS, JS 등) -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- ✅ HLS 및 썸네일 파일 매핑: /upload/* -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/upload/*</url-pattern>
+    </servlet-mapping>
 
 
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/upload/*</url-pattern>
-	</servlet-mapping>
-
-
-	<filter-mapping>
+<filter-mapping>
 		<filter-name>LoginCheckFilter</filter-name>
 		<url-pattern>/siteinquiry/siteinquiryForm</url-pattern>
 		<url-pattern>/siteinquiry/siteinquiryEdit</url-pattern>
 	</filter-mapping>
+
+
 </web-app>
