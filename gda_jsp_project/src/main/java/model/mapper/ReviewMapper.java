@@ -56,12 +56,15 @@ public interface ReviewMapper {
      * 📌 수강 여부 확인 (enrollments 기준)
      */
     @Select("""
-        SELECT COUNT(*) > 0
-        FROM enrollments
-        WHERE user_id = #{userId}
-          AND lecture_id = #{lectureId}
-    """)
-    boolean hasEnrolled(@Param("userId") int userId, @Param("lectureId") int lectureId);
+    	    SELECT EXISTS (
+    	        SELECT 1
+    	        FROM enrollments
+    	        WHERE user_id = #{userId}
+    	          AND lecture_id = #{lectureId}
+    	          AND status IN ('IN_PROGRESS', 'COMPLETED')
+    	    )
+    	""")
+    	boolean hasEnrolled(@Param("userId") int userId, @Param("lectureId") int lectureId);
 
     /**
      * 📌 리뷰 작성 여부 확인 (user_interactions 기준)
@@ -76,19 +79,19 @@ public interface ReviewMapper {
     """)
     boolean hasReviewed(@Param("userId") int userId, @Param("lectureId") int lectureId);
 
-    /**
-     * 📌 수강 완료 여부 확인 (lecture_contents + progress_logs 기준)
-     * - 진도율 평균이 100%여야 함
-     */
-    /**
-     * ✅ avg_progress가 30 이상인지 확인
-     */
-    @Select("""
-        SELECT avg_progress >= 30
-        FROM enrollments
-        WHERE user_id = #{userId}
-          AND lecture_id = #{lectureId}
-    """)
-    boolean hasCompletedWithEnoughProgress(@Param("userId") int userId, @Param("lectureId") int lectureId);
+//    /**
+//     * 📌 수강 완료 여부 확인 (lecture_contents + progress_logs 기준)
+//     * - 진도율 평균이 100%여야 함
+//     */
+//    /**
+//     * ✅ avg_progress가 30 이상인지 확인
+//     */
+//    @Select("""
+//        SELECT avg_progress >= 30
+//        FROM enrollments
+//        WHERE user_id = #{userId}
+//          AND lecture_id = #{lectureId}
+//    """)
+//    boolean hasCompletedWithEnoughProgress(@Param("userId") int userId, @Param("lectureId") int lectureId);
 
 }

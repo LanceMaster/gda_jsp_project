@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <html>
 <head>
   <title>${lecture.title} - 강의 상세</title>
@@ -59,15 +61,16 @@
       <span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
     </div>
 
-<!-- ✅ 리뷰 작성 조건: 로그인 + 수강자 + 리뷰 미작성자 -->
 <c:if test="${canReview}">
-  <form id="reviewForm" method="post">
+  <form id="reviewForm" class="review-form" method="post" autocomplete="off">
     <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
-
-    <textarea name="content" placeholder="댓글을 입력해 주세요." required></textarea>
-
+    
+    <label for="reviewContent" class="visually-hidden">리뷰 내용</label>
+    <textarea id="reviewContent" name="content" placeholder="댓글을 입력해 주세요." maxlength="1000" required></textarea>
+    
     <div class="review-controls">
-      <select name="rating" required>
+      <label for="reviewRating" class="visually-hidden">평점</label>
+      <select id="reviewRating" name="rating" required>
         <option value="">⭐ 평점을 선택하세요</option>
         <option value="5">⭐⭐⭐⭐⭐</option>
         <option value="4">⭐⭐⭐⭐</option>
@@ -75,10 +78,13 @@
         <option value="2">⭐⭐</option>
         <option value="1">⭐</option>
       </select>
-      <button type="submit" class="submit-btn">제출</button>
+      <button type="submit" class="submit-btn" id="reviewSubmitBtn">제출</button>
     </div>
+    <div id="reviewErrorMsg" class="form-error" style="display:none;"></div>
+    <div id="reviewSuccessMsg" class="form-success" style="display:none;"></div>
   </form>
 </c:if>
+
 
 <!-- ✅ 리뷰 작성 불가 조건 안내 -->
 <c:if test="${not canReview}">
@@ -93,6 +99,18 @@
       <p class="review-guide">※ 리뷰 작성 조건이 충족되지 않았습니다.</p>
     </c:otherwise>
   </c:choose>
+</c:if>
+
+
+<c:if test="${not empty reviewList}">
+  <p style="font-size:15px;color:#666;margin-bottom:8px;">
+    총 <strong>${fn:length(reviewList)}</strong>개의 리뷰가 등록되었습니다.
+  </p>
+</c:if>
+<c:if test="${empty reviewList}">
+  <p style="font-size:15px;color:#999;margin-bottom:8px;">
+    아직 리뷰가 없습니다. 첫 리뷰를 작성해보세요!
+  </p>
 </c:if>
 
 
@@ -151,6 +169,56 @@
     .catch(err => {
       console.error("🚨 오류:", err);
       alert("서버 통신 중 오류 발생");
+    });
+  }
+  
+  
+  // ✅ 리뷰 제출 UX 개선 (폼 유효성 + 메시지)
+  const reviewForm = document.getElementById("reviewForm");
+
+  if (reviewForm) {
+    reviewForm.addEventListener("submit", function(e) {
+      const rating = reviewForm.rating.value;
+      const content = reviewForm.content.value.trim();
+
+      // 에러/성공 메시지 DOM 없으면 생성
+      let errorDiv = document.getElementById("reviewErrorMsg");
+      let successDiv = document.getElementById("reviewSuccessMsg");
+      if (!errorDiv) {
+        errorDiv = document.createElement("div");
+        errorDiv.id = "reviewErrorMsg";
+        errorDiv.className = "form-error";
+        reviewForm.appendChild(errorDiv);
+      }
+      if (!successDiv) {
+        successDiv = document.createElement("div");
+        successDiv.id = "reviewSuccessMsg";
+        successDiv.className = "form-success";
+        reviewForm.appendChild(successDiv);
+      }
+
+      // 초기화
+      errorDiv.style.display = "none";
+      successDiv.style.display = "none";
+
+      // 클라이언트 유효성 검증
+      if (!rating || !content) {
+        e.preventDefault();
+        errorDiv.innerText = "⚠️ 평점과 내용을 모두 입력하세요.";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      if (content.length > 1000) {
+        e.preventDefault();
+        errorDiv.innerText = "⚠️ 리뷰는 1000자 이내로 작성해주세요.";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      // UX 피드백 (옵션)
+      successDiv.innerText = "리뷰를 등록 중입니다...";
+      successDiv.style.display = "block";
     });
   }
   </script>

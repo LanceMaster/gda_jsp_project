@@ -57,12 +57,12 @@ public class ReviewDAO {
     /**
      * ✅ 수강 진도율 30% 이상 여부 확인 (enrollments.avg_progress 기준)
      */
-    public boolean hasCompletedWithFullProgress(int userId, int lectureId) {
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            ReviewMapper mapper = session.getMapper(ReviewMapper.class);
-            return mapper.hasCompletedWithEnoughProgress(userId, lectureId); // 💡 변경된 메서드 호출
-        }
-    }
+//    public boolean hasCompletedWithFullProgress(int userId, int lectureId) {
+//        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+//            ReviewMapper mapper = session.getMapper(ReviewMapper.class);
+//            return mapper.hasCompletedWithEnoughProgress(userId, lectureId); // 💡 변경된 메서드 호출
+//        }
+//    }
 
 
     /**
