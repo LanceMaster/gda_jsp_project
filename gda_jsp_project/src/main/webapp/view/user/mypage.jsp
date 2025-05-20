@@ -238,7 +238,7 @@ a.delete-link:hover {
 									</div>
 								</div>
 <a class="btn btn-primary"
-   href="${pageContext.request.contextPath}/lecture/lectureManagementPage">
+   href="${pageContext.request.contextPath}/lecture/management">
    관리
 </a>
 
@@ -279,11 +279,8 @@ a.delete-link:hover {
 
 							</div>
 							
-							  <a class="btn btn-primary"
-       style="background: #6c6ce5; border: none;"
-       href="${pageContext.request.contextPath}/lecture/play?lectureId=${course.lectureId}">
-      수강중
-    </a>
+							<a href="${pageContext.request.contextPath}/lecture/management" class="btn btn-primary">관리</a>
+
 						</div>
 					</c:forEach>
 				</div>
