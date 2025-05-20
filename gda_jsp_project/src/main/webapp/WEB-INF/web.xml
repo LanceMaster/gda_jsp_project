@@ -44,4 +44,10 @@
 		<url-pattern>/upload/*</url-pattern>
 	</servlet-mapping>
 
+
+	<filter-mapping>
+		<filter-name>LoginCheckFilter</filter-name>
+		<url-pattern>/siteinquiry/siteinquiryForm</url-pattern>
+		<url-pattern>/siteinquiry/siteinquiryEdit</url-pattern>
+	</filter-mapping>
 </web-app>

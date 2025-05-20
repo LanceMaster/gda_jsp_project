@@ -23,7 +23,7 @@
     <form method="get" action="list">
         <div class="search-bar">
             <input type="text" name="keyword" value="${param.keyword}" placeholder="검색어를 입력하세요" />
-            <button type="submit">검색</button>
+            <button type="submit" class="search-btn">검색</button>
         </div>
     </form>
 
