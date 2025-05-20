@@ -3,8 +3,7 @@
          xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
                              http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-
-     id="WebApp_ID" version="4.0">
+         id="WebApp_ID" version="4.0">
 
     <display-name>gda_jsp_project</display-name>
 
@@ -32,7 +31,21 @@
     <filter-mapping>
         <filter-name>LoginCheckFilter</filter-name>
         <url-pattern>/projects/projectsForm</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
         <url-pattern>/projects/projectsEdit</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/siteinquiry/siteinquiryForm</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/siteinquiry/siteinquiryEdit</url-pattern>
     </filter-mapping>
 
     <!-- ✅ 정적 자원 매핑: /static/* (CSS, JS 등) -->
@@ -46,13 +59,5 @@
         <servlet-name>default</servlet-name>
         <url-pattern>/upload/*</url-pattern>
     </servlet-mapping>
-
-
-<filter-mapping>
-		<filter-name>LoginCheckFilter</filter-name>
-		<url-pattern>/siteinquiry/siteinquiryForm</url-pattern>
-		<url-pattern>/siteinquiry/siteinquiryEdit</url-pattern>
-	</filter-mapping>
-
 
 </web-app>
