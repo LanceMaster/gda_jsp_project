@@ -237,6 +237,7 @@ a.delete-link:hover {
 											class="rating-text">${lecture.avgRating}</span>
 									</div>
 								</div>
+
 <a href="${pageContext.request.contextPath}/lecture/management" class="btn btn-primary">관리</a>
 
 							</div>
@@ -275,8 +276,10 @@ a.delete-link:hover {
 									${course.avgProgress}%</div>
 
 							</div>
-							
-							  <a href="${pageContext.request.contextPath}/lecture/play?lectureId=${course.lectureId}" class="btn btn-primary">수강</a>
+
+							<a
+								href="${pageContext.request.contextPath}/lecture/play?lectureId=${course.lectureId}"
+								class="btn btn-primary">수강</a>
 
 
 						</div>
@@ -338,13 +341,29 @@ a.delete-link:hover {
 					</c:choose>
 				</div>
 			</c:if>
+			<c:choose>
+				<c:when test="${user.isDeleted()}">
+					<div class="text-right mt-2">
+						<a href="#" data-toggle="modal" data-target="#cancelDeleteModal"
+							style="color: #6c6ce5; font-size: 0.95rem;">탈퇴취소하기</a>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="text-right mt-2">
+						<a href="#" data-toggle="modal" data-target="#deleteModal"
+							style="color: #6c6ce5; font-size: 0.95rem;">탈퇴하기</a>
+					</div>
+				</c:otherwise>
+			</c:choose>
 
 
 
-			<div class="text-right mt-2">
+			<!-- 	<div class="text-right mt-2">
 				<a href="#" data-toggle="modal" data-target="#deleteModal"
 					style="color: #6c6ce5; font-size: 0.95rem;">탈퇴하기</a>
-			</div>
+			</div> -->
+
+
 		</div>
 	</div>
 
@@ -516,6 +535,8 @@ $(document).on('input', '#newPassword, #confirmPassword', function () {
 	<script>
 function deleteAccount() {
 	  const email = $("#emailInput").val(); // 혹은 서버에서 user.id 사용도 가능
+	  
+	  console.log("deleteAccount");
 
 	  $.post("${pageContext.request.contextPath}/AccountServlet", {
 	    action: "deleteAccount",
@@ -532,5 +553,51 @@ function deleteAccount() {
 	  });
 	}
 </script>
+
+	<div class="modal fade" id="cancelDeleteModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content p-3">
+				<div class="modal-header">
+					<h5 class="modal-title">회원 탈퇴 취소</h5>
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>
+						회원탈퇴 취소 하시겠습니까?
+					</p>
+					<div class="text-right">
+						<button type="button" class="btn btn-danger"
+							onclick="cancelDeleteAccount()">취소</button>
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	function cancelDeleteAccount() {
+		  const userId = "${user.userId}" // 혹은 서버에서 user.id 사용도 가능
+
+		  $.post("${pageContext.request.contextPath}/AccountServlet", {
+		    action: "cancelDeleteAccount",
+		    userId: userId
+		  }, function (response) {
+		    if (response.trim() === "success") {
+		      alert("회원 탈퇴 취소가 완료되었습니다.");
+		      window.location.href = "${pageContext.request.contextPath}/user/mypage";
+		      
+		    } else {
+		      alert("회원 탈퇴취소에 실패했습니다.");
+		    }
+		  });
+		}
+	
+	</script>
+
+
+
 </body>
 </html>

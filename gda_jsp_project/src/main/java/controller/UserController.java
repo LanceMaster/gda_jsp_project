@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.annotation.WebInitParam;
@@ -49,32 +51,57 @@ public class UserController extends MskimRequestMapping {
 		return "user/loginform"; // JSP 페이지 경로
 	}
 
-	// 로그인 처리
+	/**
+	 * 로그인
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("login")
 	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String id = request.getParameter("id");
 		String password = request.getParameter("password");
 
-		UserDTO userDTO = userDAO.login(id, password);
+		UserDTO userDTO = userDAO.login(id, password); // DB 조회
 
-		if (userDTO != null) {
-			// 로그인 성공
-			HttpSession session = request.getSession();
-			session.setAttribute("user", userDTO);
-
-			// 이전에 저장된 redirect URL 확인
-			String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
-			if (redirectUrl != null && !redirectUrl.trim().isEmpty()) {
-				session.removeAttribute("redirectAfterLogin");
-				return "redirect:" + redirectUrl;
-			}
-
-			// 기본적으로는 메인페이지로 이동
-			return "redirect:" + request.getContextPath() + "/user/mainpage";
-		} else {
+		if (userDTO == null) {
+			// 로그인 실패
 			request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");
 			return "user/loginform";
 		}
+
+		// 로그인 성공 처리
+		HttpSession session = request.getSession();
+		session.setAttribute("user", userDTO);
+
+		// 탈퇴 여부 확인
+		if (userDTO.isDeleted()) {
+			LocalDateTime deletedAt = userDTO.getDeletedAt();
+			if (deletedAt != null) {
+				Duration duration = Duration.between(deletedAt, LocalDateTime.now());
+
+				if (duration.toDays() >= 15) {
+					// 15일이 지났으면, 이미 삭제된 계정이어야 하므로 로그인 차단
+					request.setAttribute("loginError", "해당 계정은 탈퇴한 지 15일이 지나 삭제되었습니다.");
+					session.invalidate(); // 세션 초기화
+					return "user/loginform";
+				} else {
+					// 탈퇴 요청 후 15일 미만 -> 로그인은 허용, 알림 전달
+					session.setAttribute("withdrawalNotice", "탈퇴 요청된 계정입니다. 복구를 원하시면 '계정 삭제 취소' 버튼을 눌러주세요.");
+				}
+			}
+		}
+
+		// 리다이렉트 처리
+		String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
+		if (redirectUrl != null && !redirectUrl.trim().isEmpty()) {
+			session.removeAttribute("redirectAfterLogin");
+			return "redirect:" + redirectUrl;
+		}
+
+		return "redirect:" + request.getContextPath() + "/user/mainpage";
 	}
 
 	// 회원가입폼 불러오기
@@ -200,26 +227,40 @@ public class UserController extends MskimRequestMapping {
 
 	@RequestMapping("mypage")
 	public String mypage(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserDTO userDTO = (UserDTO) request.getSession().getAttribute("user");
-		if (userDTO == null) {
-			return "redirect:" + request.getContextPath() + "/user/loginform"; // 로그인 폼으로 리다이렉트
-		}
+	    HttpSession session = request.getSession();
+	    UserDTO sessionUser = (UserDTO) session.getAttribute("user");
 
-		System.out.println(userDTO.toString());
+	    if (sessionUser == null) {
+	        return "redirect:" + request.getContextPath() + "/user/loginform"; // 로그인 폼으로 리다이렉트
+	    }
 
-		//
+	    // DB에서 최신 사용자 정보 조회
+	    int userId = sessionUser.getUserId();
+	    UserDTO userDTO = userDAO.getUserInformation(userId); // 예: userDAO에 해당 메서드가 있다고 가정
 
-		// 자기가 등록한 강의 목록 갖고오기
-		List<LectureDTO> myLectures = lectureDAO.getMyLectures(userDTO.getUserId());
-		// 내가 신청한 강의 목록 갖고오기
-		List<LectureDTO> myCourses = lectureDAO.getMyCourses(userDTO.getUserId());
+	    if (userDTO == null) {
+	        session.invalidate(); // 사용자 정보가 더 이상 유효하지 않다면 세션 무효화
+	        return "redirect:" + request.getContextPath() + "/user/loginform";
+	    }
 
-		System.out.println(myLectures);
-		request.setAttribute("myLectures", myLectures);
-		request.setAttribute("myCourses", myCourses);
+	    // 세션에 최신 정보 갱신
+	    session.setAttribute("user", userDTO);
 
-		return "user/mypage"; // JSP 페이지 경로
+	    // 디버깅
+	    System.out.println(userDTO.toString());
+
+	    // 자기가 등록한 강의 목록 갖고오기
+	    List<LectureDTO> myLectures = lectureDAO.getMyLectures(userDTO.getUserId());
+	    // 내가 신청한 강의 목록 갖고오기
+	    List<LectureDTO> myCourses = lectureDAO.getMyCourses(userDTO.getUserId());
+
+	    // 요청 속성에 저장
+	    request.setAttribute("myLectures", myLectures);
+	    request.setAttribute("myCourses", myCourses);
+
+	    return "user/mypage"; // JSP 페이지 경로
 	}
+
 
 	// 이메일 중복확인
 //	@RequestMapping("emailDupCheck")
