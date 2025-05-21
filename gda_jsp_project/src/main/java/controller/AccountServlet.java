@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.Random;
 
@@ -98,42 +99,55 @@ public class AccountServlet extends HttpServlet {
 	}
 
 	private void handleDownloadResume(HttpServletRequest request, HttpServletResponse response) {
-		String email = request.getParameter("email");
-		try {
-			String resumeFilename = userDAO.getResumeFilename(email);
-			if (resumeFilename != null && !resumeFilename.isEmpty()) {
-				// 회원가입 때 저장된 경로와 일치하도록 수정
-				String filePath = getServletContext().getRealPath("/upload/resume/" + resumeFilename);
+	    String email = request.getParameter("email");
+	    try {
+	        String resumeFilename = userDAO.getResumeFilename(email);
+	        if (resumeFilename != null && !resumeFilename.isEmpty()) {
+	            String filePath = getServletContext().getRealPath("/upload/resume/" + resumeFilename);
 
-				File file = new File(filePath);
-				if (!file.exists()) {
-					response.getWriter().write("fail");
-					return;
-				}
+	            File file = new File(filePath);
+	            if (!file.exists()) {
+	                response.getWriter().write("fail");
+	                return;
+	            }
 
-				// 파일 다운로드용 헤더 설정
-				response.setContentType("application/octet-stream");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + resumeFilename + "\"");
-				response.setContentLengthLong(file.length());
+	            // 파일 다운로드용 헤더 설정
+	            response.setContentType("application/octet-stream");
+	            response.setContentLengthLong(file.length());
 
-				// 파일 스트림을 읽어 response 출력
-				try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-						ServletOutputStream out = response.getOutputStream()) {
-					byte[] buffer = new byte[4096];
-					int bytesRead = -1;
-					while ((bytesRead = in.read(buffer)) != -1) {
-						out.write(buffer, 0, bytesRead);
-					}
-					out.flush();
-				}
+	            // 한글 파일명 대응
+	            String userAgent = request.getHeader("User-Agent");
+	            String encodedFilename;
 
-			} else {
-				response.getWriter().write("fail");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	            if (userAgent != null && (userAgent.contains("MSIE") || userAgent.contains("Trident") || userAgent.contains("Edge"))) {
+	                // IE, Edge 대응
+	                encodedFilename = URLEncoder.encode(resumeFilename, "UTF-8").replaceAll("\\+", "%20");
+	                response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFilename + "\"");
+	            } else {
+	                // Chrome, Firefox, Safari 등
+	                encodedFilename = URLEncoder.encode(resumeFilename, "UTF-8").replaceAll("\\+", "%20");
+	                response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename);
+	            }
+
+	            // 파일 스트림을 읽어 response 출력
+	            try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+	                 ServletOutputStream out = response.getOutputStream()) {
+	                byte[] buffer = new byte[4096];
+	                int bytesRead;
+	                while ((bytesRead = in.read(buffer)) != -1) {
+	                    out.write(buffer, 0, bytesRead);
+	                }
+	                out.flush();
+	            }
+
+	        } else {
+	            response.getWriter().write("fail");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
+
 
 	private void handleFindId(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String name = request.getParameter("name");

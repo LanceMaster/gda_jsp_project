@@ -15,7 +15,6 @@
 		 <a
 			href="${pageContext.request.contextPath}/lecture/inquiry/inquirywrite?lectureId=${lectureId}"
 			class="write-btn"> 문의글 작성하기 </a>
-
 	</div>
 
 
