@@ -126,7 +126,7 @@
 				</div>
 				<nav class="nav-area"
 					style="display: flex; gap: 24px; font-weight: 500;">
-					<a href="${path}/company"
+					<a href="${path}/user/siteabout"
 						style="color: #666; text-decoration: none;">회사 소개</a> <a
 						href="${path}/siteinquiry/siteinquiryList" style="color: #666; text-decoration: none;">문의하기</a>
 				</nav>
