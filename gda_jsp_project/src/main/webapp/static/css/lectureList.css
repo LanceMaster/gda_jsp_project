@@ -346,3 +346,12 @@ h1 {
     font-size: 1.07em;
     background: #f8f8fa;
   }
+  
+  .lecture-thumbnail {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+  
