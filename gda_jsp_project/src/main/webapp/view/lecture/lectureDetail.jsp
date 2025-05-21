@@ -62,13 +62,13 @@
 			<p class="desc-footer">이 수업은 실전형 프로젝트를 통해 핵심 개념을 빠르게 학습할 수 있도록
 				설계되어 있습니다.</p>
 
-			<!-- 질문 게시판 바로가기 -->
-			<div class="modern-action-wrap">
-				<a
-					href="${pageContext.request.contextPath}/lecture/inquiry/list?lectureId=${lecture.lectureId}"
-					class="modern-action-btn"> 💬 강의 질문 게시판 바로가기 </a>
-			</div>
-		</div>
+    <!-- 질문 게시판 바로가기 -->
+<div class="modern-action-wrap">
+	<a
+				href="${pageContext.request.contextPath}/lecture/inquiry/list?lectureId=${lecture.lectureId}"
+				class="go-inquiry-btn"> 💬 강의 질문 게시판 바로가기 </a>
+</div>
+  </div>
 
 		<div class="review-section">
 			<div class="review-header">
@@ -106,34 +106,25 @@
 						</div>
 					</div>
 
-					<!-- 메시지 -->
-					<div id="reviewErrorMsg" class="form-error" style="display: none;"></div>
-					<div id="reviewSuccessMsg" class="form-success"
-						style="display: none;"></div>
-				</form>
+  <!-- 메시지 -->
+  <div id="reviewErrorMsg" class="form-error" style="display:none;"></div>
+  <div id="reviewSuccessMsg" class="form-success" style="display:none;"></div>
+</form>
+</c:if>
+			<!-- ✅ 리뷰 작성 불가 조건 안내 -->
+			<c:if test="${not canReview}">
+				<c:choose>
+					<c:when test="${not hasEnrolled}">
+						<p class="review-guide">※ 리뷰를 작성하려면 강의를 수강 중이어야 합니다.</p>
+					</c:when>
+					<c:when test="${hasReviewed}">
+						<p class="review-guide">※ 이미 리뷰를 작성하셨습니다.</p>
+					</c:when>
+					<c:otherwise>
+						<p class="review-guide">※ 리뷰 작성 조건이 충족되지 않았습니다.</p>
+					</c:otherwise>
+				</c:choose>
 			</c:if>
-
-
-
-		</div>
-
-
-
-
-		<!-- ✅ 리뷰 작성 불가 조건 안내 -->
-		<c:if test="${not canReview}">
-			<c:choose>
-				<c:when test="${not hasEnrolled}">
-					<p class="review-guide">※ 리뷰를 작성하려면 강의를 수강 중이어야 합니다.</p>
-				</c:when>
-				<c:when test="${hasReviewed}">
-					<p class="review-guide">※ 이미 리뷰를 작성하셨습니다.</p>
-				</c:when>
-				<c:otherwise>
-					<p class="review-guide">※ 리뷰 작성 조건이 충족되지 않았습니다.</p>
-				</c:otherwise>
-			</c:choose>
-		</c:if>
 
 
 		<c:if test="${not empty reviewList}">
