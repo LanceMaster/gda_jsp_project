@@ -1,7 +1,5 @@
 package model.dao;
 
-import java.util.List;
-
 import org.apache.ibatis.session.SqlSession;
 
 import model.dto.UserDTO;
@@ -95,11 +93,11 @@ public class UserDAO {
 		return false;
 	}
 
-	public boolean deleteAccount(String email) {
+	public boolean deactivateAccount(String email) {
 		// TODO Auto-generated method stub
 		SqlSession session = MybatisConnection.getConnection();
 		try {
-			int resultCount = session.getMapper(mapperClass).deleteAccount(email);
+			int resultCount = session.getMapper(mapperClass).deactivateAccount(email);
 			if (resultCount > 0) {
 				session.commit();
 				return true; // 계정 삭제 성공
@@ -201,6 +199,48 @@ public class UserDAO {
 			session.close();
 		}
 
+		return null;
+	}
+
+	/**
+	 * 회원탈퇴 취소
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public boolean cancelDelete(String userId) {
+
+		// TODO Auto-generated method stub
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			int resultCount = session.getMapper(mapperClass).cancelDelete(userId);
+			if (resultCount > 0) {
+				session.commit();
+				return true; // 계정 삭제 성공
+			} else {
+				session.rollback();
+				return false; // 계정 삭제 실패
+			}
+		} catch (Exception e) {
+			session.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return false;
+
+	}
+
+	public UserDTO getUserInformation(int userId) {
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			UserDTO user = session.getMapper(mapperClass).getUserInformation(userId);
+			return user;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 		return null;
 	}
 
