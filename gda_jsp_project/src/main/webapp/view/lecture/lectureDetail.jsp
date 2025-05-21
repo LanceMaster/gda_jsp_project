@@ -63,9 +63,9 @@
 
     <!-- 질문 게시판 바로가기 -->
 <div class="modern-action-wrap">
-  <a href="<c:url value='/lecture/inquiry/list' />" class="modern-action-btn">
-    💬 강의 질문 게시판 바로가기
-  </a>
+	<a
+				href="${pageContext.request.contextPath}/lecture/inquiry/list?lectureId=${lecture.lectureId}"
+				class="go-inquiry-btn"> 💬 강의 질문 게시판 바로가기 </a>
 </div>
   </div>
 
@@ -106,49 +106,6 @@
   <div id="reviewSuccessMsg" class="form-success" style="display:none;"></div>
 </form>
 </c:if>
-
-
-
-			<a
-				href="${pageContext.request.contextPath}/lecture/inquiry/list?lectureId=${lecture.lectureId}"
-				class="go-inquiry-btn"> 강의 질문 게시판 </a>
-
-		</div>
-
-		<div class="review-section">
-			<div class="review-header">
-				<h3>${lecture.title}</h3>
-				<span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
-			</div>
-
-			<c:if test="${canReview}">
-				<form id="reviewForm" class="review-form" method="post"
-					autocomplete="off">
-					<input type="hidden" name="lectureId" value="${lecture.lectureId}" />
-
-					<label for="reviewContent" class="visually-hidden">리뷰 내용</label>
-					<textarea id="reviewContent" name="content"
-						placeholder="댓글을 입력해 주세요." maxlength="1000" required></textarea>
-
-					<div class="review-controls">
-						<label for="reviewRating" class="visually-hidden">평점</label> <select
-							id="reviewRating" name="rating" required>
-							<option value="">⭐ 평점을 선택하세요</option>
-							<option value="5">⭐⭐⭐⭐⭐</option>
-							<option value="4">⭐⭐⭐⭐</option>
-							<option value="3">⭐⭐⭐</option>
-							<option value="2">⭐⭐</option>
-							<option value="1">⭐</option>
-						</select>
-						<button type="submit" class="submit-btn" id="reviewSubmitBtn">제출</button>
-					</div>
-					<div id="reviewErrorMsg" class="form-error" style="display: none;"></div>
-					<div id="reviewSuccessMsg" class="form-success"
-						style="display: none;"></div>
-				</form>
-			</c:if>
-
-
 			<!-- ✅ 리뷰 작성 불가 조건 안내 -->
 			<c:if test="${not canReview}">
 				<c:choose>
