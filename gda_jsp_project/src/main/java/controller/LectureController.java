@@ -76,10 +76,10 @@ public class LectureController extends MskimRequestMapping {
         boolean hasReviewed = false;
         boolean hasEnrolled = false;
         boolean canReview = false;
-        //김준희 추가
+        //김준희 추가 ?? 왜 추가
         boolean hasPurchased = false;
 
-        if (user != null && "STUDENT".equals(user.getRole())) {
+        if (user != null) {
             hasEnrolled = reviewService.hasEnrolled(user.getUserId(), lectureId);
             hasReviewed = reviewService.hasReviewed(user.getUserId(), lectureId);
             canReview = hasEnrolled && !hasReviewed; // ✅ 진도율 조건 제거
@@ -95,17 +95,17 @@ public class LectureController extends MskimRequestMapping {
     }
 
 
-    @RequestMapping("play")
-    public String lecturePlay(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-        LectureDTO lecture = lectureService.getLectureById(lectureId);
-        ContentDTO content = lectureService.getFirstContentByLectureId(lectureId);
-        List<TagDTO> tagList = tagService.getTagsByLectureId(lectureId);
-        request.setAttribute("lecture", lecture);
-        request.setAttribute("content", content);
-        request.setAttribute("tagList", tagList);
-        return "lecture/lecturePlay";
-    }
+//    @RequestMapping("play")
+//    public String lecturePlay(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
+//        LectureDTO lecture = lectureService.getLectureById(lectureId);
+//        ContentDTO content = lectureService.getFirstContentByLectureId(lectureId);
+//        List<TagDTO> tagList = tagService.getTagsByLectureId(lectureId);
+//        request.setAttribute("lecture", lecture);
+//        request.setAttribute("content", content);
+//        request.setAttribute("tagList", tagList);
+//        return "lecture/lecturePlay";
+//    }
 
 
 }

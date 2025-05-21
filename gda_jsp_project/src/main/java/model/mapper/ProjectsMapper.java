@@ -55,4 +55,11 @@ public interface ProjectsMapper {
     @Select("SELECT p.*, u.name AS leaderName FROM projects p JOIN users u ON p.leader_id = u.user_id WHERE p.recruit_status = #{status} ORDER BY p.view_count DESC")
     List<ProjectsDTO> listByStatusOrderByViews(@Param("status") String status);
 
+    @Select("SELECT p.*, u.name AS leaderName " +
+            "FROM projects p " +
+            "JOIN users u ON p.leader_id = u.user_id " +
+            "WHERE p.title LIKE CONCAT('%', #{keyword}, '%') " +
+            "ORDER BY p.created_at DESC")
+    List<ProjectsDTO> searchByTitleOrderByRecent(@Param("keyword") String keyword);
+
 }

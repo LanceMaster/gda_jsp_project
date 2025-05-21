@@ -26,8 +26,8 @@ public class SiteMeshFilter extends ConfigurableSiteMeshFilter {
 		.addExcludedPath("/static/css/*")
 		.addExcludedPath("/static/js/*")
 		.addExcludedPath("/static/images/*")
-		.addExcludedPath("/user/findidform");
-		
+		.addExcludedPath("/user/findidform")
+		.addDecoratorPath("/siteinquiry/*", "/layout/layout.jsp");
 
 	}
 }

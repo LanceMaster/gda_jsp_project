@@ -1,0 +1,76 @@
+body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: #fafbfc;
+    margin: 0; padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 60px;
+}
+
+.form-container {
+    background: white;
+    max-width: 600px;
+    width: 100%;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(50,60,90,0.1);
+}
+
+.form-container h2 {
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+input[type="text"], textarea {
+    width: 100%;
+    padding: 14px 20px;
+    border: 1.5px solid #ddd;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, textarea:focus {
+    border-color: #6c63ff;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 180px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.form-actions button, .form-actions a {
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 22px;
+    padding: 12px 36px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.form-actions button:hover, .form-actions a:hover {
+    background-color: #5145c6;
+}
+
+.form-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
