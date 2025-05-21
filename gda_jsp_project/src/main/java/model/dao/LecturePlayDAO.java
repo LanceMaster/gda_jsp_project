@@ -15,6 +15,11 @@ public class LecturePlayDAO {
     public LectureDTO selectLectureById(int lectureId) {
         return session.getMapper(LecturePlayMapper.class).selectLectureById(lectureId);
     }
+    
+    public List<ContentDTO> selectContentsWithProgress(int lectureId, int userId) {
+        LecturePlayMapper mapper = session.getMapper(LecturePlayMapper.class);
+        return mapper.selectContentsWithProgress(lectureId, userId);
+    }
 
     public List<ContentDTO> selectContentsByLectureId(int lectureId) {
         return session.getMapper(LecturePlayMapper.class).selectContentsByLectureId(lectureId);

@@ -284,5 +284,65 @@ h1 {
   border-radius: 4px;
 }
 
+  /* 버튼 disabled 상태 시 비활성화 */
+  .write-btn:disabled,
+  .detail-btn:disabled,
+  .delete-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  /* 검색창 경고 효과 */
+  .search-error {
+    border-color: #e74c3c !important;
+    background: #fff3f2 !important;
+    color: #e74c3c !important;
+    animation: shake 0.2s 1;
+  }
+  @keyframes shake {
+    0% { transform: translateX(-3px);}
+    25% { transform: translateX(3px);}
+    50% { transform: translateX(-2px);}
+    75% { transform: translateX(2px);}
+    100% { transform: translateX(0);}
+  }
 
 
+
+  /* 🔹 행 hover 시 강조 */
+  .inquiry-table tbody tr:hover {
+    background: #f4f8ff;
+    transition: background 0.2s;
+  }
+  /* 🔹 활성 페이징 버튼 강조 */
+  .page-btn.active {
+    background: #276EF1;
+    color: #fff !important;
+    border-radius: 5px;
+    font-weight: 700;
+  }
+  /* 🔹 버튼 hover 효과 */
+  .detail-btn, .delete-button, .write-btn, .page-btn {
+    transition: background 0.15s, color 0.15s;
+  }
+  .detail-btn:hover, .write-btn:hover, .page-btn:hover {
+    background: #276EF1;
+    color: #fff;
+    box-shadow: 0 2px 8px #276ef13d;
+  }
+  .delete-button:hover {
+    background: #e74c3c;
+    color: #fff;
+  }
+  /* 🔹 검색창 확대 효과 */
+  .inquiry-search input[type="text"]:focus {
+    border-color: #276EF1;
+    outline: none;
+    box-shadow: 0 0 4px #276ef140;
+    background: #f9fcff;
+  }
+  /* 🔹 빈 목록 안내 스타일 개선 */
+  .inquiry-table td[colspan] {
+    color: #666;
+    font-size: 1.07em;
+    background: #f8f8fa;
+  }
