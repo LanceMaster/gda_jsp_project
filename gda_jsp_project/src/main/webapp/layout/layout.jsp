@@ -128,7 +128,7 @@
 					style="display: flex; gap: 24px; font-weight: 500;">
 					<a href="${path}/company"
 						style="color: #666; text-decoration: none;">회사 소개</a> <a
-						href="${path}/contact" style="color: #666; text-decoration: none;">문의하기</a>
+						href="${path}/siteinquiry/siteinquiryList" style="color: #666; text-decoration: none;">문의하기</a>
 				</nav>
 			</div>
 

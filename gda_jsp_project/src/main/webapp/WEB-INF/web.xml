@@ -23,6 +23,7 @@
         <filter-class>filter.LoginCheckFilter</filter-class>
     </filter>
 
+    <!-- ✅ 로그인 필요한 페이지 설정 -->
     <filter-mapping>
         <filter-name>LoginCheckFilter</filter-name>
         <url-pattern>/user/mypage</url-pattern>
@@ -35,6 +36,12 @@
 
     <filter-mapping>
         <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/siteinquiry/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/lecture/inquiry/inquirywrite</url-pattern>
         <url-pattern>/projects/projectsEdit</url-pattern>
     </filter-mapping>
 
@@ -54,7 +61,7 @@
         <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
 
-    <!-- ✅ HLS 및 썸네일 파일 매핑: /upload/* -->
+    <!-- ✅ 업로드 파일 매핑: /upload/* -->
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/upload/*</url-pattern>

@@ -32,6 +32,13 @@ public class LectureListController extends HttpServlet {
         req.setAttribute("page", cond.getPage());
         req.setAttribute("size", cond.getSize());
         req.setAttribute("param", req.getParameterMap());
+        
+        System.out.println("===== 강의 조회 결과 =====");
+        for (Map.Entry<String, Object> entry : result.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+        System.out.println("=========================");
+
 
         req.getRequestDispatcher("/view/lecture/lectureList.jsp").forward(req, resp);
 

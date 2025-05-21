@@ -30,6 +30,12 @@ public class InquiryService {
     public boolean deleteInquiry(int inquiryId) {
         return inquiryDAO.deleteInquiry(inquiryId);
     }
+
+	public void updateInquiry(InquiryDTO dto) {
+		// TODO Auto-generated method stub
+		 inquiryDAO.updateInquiry(dto);
+		
+	}
     
     
 }
