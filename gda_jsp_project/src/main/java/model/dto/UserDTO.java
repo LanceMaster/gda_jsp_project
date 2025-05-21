@@ -21,7 +21,8 @@ public class UserDTO {
 	private Date birthdate;
 	private String profileImage; // profile_image
 	private String role;
-	private LocalDateTime deletedAt; // ✅ 추가된 필드
+//	private LocalDateTime deletedAt; // ✅ 추가된 필드
+	private Date deletedAt;
 	private String bio;
 	private String resume;
 	private boolean isVerified; // is_verified
@@ -160,11 +161,11 @@ public class UserDTO {
 		this.lastLoginAt = lastLoginAt;
 	}
 
-	public LocalDateTime getDeletedAt() {
+	public Date getDeletedAt() {
 		return deletedAt;
 	}
 
-	public void setDeletedAt(LocalDateTime deletedAt) {
+	public void setDeletedAt(Date deletedAt) {
 		this.deletedAt = deletedAt;
 	}
 
