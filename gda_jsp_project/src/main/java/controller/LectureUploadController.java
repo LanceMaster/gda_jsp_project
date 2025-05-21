@@ -52,7 +52,9 @@ public class LectureUploadController extends HttpServlet {
 
         // ✅ 썸네일 저장
         Part thumbPart = request.getPart("thumbnailFile");
-        String thumbFileName = UUID.randomUUID() + "_" + thumbPart.getSubmittedFileName();
+        String originalThumbName = thumbPart.getSubmittedFileName();
+        String sanitizedThumbName = originalThumbName.replaceAll("\\s+", "_"); // 공백 제거
+        String thumbFileName = UUID.randomUUID() + "_" + sanitizedThumbName;
         byte[] thumbBytes = thumbPart.getInputStream().readAllBytes();
         String thumbUrl = FileUploadUtil.saveFileToLocal("thumb", thumbFileName, thumbBytes, LOCAL_UPLOAD_DIR);
 
