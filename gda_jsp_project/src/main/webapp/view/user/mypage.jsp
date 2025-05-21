@@ -237,10 +237,7 @@ a.delete-link:hover {
 											class="rating-text">${lecture.avgRating}</span>
 									</div>
 								</div>
-<a class="btn btn-primary"
-   href="${pageContext.request.contextPath}/lecture/management">
-   관리
-</a>
+<a href="${pageContext.request.contextPath}/lecture/management" class="btn btn-primary">관리</a>
 
 							</div>
 						</c:forEach>
