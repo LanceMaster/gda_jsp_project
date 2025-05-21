@@ -76,7 +76,7 @@ public class LectureController extends MskimRequestMapping {
         boolean hasReviewed = false;
         boolean hasEnrolled = false;
         boolean canReview = false;
-        //김준희 추가
+        //김준희 추가 ?? 왜 추가
         boolean hasPurchased = false;
 
         if (user != null) {

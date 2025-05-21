@@ -42,6 +42,17 @@
     <filter-mapping>
         <filter-name>LoginCheckFilter</filter-name>
         <url-pattern>/lecture/inquiry/inquirywrite</url-pattern>
+        <url-pattern>/projects/projectsEdit</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/siteinquiry/siteinquiryForm</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>/siteinquiry/siteinquiryEdit</url-pattern>
     </filter-mapping>
 
     <!-- ✅ 정적 자원 매핑: /static/* (CSS, JS 등) -->
