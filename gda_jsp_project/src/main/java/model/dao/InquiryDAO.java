@@ -53,4 +53,14 @@ public class InquiryDAO {
             return rows > 0;
         }
     }
+
+
+	public void updateInquiry(InquiryDTO inquiry) {
+		try(SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            InquiryMapper mapper = session.getMapper(InquiryMapper.class);
+            mapper.updateInquiry(inquiry);
+            session.commit();
+            session.close();
+		} 
+	}
 }

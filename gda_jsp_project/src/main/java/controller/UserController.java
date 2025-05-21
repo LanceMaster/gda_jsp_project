@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.oreilly.servlet.MultipartRequest;
 
@@ -32,9 +33,9 @@ public class UserController extends MskimRequestMapping {
 		// 메인 페이지를 보여주는 JSP 페이지로 이동
 		List<LectureDTO> topLectures = lectureDAO.getTopLectures(8); // 상위 8개 강의
 		// 최신강의 8개 가져오기
-	
+
 		List<LectureDTO> latestLectures = lectureDAO.getLatestLectures(8); // 최신 8개 강의
-	
+
 		request.setAttribute("topLectures", topLectures);
 		request.setAttribute("latestLectures", latestLectures);
 
@@ -51,25 +52,24 @@ public class UserController extends MskimRequestMapping {
 	// 로그인 처리
 	@RequestMapping("login")
 	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		String id = request.getParameter("id");
-
 		String password = request.getParameter("password");
 
 		UserDTO userDTO = userDAO.login(id, password);
 
 		if (userDTO != null) {
 			// 로그인 성공
-			request.getSession().setAttribute("user", userDTO);
+			HttpSession session = request.getSession();
+			session.setAttribute("user", userDTO);
 
 			// 이전에 저장된 redirect URL 확인
-			String redirectUrl = (String) request.getSession().getAttribute("redirectAfterLogin");
-			if (redirectUrl != null) {
-				request.getSession().removeAttribute("redirectAfterLogin");
+			String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
+			if (redirectUrl != null && !redirectUrl.trim().isEmpty()) {
+				session.removeAttribute("redirectAfterLogin");
 				return "redirect:" + redirectUrl;
 			}
 
-			// 기본적으로는 메인페이지로
+			// 기본적으로는 메인페이지로 이동
 			return "redirect:" + request.getContextPath() + "/user/mainpage";
 		} else {
 			request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");

@@ -1,0 +1,137 @@
+/* 기본 스타일 리셋 및 폰트 설정 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 문의글 작성 컨테이너 */
+.inquiry-write-container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 스타일 */
+.inquiry-write-container h2 {
+  font-size: 24px;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #4a6bdf;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 폼 스타일 */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+input[type="text"], textarea {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, textarea:focus {
+  outline: none;
+  border-color: #4a6bdf;
+  box-shadow: 0 0 0 2px rgba(74, 107, 223, 0.2);
+}
+
+/* 서머노트 에디터 스타일 커스터마이징 */
+.note-editor.note-frame {
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  margin-bottom: 25px !important;
+}
+
+.note-editor .note-toolbar {
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #eee !important;
+  padding: 5px 10px !important;
+}
+
+.note-editor .note-statusbar {
+  background-color: #f8f9fa !important;
+}
+
+/* 버튼 스타일 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+button[type="submit"], .cancel-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button[type="submit"] {
+  background-color: #4a6bdf;
+  color: white;
+  border: none;
+}
+
+button[type="submit"]:hover {
+  background-color: #3a59c7;
+}
+
+.cancel-btn {
+  background-color: #f1f3f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+  background-color: #e9ecef;
+}
+
+/* Responsive 디자인 */
+@media (max-width: 768px) {
+  .inquiry-write-container {
+    width: 95%;
+    padding: 20px;
+    margin: 30px auto;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  button[type="submit"], .cancel-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
