@@ -53,11 +53,9 @@
       <c:if test="${status.index < 8}">
         <div class="lecture-card">
           <a href="<c:url value='/lecture/lecturedetail?lectureId=${lec.lectureId}' />">
-            <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- 썸네일 이미지 출력 -->
-<img src="${lec.thumbnail}" alt="${lec.title}" style="width:300px;" />
+<img src="${pageContext.request.contextPath}${lec.thumbnail}" alt="${lec.title}" class="lecture-thumbnail" />
             <h4>${lec.title}</h4>
             <p><fmt:formatNumber value="${lec.price}" type="currency" currencySymbol="₩" /></p>
        <!--  아무거나 -->    

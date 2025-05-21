@@ -54,8 +54,7 @@
         <filter-name>LoginCheckFilter</filter-name>
         <url-pattern>/siteinquiry/siteinquiryEdit</url-pattern>
     </filter-mapping>
-
-    <!-- ✅ 정적 자원 매핑: /static/* (CSS, JS 등) -->
+<!-- ✅ 정적 자원 매핑: /static/* (CSS, JS 등) -->
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/static/*</url-pattern>
