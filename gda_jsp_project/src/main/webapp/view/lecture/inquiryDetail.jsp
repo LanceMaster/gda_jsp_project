@@ -19,7 +19,9 @@
 		</div>
 	</div>
 	<div class="inquiry-actions">
-		<a href="<c:url value='/lecture/inquiry/list' />">← 목록으로</a>
+		<a
+			href="<c:url value='/lecture/inquiry/list?lectureId=${inquiry.lectureId}' />">←
+			목록으로</a>
 		<c:if test="${sessionScope.user.userId eq inquiry.userId}">
 			<a
 				href="<c:url value='/lecture/inquiry/write?lectureId=${inquiry.lectureId}&editId=${inquiry.inquiryId}' />">수정</a>
