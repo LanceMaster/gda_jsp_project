@@ -26,7 +26,7 @@
 			<a
 				href="<c:url value='/lecture/inquiry/write?lectureId=${inquiry.lectureId}&editId=${inquiry.inquiryId}' />">수정</a>
 			<form method="post"
-				action="<c:url value='/lecture/inquiry/delete' />"
+				action="<c:url value='/lecture/inquiry/delete?lectureId=${inquiry.lectureId}' />"
 				onsubmit="return confirm('정말 삭제하시겠습니까?')">
 				<input type="hidden" name="inquiryId" value="${inquiry.inquiryId}" />
 				<input type="hidden" name="lectureId" value="${inquiry.lectureId}" />
