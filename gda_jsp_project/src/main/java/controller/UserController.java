@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.annotation.WebInitParam;
@@ -61,48 +63,54 @@ public class UserController extends MskimRequestMapping {
 	 */
 	@RequestMapping("login")
 	public String login(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String id = request.getParameter("id");
-		String password = request.getParameter("password");
+	    String id = request.getParameter("id");
+	    String password = request.getParameter("password");
 
-		UserDTO userDTO = userDAO.login(id, password); // DB 조회
+	    UserDTO userDTO = userDAO.login(id, password); // DB 조회
 
-		if (userDTO == null) {
-			// 로그인 실패
-			request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");
-			return "user/loginform";
-		}
+	    if (userDTO == null) {
+	        // 로그인 실패
+	        request.setAttribute("loginError", "아이디 또는 비밀번호를 확인해주세요");
+	        return "user/loginform";
+	    }
 
-		// 로그인 성공 처리
-		HttpSession session = request.getSession();
-		session.setAttribute("user", userDTO);
+	    // 로그인 성공 처리
+	    HttpSession session = request.getSession();
+	    session.setAttribute("user", userDTO);
 
-		// 탈퇴 여부 확인
-		if (userDTO.isDeleted()) {
-			LocalDateTime deletedAt = userDTO.getDeletedAt();
-			if (deletedAt != null) {
-				Duration duration = Duration.between(deletedAt, LocalDateTime.now());
+	    // 탈퇴 여부 확인
+	    if (userDTO.isDeleted()) {
+	        Date deletedAtDate = userDTO.getDeletedAt();
+	        if (deletedAtDate != null) {
+	            // Date → LocalDateTime 변환
+	            LocalDateTime deletedAt = deletedAtDate.toInstant()
+	                    .atZone(ZoneId.systemDefault())
+	                    .toLocalDateTime();
 
-				if (duration.toDays() >= 15) {
-					// 15일이 지났으면, 이미 삭제된 계정이어야 하므로 로그인 차단
-					request.setAttribute("loginError", "해당 계정은 탈퇴한 지 15일이 지나 삭제되었습니다.");
-					session.invalidate(); // 세션 초기화
-					return "user/loginform";
-				} else {
-					// 탈퇴 요청 후 15일 미만 -> 로그인은 허용, 알림 전달
-					session.setAttribute("withdrawalNotice", "탈퇴 요청된 계정입니다. 복구를 원하시면 '계정 삭제 취소' 버튼을 눌러주세요.");
-				}
-			}
-		}
+	            Duration duration = Duration.between(deletedAt, LocalDateTime.now());
 
-		// 리다이렉트 처리
-		String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
-		if (redirectUrl != null && !redirectUrl.trim().isEmpty()) {
-			session.removeAttribute("redirectAfterLogin");
-			return "redirect:" + redirectUrl;
-		}
+	            if (duration.toDays() >= 15) {
+	                // 15일 경과 → 완전 삭제된 계정
+	                request.setAttribute("loginError", "해당 계정은 탈퇴한 지 15일이 지나 삭제되었습니다.");
+	                session.invalidate(); // 세션 초기화
+	                return "user/loginform";
+	            } else {
+	                // 15일 미만 → 로그인은 가능, 경고 메시지
+	                session.setAttribute("withdrawalNotice", "탈퇴 요청된 계정입니다. 복구를 원하시면 '계정 삭제 취소' 버튼을 눌러주세요.");
+	            }
+	        }
+	    }
 
-		return "redirect:" + request.getContextPath() + "/user/mainpage";
+	    // 리다이렉트 처리
+	    String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
+	    if (redirectUrl != null && !redirectUrl.trim().isEmpty()) {
+	        session.removeAttribute("redirectAfterLogin");
+	        return "redirect:" + redirectUrl;
+	    }
+
+	    return "redirect:" + request.getContextPath() + "/user/mainpage";
 	}
+
 
 	// 회원가입폼 불러오기
 	@RequestMapping("signupform")
