@@ -13,154 +13,165 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 📋 InquiryController
- * - 강의 문의 목록, 작성, 삭제 통합 컨트롤러
+ * 📋 InquiryController - 강의 문의 목록, 작성, 삭제 통합 컨트롤러
  */
-@WebServlet(
-    urlPatterns = "/lecture/inquiry/*",
-    initParams = @WebInitParam(name = "view", value = "/view/")
-)
+@WebServlet(urlPatterns = "/lecture/inquiry/*", initParams = @WebInitParam(name = "view", value = "/view/"))
 public class InquiryController extends MskimRequestMapping {
 
-    private final InquiryService inquiryService = new InquiryService();
+	private final InquiryService inquiryService = new InquiryService();
 
-    /**
-     * ✅ 문의글 목록 출력 (페이징 포함)
-     * URL: /lecture/inquiry/list
-     */
-    @RequestMapping("list")
-    public String listInquiries(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        int page = 1;
-        int size = 10;
+	/**
+	 * ✅ 문의글 목록 출력 (페이징 포함) URL: /lecture/inquiry/list
+	 */
+	@RequestMapping("list")
+	public String listInquiries(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		int page = 1;
+		int size = 10;
 
-        String pageParam = req.getParameter("page");
-        if (pageParam != null && pageParam.matches("\\d+")) {
-            page = Integer.parseInt(pageParam);
-        }
+		String lectureIdStr = request.getParameter("lectureId");
+		if (lectureIdStr == null || lectureIdStr.isBlank()) {
+			throw new IllegalArgumentException("lectureId가 전달되지 않았습니다.");
+		}
 
-        List<InquiryDTO> inquiryList = inquiryService.getPagedInquiries(page, size);
-        int totalCount = inquiryService.getTotalInquiries();
-        int totalPages = (int) Math.ceil(totalCount / (double) size);
+		System.out.println(Integer.parseInt(lectureIdStr));
 
-        req.setAttribute("inquiryList", inquiryList);
-        req.setAttribute("currentPage", page);
-        req.setAttribute("totalPages", totalPages);
+		String pageParam = request.getParameter("page");
+		if (pageParam != null && pageParam.matches("\\d+")) {
+			page = Integer.parseInt(pageParam);
+		}
 
-        return "lecture/inquiryList";
-    }
+		List<InquiryDTO> inquiryList = inquiryService.getPagedInquiries(page, size);
+		int totalCount = inquiryService.getTotalInquiries();
+		int totalPages = (int) Math.ceil(totalCount / (double) size);
 
-    @RequestMapping("write")
-    public String handleInquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
+		request.setAttribute("inquiryList", inquiryList);
+		request.setAttribute("currentPage", page);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("lectureId", lectureIdStr);
 
-        if ("GET".equalsIgnoreCase(request.getMethod())) {
-            return "lecture/inquiryWrite"; // 작성 폼
-        }
+		return "lecture/inquiryList";
+	}
 
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
-            UserDTO loginUser = (UserDTO) request.getSession().getAttribute("loginUser");
-            if (loginUser == null) {
-                throw new IllegalStateException("로그인 후 작성 가능합니다.");
-            }
+	@RequestMapping("write")
+	public String handleInquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
 
-            InquiryDTO dto = new InquiryDTO();
-            dto.setUserId(loginUser.getUserId()); // DTO에 맞게
-            dto.setLectureId(Integer.parseInt(request.getParameter("lectureId")));
-            dto.setTitle(request.getParameter("title"));
-            dto.setContent(request.getParameter("content"));
-            dto.setType("LECTURE");
-            dto.setCreatedAt(LocalDateTime.now());
+		String lectureIdStr = request.getParameter("lectureId");
 
-            inquiryService.insertInquiry(dto);
+		if ("GET".equalsIgnoreCase(request.getMethod())) {
+			// 수정 모드인지 확인
+			String editId = request.getParameter("editId");
+			if (editId != null && editId.matches("\\d+")) {
+				int inquiryId = Integer.parseInt(editId);
+				InquiryDTO inquiry = inquiryService.getInquiryById(inquiryId);
+				request.setAttribute("inquiry", inquiry);
+			}
 
-            return "redirect:inquiryList"; // ✅ 등록 후에는 목록으로 이동
-        }
+			// lectureId를 JSP에 전달
+			request.setAttribute("lectureId", Integer.parseInt(lectureIdStr));
 
-        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        return null;
-    }
+			return "lecture/inquiryWrite"; // 문의 작성 JSP 포워딩
+		}
 
-    @RequestMapping("inquirywrite")
-    public String handleNewInquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
+		if ("POST".equalsIgnoreCase(request.getMethod())) {
+			UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
+			if (loginUser == null) {
+				throw new IllegalStateException("로그인 후 작성 가능합니다.");
+			}
 
-        if ("GET".equalsIgnoreCase(request.getMethod())) {
-            // 📄 새 폼으로 이동
-            return "lecture/inquiryWrite"; // 또는 inquiryWrite2.jsp 로 분리 가능
-        }
+			InquiryDTO dto = new InquiryDTO();
+			dto.setUserId(loginUser.getUserId());
+			dto.setLectureId(Integer.parseInt(lectureIdStr));
+			dto.setTitle(request.getParameter("title"));
+			dto.setContent(request.getParameter("content"));
 
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
-            UserDTO loginUser = (UserDTO) request.getSession().getAttribute("loginUser");
-            if (loginUser == null) {
-                throw new IllegalStateException("로그인 후 작성 가능합니다.");
-            }
+			String editId = request.getParameter("editId");
+			if (editId != null && editId.matches("\\d+")) {
+				// 수정 처리
+				dto.setInquiryId(Integer.parseInt(editId));
+				inquiryService.updateInquiry(dto);
+			} else {
+				// 새 글 등록 처리
+				dto.setType("LECTURE");
+				dto.setCreatedAt(LocalDateTime.now());
+				inquiryService.insertInquiry(dto);
+			}
 
-            InquiryDTO dto = new InquiryDTO();
-            dto.setUserId(loginUser.getUserId());
-            dto.setLectureId(Integer.parseInt(request.getParameter("lectureId")));
-            dto.setTitle(request.getParameter("title"));
-            dto.setContent(request.getParameter("content"));
-            dto.setType("LECTURE");
-            dto.setCreatedAt(LocalDateTime.now());
+			// 등록/수정 후 문의 리스트로 redirect (lectureId 파라미터 포함)
+			return "redirect:" + request.getContextPath() + "/lecture/inquiry/list?lectureId=" + lectureIdStr;
+		}
 
-            inquiryService.insertInquiry(dto);
-            return "redirect:inquiryList";
-        }
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		return null;
+	}
 
-        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        return null;
-    }
+	@RequestMapping("inquirywrite")
+	public String handleNewInquiryWrite(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
 
-    /**
-     * ✅ 문의글 삭제 (목록에서 삭제)
-     * URL: /lecture/inquiry/delete
-     */
-    @RequestMapping("delete")
-    public String deleteInquiry(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String idParam = request.getParameter("inquiryId");
-        if (idParam == null || !idParam.matches("\\d+")) {
-            throw new IllegalArgumentException("❌ 유효하지 않은 ID입니다.");
-        }
+		String lectureIdStr = request.getParameter("lectureId");
+		if (lectureIdStr == null || lectureIdStr.isBlank()) {
+			throw new IllegalArgumentException("lectureId가 전달되지 않았습니다.");
+		}
 
-        int inquiryId = Integer.parseInt(idParam);
-        inquiryService.deleteInquiry(inquiryId);
+		if ("GET".equalsIgnoreCase(request.getMethod())) {
+			request.setAttribute("lectureId", lectureIdStr); // << 이 부분이 중요!
+			return "lecture/inquiryWrite";
+		}
 
-        return "redirect:inquiryList";
-    }
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		return null;
+	}
 
-    @RequestMapping("detail")
-    public String inquiryDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String param = request.getParameter("inquiryId");
-        if (param == null || !param.matches("\\d+")) {
-            throw new IllegalArgumentException("유효한 문의 ID가 필요합니다.");
-        }
+	/**
+	 * ✅ 문의글 삭제 (목록에서 삭제) URL: /lecture/inquiry/delete
+	 */
+	@RequestMapping("delete")
+	public String deleteInquiry(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        int inquiryId = Integer.parseInt(param);
-        InquiryDTO inquiry = inquiryService.getInquiryById(inquiryId);
-        if (inquiry == null) {
-            throw new IllegalArgumentException("해당 문의글을 찾을 수 없습니다.");
-        }
+		String lectureIdStr = request.getParameter("lectureId");
+		if (lectureIdStr == null || lectureIdStr.isBlank()) {
+			throw new IllegalArgumentException("lectureId가 전달되지 않았습니다.");
+		}
+		
+		String idParam = request.getParameter("inquiryId");
+		if (idParam == null || !idParam.matches("\\d+")) {
+			throw new IllegalArgumentException("❌ 유효하지 않은 ID입니다.");
+		}
+		
 
-        request.setAttribute("inquiry", inquiry);
-        return "lecture/inquiryDetail";
-    }
-    /**
-     * ✅ 문의글 삭제 (강의 상세 페이지 문의 탭)
-     * URL: /lecture/inquiry/inquiry/delete
-     */
-    @RequestMapping("inquiry/delete")
-    public String inquiryDelete(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.setCharacterEncoding("UTF-8");
+		int inquiryId = Integer.parseInt(idParam);
+		inquiryService.deleteInquiry(inquiryId);
 
-        int inquiryId = Integer.parseInt(request.getParameter("inquiryId"));
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
+		request.getSession().setAttribute("msg", "삭제가 완료되었습니다.");
 
-        inquiryService.deleteInquiry(inquiryId);
+		String path = request.getContextPath();
 
-        return "redirect:/lecture/inquiries?lectureId=" + lectureId;
-    }
-} 
+		return "redirect:" + path + "/lecture/inquiry/list?lectureId="+lectureIdStr; // ✅ 등록 후에는 목록으로 이동
+	}
+
+	@RequestMapping("detail")
+	public String inquiryDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String param = request.getParameter("inquiryId");
+		if (param == null || !param.matches("\\d+")) {
+			throw new IllegalArgumentException("유효한 문의 ID가 필요합니다.");
+		}
+
+		int inquiryId = Integer.parseInt(param);
+		InquiryDTO inquiry = inquiryService.getInquiryById(inquiryId);
+		if (inquiry == null) {
+			throw new IllegalArgumentException("해당 문의글을 찾을 수 없습니다.");
+		}
+		
+		
+
+		request.setAttribute("inquiry", inquiry);
+		return "lecture/inquiryDetail";
+	}
+
+}

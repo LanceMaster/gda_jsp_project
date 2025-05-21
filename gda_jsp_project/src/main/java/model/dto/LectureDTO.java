@@ -7,6 +7,14 @@ import java.math.BigDecimal;
  */
 public class LectureDTO {
 
+	@Override
+	public String toString() {
+		return "LectureDTO [lectureId=" + lectureId + ", title=" + title + ", description=" + description
+				+ ", thumbnail=" + thumbnail + ", category=" + category + ", price=" + price + ", avgRating="
+				+ avgRating + ", instructorId=" + instructorId + ", reviewCount=" + reviewCount + ", curriculum="
+				+ curriculum + ", avgProgress=" + avgProgress + "]";
+	}
+
 	// 📌 기본 강의 속성
 	private int lectureId;
 	private String title;

@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.Random;
 
@@ -59,6 +60,9 @@ public class AccountServlet extends HttpServlet {
 		case "checkResume":
 			handleCheckResume(request, response); // 이 메서드는 구현되지 않음
 			break;
+		case "cancelDeleteAccount":
+			handelCancelDeleteAccount(request, response);
+			break;
 		default:
 			response.getWriter().write("fail");
 		}
@@ -102,7 +106,6 @@ public class AccountServlet extends HttpServlet {
 		try {
 			String resumeFilename = userDAO.getResumeFilename(email);
 			if (resumeFilename != null && !resumeFilename.isEmpty()) {
-				// 회원가입 때 저장된 경로와 일치하도록 수정
 				String filePath = getServletContext().getRealPath("/upload/resume/" + resumeFilename);
 
 				File file = new File(filePath);
@@ -113,14 +116,28 @@ public class AccountServlet extends HttpServlet {
 
 				// 파일 다운로드용 헤더 설정
 				response.setContentType("application/octet-stream");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + resumeFilename + "\"");
 				response.setContentLengthLong(file.length());
+
+				// 한글 파일명 대응
+				String userAgent = request.getHeader("User-Agent");
+				String encodedFilename;
+
+				if (userAgent != null && (userAgent.contains("MSIE") || userAgent.contains("Trident")
+						|| userAgent.contains("Edge"))) {
+					// IE, Edge 대응
+					encodedFilename = URLEncoder.encode(resumeFilename, "UTF-8").replaceAll("\\+", "%20");
+					response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFilename + "\"");
+				} else {
+					// Chrome, Firefox, Safari 등
+					encodedFilename = URLEncoder.encode(resumeFilename, "UTF-8").replaceAll("\\+", "%20");
+					response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename);
+				}
 
 				// 파일 스트림을 읽어 response 출력
 				try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
 						ServletOutputStream out = response.getOutputStream()) {
 					byte[] buffer = new byte[4096];
-					int bytesRead = -1;
+					int bytesRead;
 					while ((bytesRead = in.read(buffer)) != -1) {
 						out.write(buffer, 0, bytesRead);
 					}
@@ -212,12 +229,23 @@ public class AccountServlet extends HttpServlet {
 
 	private void handleDeleteAccount(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String email = request.getParameter("email");
-		boolean deleted = userDAO.deleteAccount(email);
+		boolean deactivate = userDAO.deactivateAccount(email);
 
-		if (deleted) {
+		if (deactivate) {
 			request.getSession().invalidate();
 		}
-		response.getWriter().write(deleted ? "success" : "fail");
+		response.getWriter().write(deactivate ? "success" : "fail");
+	}
+
+	private void handelCancelDeleteAccount(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+
+		String userId = request.getParameter("userId");
+		boolean cancelDelete = userDAO.cancelDelete(userId);
+		
+
+		response.getWriter().write(cancelDelete ? "success" : "fail");
+
 	}
 
 	// 공통 메일 전송 메서드

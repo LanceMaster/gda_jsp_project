@@ -1,8 +1,13 @@
+
+<%@page import="model.dto.LectureDTO"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+
 <html>
 <head>
-<title>${lecture.title}-강의 상세</title>
+<title>${lecture.title}-강의상세</title>
 <link rel="stylesheet"
 	href="<c:url value='/static/css/lectureDetail.css' />">
 
@@ -11,6 +16,7 @@
 <c:url var="cartPageUrl" value="/lecture/cart" />
 </head>
 <body>
+
 	<div class="lecture-container">
 
 		<!-- 썸네일 -->
@@ -35,24 +41,13 @@
 						₩${lecture.price}
 						<fmt:formatNumber value="${lecture.price}" type="number" />
 					</p>
-
-
-					<c:choose>
-						<c:when test="${hasPurchased}">
-							<a href="${pageContext.request.contextPath}/user/mypage"
-								class="start-btn">수강 중</a>
-						</c:when>
-						<c:otherwise>
-							<button class="start-btn"
-								onclick="startNow(${lecture.lectureId})">지금 시작하기</button>
-						</c:otherwise>
-					</c:choose>
-
-
+					<button class="start-btn" onclick="startNow(${lecture.lectureId})">지금
+						시작하기</button>
 					<span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
 				</div>
 			</div>
 		</div>
+
 
 		<div class="lecture-description">
 			<h2>강의 설명</h2>
@@ -67,9 +62,13 @@
 			<p class="desc-footer">이 수업은 실전형 프로젝트를 통해 핵심 개념을 빠르게 학습할 수 있도록
 				설계되어 있습니다.</p>
 
-			<!-- 질문 게시판 바로가기 -->
-			<a href="<c:url value='/lecture/inquiry/list' />">강의 질문 게시판</a>
-		</div>
+    <!-- 질문 게시판 바로가기 -->
+<div class="modern-action-wrap">
+	<a
+				href="${pageContext.request.contextPath}/lecture/inquiry/list?lectureId=${lecture.lectureId}"
+				class="go-inquiry-btn"> 💬 강의 질문 게시판 바로가기 </a>
+</div>
+  </div>
 
 		<div class="review-section">
 			<div class="review-header">
@@ -77,27 +76,41 @@
 				<span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
 			</div>
 
-			<!-- ✅ 리뷰 작성 조건: 로그인 + 수강자 + 리뷰 미작성자 -->
+			<!-- ✅ 리뷰 작성 가능 조건 -->
 			<c:if test="${canReview}">
-				<form id="reviewForm" method="post">
+				<form id="reviewForm" method="post"
+					action="${pageContext.request.contextPath}/review"
+					class="review-form">
 					<input type="hidden" name="lectureId" value="${lecture.lectureId}" />
 
-					<textarea name="content" placeholder="댓글을 입력해 주세요." required></textarea>
-
-					<div class="review-controls">
-						<select name="rating" required>
-							<option value="">⭐ 평점을 선택하세요</option>
+					<!-- 작성자명 + 평점 -->
+					<div class="review-header-line modern">
+						<input type="text" id="reviewTitle" name="title"
+							class="review-nickname" placeholder="닉네임을 입력하세요" required /> <select
+							name="rating" class="rating-select" required>
+							<option value="" disabled selected hidden>평점 선택</option>
 							<option value="5">⭐⭐⭐⭐⭐</option>
 							<option value="4">⭐⭐⭐⭐</option>
 							<option value="3">⭐⭐⭐</option>
 							<option value="2">⭐⭐</option>
 							<option value="1">⭐</option>
 						</select>
-						<button type="submit" class="submit-btn">제출</button>
 					</div>
-				</form>
-			</c:if>
 
+					<!-- 리뷰 입력 + 제출 버튼 우측 하단 배치 -->
+					<div class="review-content-wrap">
+						<textarea id="reviewContent" name="content" rows="4"
+							placeholder="리뷰를 남겨주세요." required></textarea>
+						<div class="review-submit-right">
+							<button type="submit" class="submit-btn">제출</button>
+						</div>
+					</div>
+
+  <!-- 메시지 -->
+  <div id="reviewErrorMsg" class="form-error" style="display:none;"></div>
+  <div id="reviewSuccessMsg" class="form-success" style="display:none;"></div>
+</form>
+</c:if>
 			<!-- ✅ 리뷰 작성 불가 조건 안내 -->
 			<c:if test="${not canReview}">
 				<c:choose>
@@ -114,39 +127,51 @@
 			</c:if>
 
 
-			<!-- ✅ 리뷰 목록 -->
-			<ul class="review-list" id="reviewList">
-				<c:forEach var="review" items="${reviewList}">
-					<li class="review-item">
-						<div class="review-card">
-							<div class="review-user">
-								<img src="<c:url value='/static/images/user.png' />"
-									class="user-icon" />
-								<div class="user-meta">
-									<div class="meta-top">
-										<strong class="reviewer-name">${review.reviewer}</strong> <span
-											class="review-date"> <fmt:formatDate
-												value="${review.createdAt}" pattern="yyyy-MM-dd HH:mm" />
-										</span>
-									</div>
-									<div class="review-stars">
-										<c:forEach begin="1" end="5" var="i">
-											<c:choose>
-												<c:when test="${i <= review.rating}">⭐</c:when>
-												<c:otherwise>☆</c:otherwise>
-											</c:choose>
-										</c:forEach>
-									</div>
+		<c:if test="${not empty reviewList}">
+			<p style="font-size: 15px; color: #666; margin-bottom: 8px;">
+				총 <strong>${fn:length(reviewList)}</strong>개의 리뷰가 등록되었습니다.
+			</p>
+		</c:if>
+		<c:if test="${empty reviewList}">
+			<p style="font-size: 15px; color: #999; margin-bottom: 8px;">아직
+				리뷰가 없습니다. 첫 리뷰를 작성해보세요!</p>
+		</c:if>
+
+
+		<!-- ✅ 리뷰 목록 -->
+		<ul class="review-list" id="reviewList">
+			<c:forEach var="review" items="${reviewList}">
+				<li class="review-item">
+					<div class="review-card">
+						<div class="review-user">
+							<img src="<c:url value='/static/images/user.png' />"
+								class="user-icon" />
+							<div class="user-meta">
+								<div class="meta-top">
+									<strong class="reviewer-name">${review.reviewer}</strong> <span
+										class="review-date"> <fmt:formatDate
+											value="${review.createdAt}" pattern="yyyy-MM-dd HH:mm" />
+									</span>
+								</div>
+								<div class="review-stars">
+									<c:forEach begin="1" end="5" var="i">
+										<c:choose>
+											<c:when test="${i <= review.rating}">⭐</c:when>
+											<c:otherwise>☆</c:otherwise>
+										</c:choose>
+									</c:forEach>
 								</div>
 							</div>
-							<p class="review-content">${review.content}</p>
 						</div>
-					</li>
-				</c:forEach>
-			</ul>
+						<p class="review-content">${review.content}</p>
+					</div>
+				</li>
+			</c:forEach>
+		</ul>
 
-		</div>
-		<script>
+	</div>
+	<script>
+
   const addCartUrl = '${addCartUrl}';
   const cartPageUrl = '${cartPageUrl}';
 
@@ -172,6 +197,66 @@
       alert("서버 통신 중 오류 발생");
     });
   }
+  
+  const reviewForm = document.getElementById("reviewForm");
+
+  if (reviewForm) {
+    reviewForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const rating = reviewForm.rating.value;
+      const title = reviewForm.title.value.trim();
+      const content = reviewForm.content.value.trim();
+
+      const errorBox = document.getElementById("reviewErrorMsg");
+      const successBox = document.getElementById("reviewSuccessMsg");
+
+      errorBox.style.display = "none";
+      successBox.style.display = "none";
+
+      if (!rating || !title || !content) {
+        errorBox.innerText = "⚠ 모든 필드를 입력해 주세요.";
+        errorBox.style.display = "block";
+        return;
+      }
+
+      const params = new URLSearchParams(new FormData(reviewForm));
+
+      fetch(reviewForm.action, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            successBox.innerText = "✅ 리뷰가 성공적으로 등록되었습니다.";
+            successBox.style.display = "block";
+
+            // 폼 초기화
+            reviewForm.reset();
+
+            // 일정 시간 후 페이지 리로드 또는 이동
+            setTimeout(() => {
+              window.location.href = data.redirectUrl;
+            }, 1000);
+          } else {
+            errorBox.innerText = data.message || "❌ 리뷰 등록 실패";
+            errorBox.style.display = "block";
+          }
+        })
+        .catch((error) => {
+          console.error("🚨 서버 오류:", error);
+          errorBox.innerText = "서버 오류가 발생했습니다. 다시 시도해 주세요.";
+          errorBox.style.display = "block";
+        });
+    });
+  }
+
+
+  
   </script>
 </body>
 </html>

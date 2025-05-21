@@ -77,6 +77,8 @@
 				<div class="card lecture-card-custom h-100 shadow-sm border-0">
 					<img src="${pageContext.request.contextPath}${lecture.thumbnail}"
 						class="card-img-top p-3" alt="강의 이미지" style="border-radius: 18px" />
+					<img src="${lec.thumbnail}" alt="${lec.title}"
+						style="width: 300px;" />
 					<div class="card-body text-center">
 						<div class="font-weight-bold mb-2">
 							[${lecture.category}] <span style="color: #f0b400">⭐
@@ -120,6 +122,18 @@
 			</div>
 		</c:forEach>
 	</div>
+
+	<%
+    String notice = (String) session.getAttribute("withdrawalNotice");
+    if (notice != null) {
+%>
+	<script>
+        alert("<%= notice %>");
+    </script>
+	<%
+        session.removeAttribute("withdrawalNotice"); // 알림 표시 후 제거
+    }
+%>
 
 	<%-- <h3 class="font-weight-bold mb-4 mt-5">최신강의</h3>
 	<div class="row">

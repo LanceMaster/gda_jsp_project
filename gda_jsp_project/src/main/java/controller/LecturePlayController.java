@@ -4,6 +4,8 @@ package controller;
 import model.dao.LecturePlayDAO;
 import model.dto.ContentDTO;
 import model.dto.LectureDTO;
+import model.dto.UserDTO;
+
 import org.apache.ibatis.session.SqlSession;
 import utils.MyBatisUtil;
 
@@ -24,14 +26,26 @@ public class LecturePlayController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int lectureId = Integer.parseInt(req.getParameter("lectureId"));
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            LecturePlayDAO dao = new LecturePlayDAO(session);
+        HttpSession session = req.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("user");
+
+        try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            LecturePlayDAO dao = new LecturePlayDAO(sqlSession);
             LectureDTO lecture = dao.selectLectureById(lectureId);
-            List<ContentDTO> contents = dao.selectContentsByLectureId(lectureId);
+
+            List<ContentDTO> contents;
+            if (user != null) {
+                contents = dao.selectContentsWithProgress(lectureId, user.getUserId());
+            } else {
+                contents = dao.selectContentsByLectureId(lectureId); // 기존 로직
+            }
 
             req.setAttribute("lecture", lecture);
             req.setAttribute("contents", contents);
             req.getRequestDispatcher("/view/lecture/lecturePlay.jsp").forward(req, resp);
         }
     }
+    
+    
+    
 }

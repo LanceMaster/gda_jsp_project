@@ -53,10 +53,12 @@
       <c:if test="${status.index < 8}">
         <div class="lecture-card">
           <a href="<c:url value='/lecture/lecturedetail?lectureId=${lec.lectureId}' />">
-            <img src="<c:url value='${lec.thumbnail}' />" alt="${lec.title}" />
+
+<!-- 썸네일 이미지 출력 -->
+<img src="${pageContext.request.contextPath}${lec.thumbnail}" alt="${lec.title}" class="lecture-thumbnail" />
             <h4>${lec.title}</h4>
             <p><fmt:formatNumber value="${lec.price}" type="currency" currencySymbol="₩" /></p>
-            
+       <!--  아무거나 -->    
             <p class="rating">
               ⭐ <c:choose>
                 <c:when test="${lec.avgRating != null}">

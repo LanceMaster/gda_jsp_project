@@ -1,5 +1,6 @@
 package controller;
 
+import com.google.gson.Gson;
 import gdu.mskim.MskimRequestMapping;
 import gdu.mskim.RequestMapping;
 import model.dao.LectureDAO;
@@ -16,21 +17,19 @@ import javax.servlet.http.*;
 
 import org.apache.ibatis.session.SqlSession;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @WebServlet(urlPatterns = { "/lecture/*" }, initParams = {
         @WebInitParam(name = "view", value = "/view/")
 })
 @MultipartConfig(
-	    fileSizeThreshold = 1024 * 1024,         // 1MB 메모리 임계
-	    maxFileSize = 1024 * 1024 * 200,         // 200MB
-	    maxRequestSize = 1024 * 1024 * 500       // 500MB
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 200,
+        maxRequestSize = 1024 * 1024 * 500
 )
 public class LectureController extends MskimRequestMapping {
 
@@ -38,19 +37,13 @@ public class LectureController extends MskimRequestMapping {
     private final TagService tagService = new TagService();
     private final InquiryService inquiryService = new InquiryService();
     private final ReviewService reviewService = new ReviewService();
-
-    /**
-     * ✅ 강의 목록 조회
-     * - 키워드 검색 / 카테고리 필터 / 정렬 조건 모두 지원
-     * - 내부적으로 조건에 따라 적절한 DAO 메서드로 분기 처리
-     */
-
+    private final LectureManagementLectureService managementService = new LectureManagementLectureService();
+    private final Gson gson = new Gson();
 
     @RequestMapping("lecturedetail")
     public String lectureDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String param = request.getParameter("lectureId");
 
-        // 유효성 검사
         if (param == null || !param.matches("\\d+")) {
             request.setAttribute("error", "잘못된 요청입니다.");
             return "error/errorPage";
@@ -64,25 +57,22 @@ public class LectureController extends MskimRequestMapping {
             return "error/errorPage";
         }
 
-        // 리뷰 목록 가져오기
         List<ReviewDTO> reviewList = reviewService.getReviewsByLectureId(lectureId);
         request.setAttribute("lecture", lecture);
         request.setAttribute("reviewList", reviewList);
 
-        // 사용자 세션 확인
         HttpSession session = request.getSession(false);
         UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
         boolean hasReviewed = false;
         boolean hasEnrolled = false;
         boolean canReview = false;
-        //김준희 추가
         boolean hasPurchased = false;
 
-        if (user != null && "STUDENT".equals(user.getRole())) {
+        if (user != null) {
             hasEnrolled = reviewService.hasEnrolled(user.getUserId(), lectureId);
-//            hasReviewed = reviewService.hasReviewed(user.getUserId(), lectureId);
-            canReview = hasEnrolled && !hasReviewed; // ✅ 진도율 조건 제거
+            hasReviewed = reviewService.hasReviewed(user.getUserId(), lectureId);
+            canReview = hasEnrolled && !hasReviewed;
             hasPurchased = lectureService.hasPurchasedLecture(user.getUserId(), lectureId);
         }
 
@@ -94,18 +84,76 @@ public class LectureController extends MskimRequestMapping {
         return "lecture/lectureDetail";
     }
 
+    @RequestMapping("management")
+    public String management(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HttpSession session = request.getSession(false);
+        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
-//    @RequestMapping("play")
-//    public String lecturePlay(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-//        LectureDTO lecture = lectureService.getLectureById(lectureId);
-//        ContentDTO content = lectureService.getFirstContentByLectureId(lectureId);
-//        List<TagDTO> tagList = tagService.getTagsByLectureId(lectureId);
-//        request.setAttribute("lecture", lecture);
-//        request.setAttribute("content", content);
-//        request.setAttribute("tagList", tagList);
-//        return "lecture/lecturePlay";
-//    }
+        if (user == null || !"INSTRUCTOR".equalsIgnoreCase(user.getRole())) {
+            return "redirect:" + request.getContextPath() + "/user/loginform";
+        }
 
+        int instructorId = user.getUserId();
+        String search = param(request, "search");
+        String category = param(request, "category");
+        String status = param(request, "status");
+        String sort = param(request, "sort");
 
-}
+        List<LectureManagementLectureDTO> myLectures =
+                managementService.getLecturesByInstructorFiltered(instructorId, search, category, status, sort);
+
+        request.setAttribute("myLectures", myLectures);
+        request.setAttribute("categories", managementService.getAllCategories());
+        return "lecture/lectureManagementPage";
+    }
+
+    @RequestMapping("updateField")
+    public String updateField(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Long lectureId = longParam(request, "lectureId");
+        String field = param(request, "field");
+        String value = param(request, "value");
+
+        boolean success = managementService.updateLectureField(lectureId, field, value);
+        writeJson(response, Map.of("success", success));
+        return null;
+    }
+
+    @RequestMapping("toggleStatus")
+    public String toggleStatus(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Long lectureId = longParam(request, "lectureId");
+        String status = param(request, "status");
+
+        boolean success = managementService.updateStatus(lectureId, status);
+        writeJson(response, Map.of("success", success));
+        return null;
+    }
+
+    @RequestMapping("delete")
+    public String delete(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Long lectureId = longParam(request, "lectureId");
+
+        boolean success = managementService.deleteLecture(lectureId);
+        writeJson(response, Map.of("success", success));
+        return null;
+    }
+
+    private String param(HttpServletRequest req, String name) {
+        String value = req.getParameter(name);
+        return (value != null && !value.trim().isEmpty()) ? value.trim() : null;
+    }
+
+    private Long longParam(HttpServletRequest req, String name) {
+        try {
+            return Long.parseLong(req.getParameter(name));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void writeJson(HttpServletResponse resp, Map<String, Object> result) throws Exception {
+        resp.setContentType("application/json; charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+        out.print(gson.toJson(result));
+        out.flush();
+    }
+} 

@@ -1,20 +1,71 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-  <title>문의글 작성</title>
-  <link rel="stylesheet" href="<c:url value='/static/css/inquiry.css' />">
-<div class="inquiry-write-container">
-  <h2>📨 문의글 작성</h2>
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title><c:choose>
+		<c:when test="${not empty inquiry}">문의글 수정</c:when>
+		<c:otherwise>문의글 작성</c:otherwise>
+	</c:choose></title>
 
-  <form method="post" action="<c:url value='/lecture/inquiry/write' />">
-    <input type="hidden" name="lectureId" value="1001" /> <!-- 실제 사용 시 lectureId 동적 설정 필요 -->
+<link rel="stylesheet"
+	href="<c:url value='/static/css/inquiryWrite.css' />">
 
-    <label for="title">제목:</label><br>
-    <input type="text" name="title" id="title" required><br><br>
+<!-- Summernote CSS -->
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css"
+	rel="stylesheet">
+</head>
+<body>
+	<div class="inquiry-write-container">
+		<h2>
+			<c:choose>
+				<c:when test="${not empty inquiry}">문의글 수정</c:when>
+				<c:otherwise>문의글 작성</c:otherwise>
+			</c:choose>
+		</h2>
 
-    <label for="content">내용:</label><br>
-    <textarea name="content" id="content" rows="7" cols="60" required></textarea><br><br>
+		<form method="post" action="<c:url value='/lecture/inquiry/write' />"
+			id="inquiryForm">
+			<!-- 수정 시 전달할 ID -->
+			<input type="hidden" name="lectureId"
+				value="${inquiry.lectureId != null ? inquiry.lectureId : lectureId}" />
 
-    <button type="submit">작성 완료</button>
-    <a href="<c:url value='/lecture/inquiry/list' />">목록으로</a>
-  </form>
-</div>
+			<c:if test="${not empty inquiry}">
+				<input type="hidden" name="editId" value="${inquiry.inquiryId}" />
+			</c:if>
+
+			<label for="title">제목</label> <input type="text" name="title"
+				id="title" required
+				value="${inquiry.title != null ? inquiry.title : ''}" /> <label
+				for="content">문의 내용</label>
+			<textarea name="content" id="content" required>${inquiry.content != null ? inquiry.content : ''}</textarea>
+
+			<div class="form-actions">
+				<a
+					href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId != null ? inquiry.inquiryId : lectureId}' />"
+					class="cancel-btn">취소</a>
+				<button type="submit">
+					<c:choose>
+						<c:when test="${not empty inquiry}">수정</c:when>
+						<c:otherwise>제출</c:otherwise>
+					</c:choose>
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- Summernote JS -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('#content').summernote({
+				height : 300,
+				placeholder : '문의 내용을 작성해주세요'
+			});
+		});
+	</script>
+</body>
+</html>

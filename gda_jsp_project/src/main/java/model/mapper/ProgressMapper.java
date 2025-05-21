@@ -4,6 +4,7 @@ import model.dto.ContentDTO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProgressMapper {
 
@@ -74,7 +75,10 @@ public interface ProgressMapper {
         	    INSERT INTO progress_logs (user_id, content_id, progress_percent, created_at, updated_at, last_accessed_at)
         	    VALUES (#{userId}, #{contentId}, #{percent}, NOW(), NOW(), NOW())
         	    ON DUPLICATE KEY UPDATE
-        	        progress_percent = #{percent},
+        	        progress_percent = CASE 
+        	            WHEN progress_percent < #{percent} THEN #{percent} 
+        	            ELSE progress_percent 
+        	        END,
         	        updated_at = NOW(),
         	        last_accessed_at = NOW()
         	""")
@@ -82,5 +86,45 @@ public interface ProgressMapper {
         	                    @Param("contentId") int contentId,
         	                    @Param("percent") int percent);
 
-    }
+        
+        @Update("""
+        	    UPDATE enrollments
+        	    SET status = 'COMPLETED'
+        	    WHERE user_id = #{userId}
+        	      AND lecture_id = #{lectureId}
+        	      AND status != 'COMPLETED'
+        	""")
+        	void markEnrollmentComplete(@Param("userId") int userId,
+        	                            @Param("lectureId") int lectureId);
+
+        @Select("""
+        	    SELECT lecture_id
+        	    FROM contents
+        	    WHERE content_id = #{contentId}
+        	""")
+        	Integer selectLectureIdByContentId(@Param("contentId") int contentId);
+
+        
+     // mapper/ProgressMapper.java
+        @Select("""
+            SELECT c.content_id, IFNULL(p.progress_percent, 0) AS progress
+            FROM contents c
+            LEFT JOIN progress_logs p 
+              ON c.content_id = p.content_id AND p.user_id = #{userId}
+            WHERE c.lecture_id = #{lectureId}
+        """)
+        @MapKey("content_id")
+        @Results({
+            @Result(property = "content_id", column = "content_id"),
+            @Result(property = "progress", column = "progress")
+        })
+        Map<Integer, Integer> selectProgressMap(@Param("userId") int userId,
+                                                @Param("lectureId") int lectureId);
+
+        
+        }
+
+
+
+
 

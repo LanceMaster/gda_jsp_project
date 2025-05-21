@@ -35,12 +35,11 @@ public interface MainMapper {
 	//비밀번호 변경
 	@Update("UPDATE users SET password = #{newPassword} WHERE email = #{email}")
 	int updatePasswordByEmail(@Param("email") String email, @Param("newPassword") String newPassword);
-
-	//회원탈퇴
-	@Delete("DELETE FROM users WHERE email = #{email}")	
-	int deleteAccount(String email);
-
 	
+	//회원탈퇴신청로직
+	@Update("UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE email = #{email}")
+	int deactivateAccount(String email);
+
 	
 	//비밀번호 찾기
 	@Select("SELECT COUNT(*) FROM users WHERE email = #{email} AND name = #{name}")
@@ -53,6 +52,15 @@ public interface MainMapper {
 	//이력서 파일명 가져오기
 	@Select("SELECT resume FROM users WHERE email = #{email}")
 	String getResumeFilename(String parameter);
+
+	@Update("UPDATE users SET is_deleted = false , deleted_at = NULL WHERE user_id = #{userId}")
+	int cancelDelete(String userId);
+
+	// user_id 기준으로 사용자 정보 조회
+	@Select("SELECT * FROM users WHERE user_id = #{userId}")
+	UserDTO getUserInformation(@Param("userId") int userId);
+
+
 
 	
 
