@@ -56,7 +56,7 @@
             <img src="<c:url value='${lec.thumbnail}' />" alt="${lec.title}" />
             <h4>${lec.title}</h4>
             <p><fmt:formatNumber value="${lec.price}" type="currency" currencySymbol="₩" /></p>
-            
+       <!--  아무거나 -->    
             <p class="rating">
               ⭐ <c:choose>
                 <c:when test="${lec.avgRating != null}">
