@@ -209,10 +209,8 @@ video:hover {
   
 }
 </style>
-
 </head>
 <body>
-
 <div class="video-section">
   <div class="lecture-title">${lecture.title}</div>
   <div class="lecture-instructor">강사: ${instructor.name}</div>
@@ -240,7 +238,6 @@ video:hover {
     </c:forEach>
   </ul>
 </div>
-
 <script>
 
 window.onload = () => {

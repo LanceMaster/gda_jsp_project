@@ -45,4 +45,7 @@ public class LecturePlayController extends HttpServlet {
             req.getRequestDispatcher("/view/lecture/lecturePlay.jsp").forward(req, resp);
         }
     }
+    
+    
+    
 }
