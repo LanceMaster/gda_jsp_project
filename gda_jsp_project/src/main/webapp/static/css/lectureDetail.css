@@ -1,6 +1,6 @@
 /* ==========================
    📘 lectureDetail.css
-   이미지 기반 완전 대응 스타일
+   강의 상세 스타일 최적화
 ========================== */
 
 body {
@@ -16,7 +16,6 @@ body {
   margin: 40px auto;
 }
 
-/* ✅ 상단 구조 */
 .lecture-top {
   display: flex;
   gap: 40px;
@@ -60,6 +59,12 @@ body {
   font-weight: 700;
 }
 
+.lecture-rating {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1c40f;
+}
+
 .start-btn {
   padding: 10px 18px;
   background-color: #111;
@@ -68,12 +73,7 @@ body {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-}
-
-.lecture-rating {
-  font-size: 16px;
-  font-weight: 600;
-  color: #f1c40f;
+  font-size: 14px;
 }
 
 /* ✅ 강의 설명 */
@@ -122,16 +122,6 @@ body {
   margin-bottom: 20px;
 }
 
-.ask-btn {
-  padding: 10px 16px;
-  background: #111;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
 /* ✅ 리뷰 영역 */
 .review-section {
   margin-top: 40px;
@@ -141,121 +131,171 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  color: #1b1e23;
 }
 
+/* ✅ 리뷰 작성 폼 */
 .review-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 30px;
+  background: #f9fafa;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #e5e8eb;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+.review-form input,
+.review-form select,
 .review-form textarea {
   width: 100%;
-  height: 80px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  font-family: inherit;
+  padding: 12px 14px;
   font-size: 14px;
-  resize: none;
+  border: 1.5px solid #e5e8eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #1b1e23;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
-.review-controls {
+.review-form input:focus,
+.review-form select:focus,
+.review-form textarea:focus {
+  border-color: #3182f6;
+  background: #f7fbff;
+  outline: none;
+}
+
+/* ✅ 작성자명 + 평점 */
+.review-header-line.modern {
   display: flex;
+  gap: 16px;
   align-items: center;
-  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.review-controls select {
-  padding: 6px;
-  border-radius: 6px;
-  font-size: 14px;
+/* ✅ 리뷰 입력 영역 */
+.review-content-wrap {
+  position: relative;
+}
+
+.review-content-wrap textarea {
+  resize: vertical;
+  font-size: 15px;
+}
+
+/* ✅ 제출 버튼 우하단 */
+.review-submit-right {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }
 
 .submit-btn {
-  padding: 10px 20px;
-  background-color: #4f70ff;
+  padding: 14px;
+  background: linear-gradient(90deg, #3182f6, #156af3);
   color: #fff;
   border: none;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.review-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.review-item {
-  background: #f9f9f9;
-  border: 1px solid #eee;
   border-radius: 10px;
-  padding: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(49,130,246,0.08);
+  transition: all 0.2s ease-in-out;
+  letter-spacing: -0.02em;
 }
 
-.review-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+.submit-btn:hover {
+  background: linear-gradient(90deg, #156af3, #3182f6);
+  box-shadow: 0 3px 14px rgba(49,130,246,0.15);
 }
 
-.user-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+.submit-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-.review-meta {
-  font-size: 12px;
-  color: #777;
-  margin-top: 2px;
+/* ✅ 메시지 */
+.form-error,
+.form-success {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
 }
 
-.review-content {
-  font-size: 14px;
-  color: #333;
-  margin-top: 4px;
+.form-error {
+  color: #fa5252;
+  background: #fff0f1;
+  animation: shake-toss 0.23s;
 }
 
+.form-success {
+  color: #3182f6;
+  background: #f2f8fd;
+  animation: fadein-toss 0.6s;
+}
+
+@keyframes shake-toss {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fadein-toss {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ✅ 리뷰 목록 */
 .review-list {
   list-style: none;
   padding: 0;
-  margin: 20px 0;
+  margin: 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.review-item {
-  margin-bottom: 16px;
-}
-
+/* ✅ 리뷰 카드 */
 .review-card {
   background: #fff;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,32,51,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.2s;
+}
+
+.review-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 32, 51, 0.07);
 }
 
 .review-user {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 14px;
 }
 
 .user-icon {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  margin-right: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e8eb;
 }
 
 .user-meta {
@@ -271,141 +311,112 @@ body {
 .reviewer-name {
   font-weight: 600;
   font-size: 16px;
+  color: #1b1e23;
 }
 
 .review-date {
   font-size: 13px;
-  color: #777;
+  color: #8b95a1;
 }
 
 .review-stars {
+  font-size: 16px;
+  color: #facc15;
   margin-top: 4px;
-  color: #FFD700;
-  font-size: 14px;
 }
 
 .review-content {
   font-size: 15px;
-  line-height: 1.5;
-  color: #333;
+  line-height: 1.6;
+  color: #334155;
+  white-space: pre-wrap;
 }
 
-
-/* 토스 스타일 리뷰 작성 폼 */
-.review-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  background: #f7f8fa;
-  padding: 28px 24px 22px 24px;
-  border-radius: 18px;
-  box-shadow: 0 4px 16px 0 rgba(0,32,51,0.03);
-  margin-bottom: 28px;
-  max-width: 520px;
-  margin-left: auto;
-  margin-right: auto;
-  border: none;
-}
-
-.review-form textarea {
-  width: 100%;
-  min-height: 64px;
-  padding: 18px 16px;
-  background: #fff;
-  border: 1.5px solid #e5e8eb;
-  border-radius: 12px;
-  font-size: 16px;
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', Arial, sans-serif;
-  color: #191f28;
-  resize: none;
-  transition: border 0.18s;
-  outline: none;
-}
-.review-form textarea:focus {
-  border: 1.5px solid #3182f6;
-  background: #f7fbff;
-}
-
-.review-controls {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.review-controls select {
-  min-width: 140px;
-  padding: 10px 12px;
-  border: 1.5px solid #e5e8eb;
+.review-guide {
+  font-size: 15px;
+  color: #87929d;
+  background: #f9f9fb;
+  padding: 14px 18px;
   border-radius: 10px;
-  font-size: 16px;
-  color: #1b2a3a;
-  background: #fff;
-  font-family: inherit;
-  transition: border 0.18s;
-}
-.review-controls select:focus {
-  border: 1.5px solid #3182f6;
-  background: #f7fbff;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-/* 토스 스타일 버튼 */
-.submit-btn {
-  padding: 12px 22px;
-  background: linear-gradient(90deg, #3182f6 0%, #156af3 100%);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
+/* ✅ 질문 게시판 버튼 가운데 정렬 */
+.centered-btn-wrap {
+  text-align: center;
+  margin-top: 24px;
+}
+
+
+
+.centered-btn:hover {
+  background-color: #222;
+}
+
+/* ✅ 반응형 */
+@media (max-width: 768px) {
+  .lecture-container {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .lecture-top {
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .lecture-image img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .lecture-info {
+    width: 100%;
+    text-align: center;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+
+  .review-header-line.modern {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-submit-right {
+    position: static;
+    margin-top: 10px;
+    text-align: right;
+  }
+  
+  /* ✅ 현대적 질문 게시판 버튼 */
+.modern-action-wrap {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.modern-action-btn {
+  display: inline-block;
+  padding: 16px 32px;
   font-size: 17px;
   font-weight: 700;
-  box-shadow: 0 2px 10px 0 rgba(49,130,246,0.08);
-  cursor: pointer;
-  letter-spacing: -0.02em;
-  transition: background 0.16s, box-shadow 0.16s;
-}
-.submit-btn:hover, .submit-btn:active {
-  background: linear-gradient(90deg, #156af3 0%, #3182f6 100%);
-  box-shadow: 0 3px 14px 0 rgba(49,130,246,0.11);
-}
-
-/* 피드백 메시지(에러/성공) 토스 스타일 */
-.form-error {
-  color: #fa5252;
-  background: #fff0f1;
-  border-radius: 8px;
-  padding: 11px 16px;
-  margin-top: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  box-shadow: 0 1px 6px 0 rgba(250,82,82,0.04);
-  animation: shake-toss 0.23s;
-}
-@keyframes shake-toss {
-  10%, 90% { transform: translateX(-2px);}
-  20%, 80% { transform: translateX(4px);}
-  30%, 50%, 70% { transform: translateX(-6px);}
-  40%, 60% { transform: translateX(6px);}
-  100% { transform: translateX(0);}
+  background: linear-gradient(90deg, #4f46e5, #6366f1); /* 보라-블루 계열 */
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
 }
 
-.form-success {
-  color: #3182f6;
-  background: #f2f8fd;
-  border-radius: 8px;
-  padding: 11px 16px;
-  margin-top: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  box-shadow: 0 1px 6px 0 rgba(49,130,246,0.04);
-  animation: fadein-toss 0.6s;
+.modern-action-btn:hover {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+  transform: translateY(-2px);
 }
-@keyframes fadein-toss {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* placeholder 토스 컬러 */
-.review-form textarea::placeholder,
-.review-controls select:invalid {
-  color: #b0b8c1;
-  opacity: 1;
+  
 }

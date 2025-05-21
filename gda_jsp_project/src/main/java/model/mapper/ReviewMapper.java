@@ -33,10 +33,33 @@ public interface ReviewMapper {
      * 📌 리뷰 등록 (reviews 테이블 기준)
      */
     @Insert("""
-        INSERT INTO reviews (target_id, content, rating, user_id, created_at)
-        VALUES (#{targetId}, #{content}, #{rating}, #{userId}, NOW())
-    """)
-    void insertReview(ReviewDTO dto);
+    	    INSERT INTO user_interactions (
+    	        target_type,
+    	        target_id,
+    	        interaction_kind,
+    	        title,
+    	        content,
+    	        rating,
+    	        visibility,
+    	        is_answered,
+    	        created_at,
+    	        user_id
+    	    ) VALUES (
+    	        'LECTURE',
+    	        #{lectureId},
+    	        'FEEDBACK',
+    	        #{title},
+    	        #{content},
+    	        #{rating},
+    	        'PUBLIC',
+    	        NULL,
+    	        NOW(),
+    	        #{userId}
+    	    )
+    	""")
+    	void insertReview(ReviewDTO dto);
+
+
 
     /**
      * 📌 평균 평점 갱신

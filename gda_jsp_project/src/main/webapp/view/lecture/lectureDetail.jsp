@@ -56,7 +56,11 @@
     <p class="desc-footer">이 수업은 실전형 프로젝트를 통해 핵심 개념을 빠르게 학습할 수 있도록 설계되어 있습니다.</p>
 
     <!-- 질문 게시판 바로가기 -->
-    <a href="<c:url value='/lecture/inquiry/list' />">강의 질문 게시판</a>
+<div class="modern-action-wrap">
+  <a href="<c:url value='/lecture/inquiry/list' />" class="modern-action-btn">
+    💬 강의 질문 게시판 바로가기
+  </a>
+</div>
   </div>
 
   <div class="review-section">
@@ -65,30 +69,37 @@
       <span class="lecture-rating">⭐ ${lecture.avgRating} / 5.0</span>
     </div>
 
+<!-- ✅ 리뷰 작성 가능 조건 -->
 <c:if test="${canReview}">
-  <form id="reviewForm" class="review-form" method="post" autocomplete="off">
-    <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
-    
-    <label for="reviewContent" class="visually-hidden">리뷰 내용</label>
-    <textarea id="reviewContent" name="content" placeholder="댓글을 입력해 주세요." maxlength="1000" required></textarea>
-    
-    <div class="review-controls">
-      <label for="reviewRating" class="visually-hidden">평점</label>
-      <select id="reviewRating" name="rating" required>
-        <option value="">⭐ 평점을 선택하세요</option>
-        <option value="5">⭐⭐⭐⭐⭐</option>
-        <option value="4">⭐⭐⭐⭐</option>
-        <option value="3">⭐⭐⭐</option>
-        <option value="2">⭐⭐</option>
-        <option value="1">⭐</option>
-      </select>
-      <button type="submit" class="submit-btn" id="reviewSubmitBtn">제출</button>
-    </div>
-    <div id="reviewErrorMsg" class="form-error" style="display:none;"></div>
-    <div id="reviewSuccessMsg" class="form-success" style="display:none;"></div>
-  </form>
-</c:if>
+<form id="reviewForm" method="post" action="${pageContext.request.contextPath}/review" class="review-form">
+  <input type="hidden" name="lectureId" value="${lecture.lectureId}" />
 
+  <!-- 작성자명 + 평점 -->
+<div class="review-header-line modern">
+  <input type="text" id="reviewTitle" name="title" class="review-nickname" placeholder="닉네임을 입력하세요" required />
+  <select name="rating" class="rating-select" required>
+    <option value="" disabled selected hidden>평점 선택</option>
+    <option value="5">⭐⭐⭐⭐⭐</option>
+    <option value="4">⭐⭐⭐⭐</option>
+    <option value="3">⭐⭐⭐</option>
+    <option value="2">⭐⭐</option>
+    <option value="1">⭐</option>
+  </select>
+</div>
+
+<!-- 리뷰 입력 + 제출 버튼 우측 하단 배치 -->
+<div class="review-content-wrap">
+  <textarea id="reviewContent" name="content" rows="4" placeholder="리뷰를 남겨주세요." required></textarea>
+  <div class="review-submit-right">
+    <button type="submit" class="submit-btn">제출</button>
+  </div>
+</div>
+
+  <!-- 메시지 -->
+  <div id="reviewErrorMsg" class="form-error" style="display:none;"></div>
+  <div id="reviewSuccessMsg" class="form-success" style="display:none;"></div>
+</form>
+</c:if>
 
 <!-- ✅ 리뷰 작성 불가 조건 안내 -->
 <c:if test="${not canReview}">
@@ -177,55 +188,65 @@
     });
   }
   
-  
-  // ✅ 리뷰 제출 UX 개선 (폼 유효성 + 메시지)
   const reviewForm = document.getElementById("reviewForm");
 
   if (reviewForm) {
-    reviewForm.addEventListener("submit", function(e) {
+    reviewForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
       const rating = reviewForm.rating.value;
+      const title = reviewForm.title.value.trim();
       const content = reviewForm.content.value.trim();
 
-      // 에러/성공 메시지 DOM 없으면 생성
-      let errorDiv = document.getElementById("reviewErrorMsg");
-      let successDiv = document.getElementById("reviewSuccessMsg");
-      if (!errorDiv) {
-        errorDiv = document.createElement("div");
-        errorDiv.id = "reviewErrorMsg";
-        errorDiv.className = "form-error";
-        reviewForm.appendChild(errorDiv);
-      }
-      if (!successDiv) {
-        successDiv = document.createElement("div");
-        successDiv.id = "reviewSuccessMsg";
-        successDiv.className = "form-success";
-        reviewForm.appendChild(successDiv);
-      }
+      const errorBox = document.getElementById("reviewErrorMsg");
+      const successBox = document.getElementById("reviewSuccessMsg");
 
-      // 초기화
-      errorDiv.style.display = "none";
-      successDiv.style.display = "none";
+      errorBox.style.display = "none";
+      successBox.style.display = "none";
 
-      // 클라이언트 유효성 검증
-      if (!rating || !content) {
-        e.preventDefault();
-        errorDiv.innerText = "⚠️ 평점과 내용을 모두 입력하세요.";
-        errorDiv.style.display = "block";
+      if (!rating || !title || !content) {
+        errorBox.innerText = "⚠ 모든 필드를 입력해 주세요.";
+        errorBox.style.display = "block";
         return;
       }
 
-      if (content.length > 1000) {
-        e.preventDefault();
-        errorDiv.innerText = "⚠️ 리뷰는 1000자 이내로 작성해주세요.";
-        errorDiv.style.display = "block";
-        return;
-      }
+      const params = new URLSearchParams(new FormData(reviewForm));
 
-      // UX 피드백 (옵션)
-      successDiv.innerText = "리뷰를 등록 중입니다...";
-      successDiv.style.display = "block";
+      fetch(reviewForm.action, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            successBox.innerText = "✅ 리뷰가 성공적으로 등록되었습니다.";
+            successBox.style.display = "block";
+
+            // 폼 초기화
+            reviewForm.reset();
+
+            // 일정 시간 후 페이지 리로드 또는 이동
+            setTimeout(() => {
+              window.location.href = data.redirectUrl;
+            }, 1000);
+          } else {
+            errorBox.innerText = data.message || "❌ 리뷰 등록 실패";
+            errorBox.style.display = "block";
+          }
+        })
+        .catch((error) => {
+          console.error("🚨 서버 오류:", error);
+          errorBox.innerText = "서버 오류가 발생했습니다. 다시 시도해 주세요.";
+          errorBox.style.display = "block";
+        });
     });
   }
+
+
+  
   </script>
 </body>
 </html>

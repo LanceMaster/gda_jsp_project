@@ -7,13 +7,20 @@ public class ReviewDTO {
     private int interactionId;
     private int userId;
     private int lectureId;
-    private String reviewer;
+    private String title;       // ✅ 새로 추가됨
+    private String reviewer;    // (title과 분리된 용도일 경우 유지)
     private String content;
     private int rating;
     private LocalDateTime createdAt;
     private String formattedCreatedAt;
     private String createdAtFormatted;
 
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
 	public String getCreatedAtFormatted() {
 		return createdAtFormatted;
 	}
