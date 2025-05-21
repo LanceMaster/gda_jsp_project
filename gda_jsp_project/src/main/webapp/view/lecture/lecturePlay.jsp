@@ -223,7 +223,7 @@ video:hover {
   <div id="currentContentTitle">📺 콘텐츠를 준비 중입니다...</div>
     <div class="lecture-description">${lecture.description}</div>
 </div>
-
+<!-- ewfwfew -->
 <div class="sidebar">
   <h4>📑 콘텐츠 목록</h4>
   <ul id="contentList">
