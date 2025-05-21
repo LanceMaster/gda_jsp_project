@@ -85,64 +85,60 @@
         </tr>
       </thead>
       <tbody>
-        <c:forEach var="lecture" items="${myLectures}">
-          <tr id="row-${lecture.lectureId}">
-            <img src="${pageContext.request.contextPath}${fn:escapeXml(lecture.thumbnail)}" class="lecture-thumb" alt="썸네일">
-            </td>
-            <td>
-              <span class="editable" data-field="title" data-id="${lecture.lectureId}">
-                <span class="edit-span">${lecture.title}</span>
-                <input class="edit-field d-none" name="title" value="${lecture.title}">
-              </span>
-            </td>
-            <td>
-              <span class="editable" data-field="description" data-id="${lecture.lectureId}">
-                <span class="edit-span">${lecture.description}</span>
-                <input class="edit-field d-none" value="${lecture.description}">
-              </span>
-            </td>
-            <td>
-              <span class="editable" data-field="category" data-id="${lecture.lectureId}">
-                <span class="edit-span">${lecture.category}</span>
-                <select class="edit-field d-none">
-                  <c:forEach var="cat" items="${categories}">
-                    <option value="${cat}" <c:if test="${lecture.category == cat}">selected</c:if>>${cat}</option>
-                  </c:forEach>
-                </select>
-              </span>
-            </td>
-            <td>
-              <span class="editable" data-field="price" data-id="${lecture.lectureId}">
-                <span class="edit-span"><fmt:formatNumber value="${lecture.price}" type="number"/></span>
-                <input type="number" class="edit-field d-none" value="${lecture.price}" min="0">
-              </span>
-            </td>
-            <td><fmt:formatNumber value="${lecture.avgRating}" pattern="#.0"/> / 5</td>
-            <td>
-              <span class="badge badge-status ${lecture.status eq 'PUBLISHED' ? 'badge-published' : 'badge-draft'}">
-                <c:out value="${lecture.status eq 'PUBLISHED' ? '공개중' : '임시저장'}"/>
-              </span>
-            </td>
-            <td>
-              <label class="switch">
-                <input type="checkbox" onchange="toggleStatus(${lecture.lectureId}, this.checked)"
-                  <c:if test="${lecture.status eq 'PUBLISHED'}">checked</c:if> >
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td>
-              <div class="btn-group btn-group-sm">
-                <a class="btn btn-info" href="${pageContext.request.contextPath}/lecture/play?lectureId=${lecture.lectureId}">
-                  <i class="fa fa-eye"></i> 상세
-                </a>
-                <button class="btn btn-danger" onclick="deleteLecture(${lecture.lectureId}, '${lecture.title}')">
-                  <i class="fa fa-trash"></i> 삭제
-                </button>
-              </div>
-            </td>
-          </tr>
-        </c:forEach>
-      </tbody>
+					<c:forEach var="lecture" items="${myLectures}">
+						<td><img
+							src="${pageContext.request.contextPath}${fn:escapeXml(lecture.thumbnail)}"
+							class="lecture-thumb" alt="썸네일" /></td>
+
+						<td><span class="editable" data-field="title"
+							data-id="${lecture.lectureId}"> <span class="edit-span">${lecture.title}</span>
+								<input class="edit-field d-none" name="title"
+								value="${lecture.title}">
+						</span></td>
+						<td><span class="editable" data-field="description"
+							data-id="${lecture.lectureId}"> <span class="edit-span">${lecture.description}</span>
+								<input class="edit-field d-none" value="${lecture.description}">
+						</span></td>
+						<td><span class="editable" data-field="category"
+							data-id="${lecture.lectureId}"> <span class="edit-span">${lecture.category}</span>
+								<select class="edit-field d-none">
+									<c:forEach var="cat" items="${categories}">
+										<option value="${cat}"
+											<c:if test="${lecture.category == cat}">selected</c:if>>${cat}</option>
+									</c:forEach>
+							</select>
+						</span></td>
+						<td><span class="editable" data-field="price"
+							data-id="${lecture.lectureId}"> <span class="edit-span"><fmt:formatNumber
+										value="${lecture.price}" type="number" /></span> <input type="number"
+								class="edit-field d-none" value="${lecture.price}" min="0">
+						</span></td>
+						<td><fmt:formatNumber value="${lecture.avgRating}"
+								pattern="#.0" /> / 5</td>
+						<td><span
+							class="badge badge-status ${lecture.status eq 'PUBLISHED' ? 'badge-published' : 'badge-draft'}">
+								<c:out value="${lecture.status eq 'PUBLISHED' ? '공개중' : '임시저장'}" />
+						</span></td>
+						<td><label class="switch"> <input type="checkbox"
+								onchange="toggleStatus(${lecture.lectureId}, this.checked)"
+								<c:if test="${lecture.status eq 'PUBLISHED'}">checked</c:if>>
+								<span class="slider"></span>
+						</label></td>
+						<td>
+							<div class="btn-group btn-group-sm">
+								<a class="btn btn-info"
+									href="${pageContext.request.contextPath}/lecture/play?lectureId=${lecture.lectureId}">
+									<i class="fa fa-eye"></i> 상세
+								</a>
+								<button class="btn btn-danger"
+									onclick="deleteLecture(${lecture.lectureId}, '${lecture.title}')">
+									<i class="fa fa-trash"></i> 삭제
+								</button>
+							</div>
+						</td>
+						</tr>
+					</c:forEach>
+				</tbody>
     </table>
   </div>
 
@@ -172,26 +168,56 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+let editing = false;
+let toastTimeout = null;
+let isRequesting = false;
+
 function showToast(msg, type = 'success') {
-  $("#toast").removeClass("alert-success alert-danger").addClass("alert-" + type)
-    .text(msg).fadeIn(200).delay(1200).fadeOut(400);
+  $("#toast").removeClass("alert-success alert-danger")
+    .addClass("alert-" + type)
+    .html(msg)
+    .stop(true, true)
+    .fadeIn(200);
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { $("#toast").fadeOut(400); }, 1400);
+}
+
+function showSpinner($target) {
+  hideSpinner($target);
+  $target.after('<span class="spinner-border spinner-border-sm ml-2" role="status"></span>');
+}
+function hideSpinner($target) {
+  $target.siblings('.spinner-border').remove();
 }
 
 $(document).on('click', '.editable', function(e) {
-  if ($(e.target).hasClass('edit-field')) return;
-  $(this).find('.edit-span').addClass('d-none');
-  $(this).find('.edit-field').removeClass('d-none').focus().select();
+  if (editing) return;
+  editing = true;
+  let $span = $(this).find('.edit-span');
+  let $field = $(this).find('.edit-field');
+  $span.addClass('d-none');
+  $field.removeClass('d-none').focus().select();
 });
 
 $(document).on('blur', '.edit-field', function() {
+  if (isRequesting) return;
   let $td = $(this).closest('.editable');
   let val = $(this).val();
   let field = $td.data('field'), id = $td.data('id');
+  // 유효성 검사
+  if(field === 'price' && (isNaN(val) || val < 0)) {
+    showToast('가격은 0 이상 숫자만 입력', 'danger'); $(this).val(0).focus(); editing=false; return false;
+  }
+  if(field === 'title' && val.length < 2) {
+    showToast('강의명 2자 이상 입력', 'danger'); $(this).focus(); editing=false; return false;
+  }
+  isRequesting = true;
+  showSpinner($(this));
   $.ajax({
     url: '${pageContext.request.contextPath}/lecture/updateField',
     type: 'POST',
     data: { lectureId: id, field: field, value: val },
-    success: function() {
+    success: () => {
       if ($td.find('.edit-field').is('select')) {
         $td.find('.edit-span').text($td.find('option:selected').text());
       } else {
@@ -201,9 +227,10 @@ $(document).on('blur', '.edit-field', function() {
       $td.find('.edit-span').removeClass('d-none');
       showToast('저장 완료');
     },
-    error: function() {
+    error: () => {
       showToast('저장 실패', 'danger');
-    }
+    },
+    complete: () => { hideSpinner($(this)); editing = false; isRequesting = false; }
   });
 });
 
@@ -211,17 +238,29 @@ $(document).on('keyup', '.edit-field', function(e) {
   if (e.key === 'Enter') $(this).blur();
 });
 
+// 상태 토글시 전체 리로드 X, UI만 즉시 반영
 function toggleStatus(id, isChecked) {
+  let $row = $('input[type="checkbox"][onchange^="toggleStatus"][value="' + id + '"]').closest('tr');
+  let $badge = $row.find('.badge-status');
+  showSpinner($badge);
   $.post('${pageContext.request.contextPath}/lecture/toggleStatus',
     { lectureId: id, status: isChecked ? 'PUBLISHED' : 'DRAFT' },
     function() {
+      if(isChecked) {
+        $badge.removeClass('badge-draft').addClass('badge-published').text('공개중');
+      } else {
+        $badge.removeClass('badge-published').addClass('badge-draft').text('임시저장');
+      }
       showToast('상태 변경 완료');
-      location.reload();
-    }).fail(function() {
-      showToast('상태 변경 실패', 'danger');
-    });
+    }
+  ).fail(function() {
+    showToast('상태 변경 실패', 'danger');
+    // 실패시 스위치 원복
+    $('input[type="checkbox"][onchange^="toggleStatus"][value="' + id + '"]').prop('checked', !isChecked);
+  }).always(function(){ hideSpinner($badge); });
 }
 
+// 삭제: Undo UI(프론트만)
 let deleteId = null;
 function deleteLecture(id, title) {
   deleteId = id;
@@ -236,14 +275,20 @@ $('#confirmDeleteBtn').click(function() {
     data: { lectureId: deleteId },
     success: function() {
       $('#row-' + deleteId).fadeOut();
-      showToast('삭제 완료! 되돌리기(Undo)는 10초간 상단에 표시됩니다.');
+      showToast('삭제 완료! <button class="btn btn-link btn-sm" id="undoBtn">되돌리기</button>');
       $('#deleteModal').modal('hide');
+      $('#undoBtn').on('click', function() {
+        // 백엔드에 undoDelete 필요
+        $.post('${pageContext.request.contextPath}/lecture/undoDelete', { lectureId: deleteId }, function() {
+          $('#row-' + deleteId).fadeIn();
+          showToast('복구 완료!');
+        });
+      });
     },
-    error: function() {
-      showToast('삭제 실패', 'danger');
-    }
+    error: function() { showToast('삭제 실패', 'danger'); }
   });
 });
+
 </script>
 </body>
 </html>
