@@ -12,10 +12,19 @@ public class ContentDTO {
     private String type;           // 콘텐츠 유형 (예: VIDEO)
     private int duration;          // 재생 시간 (초)
     private int orderNo;           // 콘텐츠 순서
+    private int progressPercent; // 진도율 (0~100)
 
     // ✅ Getter & Setter
 
-    public int getContentId() {
+    public int getProgressPercent() {
+		return progressPercent;
+	}
+
+	public void setProgressPercent(int progressPercent) {
+		this.progressPercent = progressPercent;
+	}
+
+	public int getContentId() {
         return contentId;
     }
 

@@ -60,11 +60,4 @@
         <servlet-name>default</servlet-name>
         <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
-
-    <!-- ✅ 업로드 파일 매핑: /upload/* 
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/upload/*</url-pattern>
-    </servlet-mapping>
--->
 </web-app>
