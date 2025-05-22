@@ -238,7 +238,8 @@ a.delete-link:hover {
 									</div>
 								</div>
 
-<a href="${pageContext.request.contextPath}/lecture/management" class="btn btn-primary">관리</a>
+								<a href="${pageContext.request.contextPath}/lecture/management"
+									class="btn btn-primary">관리</a>
 
 							</div>
 						</c:forEach>
@@ -259,7 +260,12 @@ a.delete-link:hover {
 							<img src="${pageContext.request.contextPath}${course.thumbnail}"
 								class="lecture-img" alt="강의 이미지" />
 							<div class="lecture-info">
-								<div style="font-weight: 600;">${course.title}</div>
+								<div style="font-weight: 600;">
+									<a
+										href="${pageContext.request.contextPath}/lecture/lecturedetail?lectureId=${course.lectureId}"
+										style="text-decoration: none; color: inherit;">
+										${course.title} </a>
+								</div>
 								<div class="lecture-instructor"
 									style="font-size: 0.95rem; color: #888;">${course.description}</div>
 
@@ -554,7 +560,8 @@ function deleteAccount() {
 	}
 </script>
 
-	<div class="modal fade" id="cancelDeleteModal" tabindex="-1" role="dialog">
+	<div class="modal fade" id="cancelDeleteModal" tabindex="-1"
+		role="dialog">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content p-3">
 				<div class="modal-header">
@@ -564,9 +571,7 @@ function deleteAccount() {
 					</button>
 				</div>
 				<div class="modal-body">
-					<p>
-						회원탈퇴 취소 하시겠습니까?
-					</p>
+					<p>회원탈퇴 취소 하시겠습니까?</p>
 					<div class="text-right">
 						<button type="button" class="btn btn-danger"
 							onclick="cancelDeleteAccount()">취소</button>

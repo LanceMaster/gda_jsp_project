@@ -25,6 +25,7 @@
       <label>카테고리</label>
       <select name="category" required>
         <option value="">선택</option>
+        <option value="JavaScript">JAVASCRIPT</option>
         <option value="Spring Boot">Spring Boot</option>
         <option value="CSS">CSS</option>
         <option value="Python">Python</option>
