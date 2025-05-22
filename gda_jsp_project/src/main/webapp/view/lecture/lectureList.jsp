@@ -11,13 +11,6 @@
 <!-- ✅ 하나의 필터 통합 form + 안전한 action 경로 -->
 <form method="get" action="${pageContext.request.contextPath}/lecture/lecturelist" class="filter-form">
 
-  <!-- ✅ 인기 태그 -->
-  <div class="top-tags">
-    <c:forEach var="tag" items="${topTags}">
-      <button type="submit" class="tag-btn" name="keyword" value="${tag.name}">${tag.name}</button>
-    </c:forEach>
-  </div>
-
   <!-- ✅ 카테고리 필터 -->
   <div class="category-buttons">
     <button type="submit" class="category-btn" name="category" value="javascript">JavaScript</button>
@@ -30,10 +23,12 @@
 
   <!-- ✅ 검색창 -->
   <div class="search-box">
-    <input type="text" name="keyword" value="${param.keyword}" placeholder="    강의, 카테고리를 입력하세요" class="search-input" />
+    <input type="text" name="keyword"
+           value="${not empty param.keyword ? param.keyword : ''}"
+           placeholder="강의, 카테고리를 입력하세요"
+           class="search-input" />
     <button type="submit" class="search-btn">검색</button>
   </div>
-  
 
   <!-- ✅ 정렬 드롭다운 -->
   <div class="sort-dropdown">
@@ -43,7 +38,9 @@
       <option value="popular" <c:if test="${param.sort == 'popular'}">selected</c:if>>인기순</option>
     </select>
   </div>
+
 </form>
+
 
 
 <!-- ✅ 최대 8개까지만 출력 -->
@@ -95,8 +92,11 @@
   </c:if>
 
   <c:forEach begin="1" end="${totalPages}" var="i">
-    <a href="?page=${i}&category=${param.category}&keyword=${param.keyword}&sort=${param.sort}"
-       class="<c:if test='${i == page}'>active</c:if>">${i}</a>
+<a href="?page=${i}
+<c:if test='${not empty param.keyword}'>&keyword=${param.keyword}</c:if>
+<c:if test='${not empty param.sort}'>&sort=${param.sort}</c:if>
+<c:if test='${not empty param.category}'>&category=${param.category}</c:if>"
+class="<c:if test='${i == page}'>active</c:if>">${i}</a>
   </c:forEach>
 
   <c:if test="${page * size < totalCount}">
