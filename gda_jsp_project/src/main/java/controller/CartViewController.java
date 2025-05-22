@@ -63,41 +63,41 @@ public class CartViewController extends HttpServlet {
         }
     }
 
-    /**
-     * 장바구니 추가 (POST)
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
-
-        if (user == null) {
-            System.out.println("🚫 [CartController-POST] 로그인 필요 → 로그인 폼 이동");
-            response.sendRedirect(request.getContextPath() + "/user/loginform");
-            return;
-        }
-
-        int userId = user.getUserId();
-        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
-
-        try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
-            CartDAO cartDAO = new CartDAO(sqlSession);
-
-            if (!cartDAO.isLectureInCart(userId, lectureId)) {
-                cartDAO.addToCart(userId, lectureId);
-                System.out.println("✅ [CartController-POST] 장바구니에 강의 추가 완료: " + lectureId);
-            } else {
-                System.out.println("ℹ️ [CartController-POST] 이미 장바구니에 있음: " + lectureId);
-            }
-
-            response.sendRedirect(request.getContextPath() + "/lecture/cart");
-
-        } catch (Exception e) {
-            System.err.println("❌ [CartController-POST] 장바구니 추가 중 오류 발생");
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error.jsp");
-        }
-    }
+//    /**
+//     * 장바구니 추가 (POST)
+//     */
+//    @Override
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//
+//        HttpSession session = request.getSession(false);
+//        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
+//
+//        if (user == null) {
+//            System.out.println("🚫 [CartController-POST] 로그인 필요 → 로그인 폼 이동");
+//            response.sendRedirect(request.getContextPath() + "/user/loginform");
+//            return;
+//        }
+//
+//        int userId = user.getUserId();
+//        int lectureId = Integer.parseInt(request.getParameter("lectureId"));
+//
+//        try (SqlSession sqlSession = MyBatisUtil.getSqlSessionFactory().openSession(true)) {
+//            CartDAO cartDAO = new CartDAO(sqlSession);
+//
+//            if (!cartDAO.isLectureInCart(userId, lectureId)) {
+//                cartDAO.addToCart(userId, lectureId);
+//                System.out.println("✅ [CartController-POST] 장바구니에 강의 추가 완료: " + lectureId);
+//            } else {
+//                System.out.println("ℹ️ [CartController-POST] 이미 장바구니에 있음: " + lectureId);
+//            }
+//
+//            response.sendRedirect(request.getContextPath() + "/lecture/cart");
+//
+//        } catch (Exception e) {
+//            System.err.println("❌ [CartController-POST] 장바구니 추가 중 오류 발생");
+//            e.printStackTrace();
+//            response.sendRedirect(request.getContextPath() + "/error.jsp");
+//        }
+//    }
 }
