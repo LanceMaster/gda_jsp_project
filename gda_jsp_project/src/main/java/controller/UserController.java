@@ -268,6 +268,14 @@ public class UserController extends MskimRequestMapping {
 
 	    return "user/mypage"; // JSP 페이지 경로
 	}
+	
+	// siteabout
+	@RequestMapping("about")
+	public String about(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	    // view 폴더 아래 user/about.jsp 를 렌더링
+	    return "user/about";
+	}
+
 
 
 	// 이메일 중복확인

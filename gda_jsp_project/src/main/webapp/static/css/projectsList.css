@@ -1,53 +1,55 @@
-/* 메인 컨테이너 */
+/* projectsList.css */
+
+/* ─── 메인 컨테이너 ─── */
 .main-wrap {
   max-width: 800px;
   margin: 50px auto;
   padding: 0 20px;
 }
 
-/* 페이지 제목 */
+/* ─── 페이지 제목 ─── */
 .page-title {
   text-align: center;
   margin-bottom: 30px;
   font-size: 1.5rem;
+  color: #333;
 }
 
-/* 검색바 */
+/* ─── 검색바 ─── */
 .search-bar {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.search-btn {
-    background: #6c63ff;
-    color: #fff;
-    font-weight: 500;
-    border-radius: 8px;
-    border: none;
-    padding: 11px 22px;
-    font-size: 1.01rem;
-    cursor: pointer;
-    transition: background .15s;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.search-btn:hover {
-    background: #5846e8;
-}
-
-
 .search-bar input[type="text"] {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 1rem;
 }
 
-/* 필터바 */
+.search-btn {
+  background: #6c63ff;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  padding: 11px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+.search-btn:hover {
+  background: #5846e8;
+}
+
+/* ─── 필터바 & 액션버튼 ─── */
 .filter-bar {
   display: flex;
   gap: 10px;
@@ -58,6 +60,9 @@
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+  cursor: pointer;
 }
 
 .action-btn {
@@ -67,91 +72,119 @@
   background-color: #6c6ce5;
   color: #fff;
   cursor: pointer;
+  transition: background .15s;
 }
-
 .action-btn:hover {
-    background: #5846e8;
+  background: #5846e8;
 }
 
-/* 프로젝트 카드 */
+/* ─── 프로젝트 카드 ─── */
 .project-card {
-  border: 1px solid #ddd;
+  border: 1px solid #e2e5ed;
   border-radius: 12px;
-  padding: 20px;
   margin-bottom: 20px;
   background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
+/* ─── 카드 헤더 ─── */
 .card-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 12px;
+  background: #f7f8fa;               /* 연한 파스텔 그레이 */
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e5ed;  /* 헤더와 본문 구분선 */
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
+/* 모집중 배지 (파스텔 옐로우) */
 .badge {
-  display: inline-block;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  background-color: #ffeb3b;
-  color: #555;
-  border-radius: 12px;
+  background: #fffde7;
+  color: #f9a825;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
+/* 제목 */
 .card-header h3 {
   margin: 0;
   font-size: 1.2rem;
+  font-weight: 800;
+  color: #2d3436;
 }
 
-.card-header h3 a {
-  text-decoration: none;
-  color: #333;
-}
-
+/* ─── 카드 본문 ─── */
 .card-content {
-  margin-bottom: 12px;
-  color: #555;
+  background: #ffffff;
+  padding: 20px;
 }
 
-/* 메타 정보 */
+/* 메타 정보 (작성자, 등록일, 조회수) */
+/* 위/아래 여백을 충분히 주고, 구분선과 떨어뜨려서 가독성 향상 */
+/* 메타 정보 (작성자, 등록일, 조회수) */
 .card-meta {
   font-size: 0.85rem;
-  color: #999;
+  color: #636e72;
+  /* 위·아래 여백 유지, 좌우 20px 패딩 추가 */
+  margin: 16px 0;
+  padding: 0 20px 8px;
+  border-bottom: 1px dashed #dfe6e9;
 }
 
-/* 프로젝트 카드의 태그 목록 */
+
+/* ─── 태그 목록 ─── */
 .card-tags {
-  margin-top: 10px;
+  padding: 12px 20px 20px;
 }
 
-/* ✅ 태그 버튼 스타일 우선순위 명확화 */
 .card-tags .tag-button {
   display: inline-block;
-  padding: 4px 12px;
-  margin: 2px 4px 0 0;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f0f0f0;
+  padding: 6px 14px;
+  margin: 4px 6px 0 0;
   font-size: 0.85rem;
-  color: #333;
+  font-weight: 600;
+  color: #546e7a;
+  background: #fafafa;
+  border: 1px solid #eceff1;
+  border-radius: 999px;
   cursor: default;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.card-tags .tag-button:hover {
+  background: #6c63ff;
+  color: #fff;
+  border-color: #6c63ff;
 }
 
-.card-tags .tag-button::before {
-  content: '#';
-  margin-right: 2px;
-  color: #999;
+/* 기존 .tag 색상 클래스 (필요 시 사용) */
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  margin-right: 5px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
 }
+.color0 { background-color: #f0f0f0; color: #333; }
+.color1 { background-color: #d6eaff; color: #007bff; }
+.color2 { background-color: #ffe5e5; color: #dc3545; }
+.color3 { background-color: #e6f4ea; color: #28a745; }
+.color4 { background-color: #fff9db; color: #ffc107; }
 
-/* 페이징 */
+/* ─── 페이징 ─── */
 .pagination {
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-top: 30px;
 }
-
 .pagination a {
   padding: 6px 12px;
   border: 1px solid #ddd;
@@ -159,14 +192,13 @@
   color: #333;
   text-decoration: none;
 }
-
 .pagination a.active {
   background-color: #6c6ce5;
   color: #fff;
-  border: 1px solid #6c6ce5;
+  border-color: #6c6ce5;
 }
 
-/* 태그 입력 컨테이너 */
+/* ─── 태그 입력 컨테이너 ─── */
 #tagContainer span {
   display: inline-block;
   background-color: #e0e0e0;
@@ -175,7 +207,6 @@
   margin: 4px;
   border-radius: 8px;
 }
-
 #tagContainer span button {
   background: none;
   border: none;
@@ -183,17 +214,3 @@
   cursor: pointer;
   font-size: 0.85rem;
 }
-
-.tag {
-    display: inline-block;
-    padding: 4px 10px;
-    margin-right: 5px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-}
-.color0 { background-color: #f0f0f0; color: #333; }
-.color1 { background-color: #d6eaff; color: #007bff; }
-.color2 { background-color: #ffe5e5; color: #dc3545; }
-.color3 { background-color: #e6f4ea; color: #28a745; }
-.color4 { background-color: #fff9db; color: #ffc107; }
