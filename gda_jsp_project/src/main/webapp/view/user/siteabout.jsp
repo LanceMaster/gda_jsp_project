@@ -25,7 +25,7 @@
         .value-desc { font-size: 0.98rem; color: #444;}
         .cta { margin: 40px 0 0 0; text-align: center;}
         .cta-btn { background: #3568ff; color: #fff; font-size: 1.08rem; padding: 14px 34px; border-radius: 25px; border: none; font-weight: 700; box-shadow: 0 4px 18px 0 #dbe4fa; cursor: pointer; transition: background 0.18s;}
-        .cta-btn:hover { background: #2849b7;}
+        .cta-btn:hover { background: #2849b7; text-decoration: none;}
         @media (max-width: 600px) {
             .about-wrap { padding: 16px 6px;}
             .values-list { flex-direction: column; gap: 10px;}
