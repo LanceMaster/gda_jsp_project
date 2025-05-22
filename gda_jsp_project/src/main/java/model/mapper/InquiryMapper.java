@@ -10,7 +10,7 @@ public interface InquiryMapper {
 	@Select("""
 			    SELECT i.*, l.title AS lectureTitle
 			    FROM inquiries i
-			    LEFT JOIN lectures l ON i.lecture_id = l.lecture_id
+			    INNER JOIN lectures l ON i.lecture_id = l.lecture_id
 			    ORDER BY i.created_at DESC
 			    LIMIT #{limit} OFFSET #{offset}
 			""")

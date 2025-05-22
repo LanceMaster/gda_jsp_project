@@ -42,10 +42,35 @@
 				for="content">문의 내용</label>
 			<textarea name="content" id="content" required>${inquiry.content != null ? inquiry.content : ''}</textarea>
 
-			<div class="form-actions">
+			<%-- <div class="form-actions">
 				<a
 					href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId != null ? inquiry.inquiryId : lectureId}' />"
 					class="cancel-btn">취소</a>
+					
+					
+				<button type="submit">
+					<c:choose>
+						<c:when test="${not empty inquiry}">수정</c:when>
+						<c:otherwise>제출</c:otherwise>
+					</c:choose>
+				</button>
+			</div> --%>
+
+			<div class="form-actions">
+				<c:choose>
+					<c:when test="${not empty inquiry}">
+						<!-- 수정일 때: 상세 페이지로 이동 -->
+						<a
+							href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId}' />"
+							class="cancel-btn">취소</a>
+					</c:when>
+					<c:otherwise>
+						<!-- 작성일 때: 예시로 강의 상세 페이지로 이동 -->
+						<a href="<c:url value='/lecture/inquiry/list?lectureId=${lectureId}' />"
+							class="cancel-btn">취소</a>
+					</c:otherwise>
+				</c:choose>
+
 				<button type="submit">
 					<c:choose>
 						<c:when test="${not empty inquiry}">수정</c:when>
