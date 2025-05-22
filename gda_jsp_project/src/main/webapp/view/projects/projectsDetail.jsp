@@ -14,14 +14,15 @@
 
 <div class="project-header">
     <span class="project-title">${project.title}</span>
-    <c:if test="${loginUserId eq project.leaderId}">
         <div class="action-buttons">
+    <c:if test="${loginUserId eq project.leaderId}">
             <a href="${pageContext.request.contextPath}/projects/projectsEdit?projectId=${project.projectId}" class="edit-link">수정하기</a>
             <a href="${pageContext.request.contextPath}/projects/delete?projectId=${project.projectId}" 
                class="delete-link" 
                onclick="return confirm('정말 삭제하시겠습니까?');">삭제하기</a>
-        </div>
     </c:if>
+            <a href="${pageContext.request.contextPath}/projects/list" class="btn-list">목록으로</a>    
+        </div>
 </div>
 
 

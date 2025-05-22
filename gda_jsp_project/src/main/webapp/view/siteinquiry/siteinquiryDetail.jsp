@@ -10,14 +10,15 @@
 
     <div class="inquiry-header">
         <span class="inquiry-title">${inquiry.title}</span>
-        <c:if test="${loginUserId eq inquiry.userId}">
             <div class="action-buttons">
+        <c:if test="${loginUserId eq inquiry.userId}">
                 <a href="${pageContext.request.contextPath}/siteinquiry/editForm?inquiryId=${inquiry.inquiryId}" class="edit-link">수정하기</a>
                 <a href="${pageContext.request.contextPath}/siteinquiry/delete?inquiryId=${inquiry.inquiryId}" 
                    class="delete-link" 
                    onclick="return confirm('정말 삭제하시겠습니까?');">삭제하기</a>
-            </div>
         </c:if>
+                <a href="${pageContext.request.contextPath}/siteinquiry/list" class="btn-list">목록으로</a>            
+            </div>
     </div>
 
     <div class="inquiry-meta">
