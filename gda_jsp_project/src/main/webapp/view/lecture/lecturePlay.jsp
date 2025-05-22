@@ -6,214 +6,279 @@
   <link rel="stylesheet" href="<c:url value='/static/css/lecturePlay.css'/>" />
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
-/* ✅ 기본 Reset + 토스 스타일 전반 적용 */
+:root {
+  --bg: #fff;
+  --surface: #fff;
+  --border: #e5e7eb;
+  --primary: #6366f1;
+  --primary-soft: #eff0fe;
+  --primary-dark: #4549d6;
+  --secondary: #10b981;
+  --secondary-soft: #e6faf3;
+  --text: #202124;
+  --text-soft: #8e98a8;
+  --shadow: 0 6px 32px rgba(29,41,75,0.07);
+  --shadow-lg: 0 18px 52px rgba(34,43,65,0.14);
+  --radius-xl: 2.2rem;
+  --radius-md: 1.2rem;
+}
+
+/* 전체 배경 */
 body {
   margin: 0;
   display: flex;
-  font-family: 'Spoqa Han Sans Neo', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
-  background-color: #fefefe;
-  color: #1c1c1e;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Spoqa Han Sans Neo', 'Apple SD Gothic Neo', 'Pretendard', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.2s;
 }
 
+/* ===== 레이아웃 ===== */
 .video-section {
   flex: 3;
   min-width: 720px;
-  padding: 48px 64px;
-  background: #ffffff;
+  padding: 52px 68px 46px 68px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: background 0.3s;
 }
 
 .sidebar {
-  flex: 1;
-  min-width: 300px;
-  background: #f9fafb;
-  border-left: 1px solid #e5e7eb;
+  flex: 1.1;
+  min-width: 325px;
+  background: var(--primary-soft);
+  border-left: 2.5px solid var(--border);
   height: 100vh;
   overflow-y: auto;
-  padding: 32px 24px;
-  box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.02);
+  padding: 46px 30px 28px 30px;
+  box-shadow: var(--shadow-lg);
+  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
 }
 
-/* 🎯 타이틀 & 설명 */
+@media (max-width: 1080px) {
+  body { flex-direction: column; }
+  .video-section { width: 100%; min-width: unset; border-radius: 0 0 var(--radius-xl) var(--radius-xl); box-shadow: none;}
+  .sidebar { order: -1; width: 100%; min-width: unset; border-left: none; border-top: 2.5px solid var(--border); border-radius: var(--radius-xl);}
+}
+
+/* ===== 타이틀/강사/설명 ===== */
 .lecture-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 2.22rem;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: -1.1px;
+  background: linear-gradient(90deg, #6366f1 70%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 12px;
 }
 
-.lecture-instructor {
-  font-size: 15px;
-  color: #6b7280;
-  margin-bottom: 16px;
-}
-
 .lecture-description {
-  font-size: 15px;
-  color: #374151;
-  line-height: 1.6;
-  margin-bottom: 32px;
+  font-size: 1.11rem;
+  color: var(--text-soft);
+  margin-top: 36px;
+  margin-bottom: 0;
+  line-height: 1.77;
 }
 
-/* 🎥 비디오 */
+/* ===== 비디오 영역 ===== */
 video {
   width: 100%;
   max-width: 960px;
-  border-radius: 12px;
-  background: #000;
-  border: none;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
+  border-radius: 20px;
+  background: #fff !important;   /* 비어있는 부분도 흰색 */
+  border: 1.6px solid var(--border);
+  box-shadow: 0 8px 40px rgba(50,60,120,0.09);
+  margin-bottom: 20px;
+  margin-top: 2px;
+  outline: none;
+  transition: box-shadow .27s, border .22s;
+  object-fit: contain;
+}
+video:focus {
+  border: 1.6px solid var(--primary);
+  box-shadow: 0 4px 14px rgba(99,102,241,0.10);
 }
 video:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 28px rgba(99,102,241,0.14);
 }
 
-/* 🌀 로딩 메시지 */
-#loadingMessage {
+/* ===== 로딩/알림 ===== */
+#loadingMessage, .alert {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 42%;
+  left: 52%;
   transform: translate(-50%, -50%);
-  background: #ffffff;
-  color: #1f2937;
-  font-weight: 500;
-  border: 1px solid #d1d5db;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  font-size: 15px;
-  display: none;
+  background: #fff;
+  color: var(--primary);
+  font-weight: 700;
+  border: 1.4px solid var(--primary);
+  padding: 18px 38px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  font-size: 1.08rem;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  display: none;
+  animation: fadeIn 0.26s cubic-bezier(.4,1.3,.4,1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* ✅ 현재 콘텐츠 정보 */
+/* ===== 현재 콘텐츠 정보 ===== */
 #currentContentTitle {
-  font-size: 15px;
-  margin-top: 18px;
-  color: #3f3f46;
-  font-weight: 500;
-  background: #f3f4f6;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 1.17rem;
+  color: var(--primary);
+  font-weight: 800;
+  background: #f5f6fd;
+  padding: 14px 22px;
+  border-radius: 12px;
+  border: 1.3px solid var(--border);
+  margin-bottom: 16px;
+  margin-top: 23px;
+  box-shadow: 0 2px 7px rgba(99,102,241,0.06);
+  letter-spacing: -0.15px;
 }
 
-/* 📑 사이드바 리스트 */
+/* ===== 사이드바 ===== */
 .sidebar h4 {
-  font-size: 17px;
-  font-weight: 600;
-  margin-bottom: 18px;
-  color: #111827;
+  font-size: 1.22rem;
+  font-weight: 900;
+  margin-bottom: 19px;
+  color: var(--primary);
+  letter-spacing: -0.8px;
 }
-
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
-
 .sidebar li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: #ffffff;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  padding: 15px 21px;
+  background: #fff;
+  border-radius: 15px;
+  margin-bottom: 13px;
   cursor: pointer;
-  font-size: 15px;
-  box-shadow: inset 0 0 0 1px #e0e0e0;
-  transition: all 0.2s ease;
-}
-
-.sidebar li:hover {
-  background: #f0f4ff;
-  transform: translateX(2px);
-  box-shadow: inset 0 0 0 2px #4f46e5;
-}
-
-.sidebar li.active {
-  background: #eef2ff;
-  border-left: 4px solid #6366f1;
-  font-weight: 600;
-}
-
-.sidebar li.completed {
-  background: #ecfdf5;
-  color: #059669;
-  border-left: 4px solid #10b981;
-}
-
-.sidebar li:focus {
+  font-size: 1.05rem;
+  border: 2px solid transparent;
+  box-shadow: 0 1px 10px rgba(99,102,241,0.06);
+  transition: all 0.21s cubic-bezier(.3,1.5,.5,1);
   outline: none;
-  box-shadow: 0 0 0 2px #6366f1;
-  background: #eef2ff;
+  position: relative;
+  min-height: 48px;
+}
+.sidebar li:hover, .sidebar li:focus {
+  background: var(--primary-soft);
+  border: 2px solid var(--primary);
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  z-index: 2;
+}
+.sidebar li.active {
+  background: var(--primary-soft);
+  border-left: 7px solid var(--primary);
+  font-weight: 900;
+  color: var(--primary);
+  z-index: 2;
+  box-shadow: 0 3px 18px rgba(99,102,241,0.13);
+}
+.sidebar li.completed {
+  background: var(--secondary-soft);
+  color: var(--secondary);
+  border-left: 7px solid var(--secondary);
+  font-weight: 800;
+}
+.sidebar li.completed .progress-bar {
+  background: var(--secondary);
+}
+.sidebar li.completed .badge {
+  background: var(--secondary);
+  color: #fff;
 }
 
-/* ⏱️ 진도율 */
+.sidebar li:focus-visible {
+  outline: 2px solid var(--primary);
+}
+
+/* ===== 진도율(퍼센트+바) ===== */
 .progress-percent {
-  font-size: 12px;
-  font-weight: 500;
-  color: #6b7280;
-  margin-left: 6px;
-  white-space: nowrap;
+  font-size: 1.03rem;
+  font-weight: 900;
+  color: var(--text-soft);
+  margin-left: 13px;
+  letter-spacing: -0.09px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 90px;
+}
+.progress-bar {
+  width: 52px;
+  height: 9px;
+  background: var(--primary-soft);
+  border-radius: 7px;
+  margin-left: 10px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1.2px solid var(--primary);
+  box-shadow: 0 2px 9px rgba(99,102,241,0.09);
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1 20%, #a5b4fc 100%);
+  border-radius: 7px;
+  transition: width 0.36s cubic-bezier(.4,2,.4,1);
 }
 
-/* 📱 반응형 */
-@media (max-width: 960px) {
-  body {
-    flex-direction: column;
-  }
-
-  .video-section {
-    width: 100%;
-    padding: 24px;
-    min-width: unset;
-  }
-
-  .sidebar {
-    order: -1;
-    width: 100%;
-    min-width: unset;
-    border-left: none;
-    border-top: 1px solid #e5e7eb;
-    padding: 20px;
-  }
-
-  .sidebar li {
-    font-size: 14px;
-    padding: 10px 14px;
-  }
-  
-  .sidebar li.completed::after {
-  content: "✔ 수료";
-  font-size: 12px;
-  font-weight: 600;
-  color: #059669;
-  margin-left: 8px;
+/* ===== 수료 뱃지 ===== */
+.badge {
+  font-size: 1.07rem;
+  margin-left: 14px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  border: 1.2px solid var(--primary);
+  transition: background 0.23s, color 0.17s;
 }
 
-.completion-badge {
-  font-size: 12px;
-  font-weight: 600;
-  color: #059669;
-  margin-left: 8px;
+.sidebar li.completed .badge {
+  background: var(--secondary);
+  color: #fff;
+  border: none;
 }
 
-  
+/* ===== 반응형 ===== */
+@media (max-width: 900px) {
+  .video-section { padding: 16px 3vw 24px 3vw; border-radius: 0 0 var(--radius-xl) var(--radius-xl);}
+  .sidebar { padding: 13px 3vw 11px 3vw;}
+  .sidebar li { font-size: 0.99rem; padding: 11px 9px;}
+  #currentContentTitle { margin-top: 10px;}
+  .lecture-title { font-size: 1.45rem;}
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96);}
+  to { opacity: 1; transform: scale(1);}
+}
+
 </style>
 </head>
 <body>
 <div class="video-section">
   <div class="lecture-title">${lecture.title}</div>
-  <div class="lecture-instructor">강사: ${instructor.name}</div>
 
   <div id="loadingMessage">⏳ 콘텐츠 로딩 중입니다...</div>
 
@@ -239,248 +304,185 @@ video:hover {
   </ul>
 </div>
 <script>
+//===== JS (lecturePlay.jsp 내 script 태그) =====
 
-window.onload = () => {
-	  // ✅ 진도율 텍스트를 초기 렌더링에 반영
-	  contents.forEach(content => {
-	    const el = document.getElementById("progress-" + content.contentId);
-	    if (el) el.innerText = content.progress + "%";
+//JSP 컨텍스트 경로 안전하게 변수화
+const CONTEXT_PATH = "<c:out value='${pageContext.request.contextPath}'/>";
 
-	    // ✅ 100%인 콘텐츠는 completed 클래스도 미리 부여
-	    if (content.progress === 100) {
-	      const li = document.getElementById("content-" + content.contentId);
-	      if (li) li.classList.add("completed");
-	    }
-	  });
+//contents 생성: JSP EL만 사용, JS 템플릿 리터럴 사용 X
+const contents = [
+<c:forEach var="c" items="${contents}" varStatus="loop">
+ {
+   contentId: ${c.contentId},
+   title: '<c:out value="${c.title}"/>',
+   url: '<c:out value="${c.url}"/>',
+   duration: ${c.duration > 0 ? c.duration : 300},
+   progress: ${c.progressPercent}
+ }<c:if test="${!loop.last}">,</c:if>
+</c:forEach>
+];
 
-	  playContent(0);
-	};
+//기타 변수
+const video = document.getElementById("lectureVideo");
+const loadingMessage = document.getElementById("loadingMessage");
+const titleDisplay = document.getElementById("currentContentTitle");
+const contentList = document.getElementById("contentList");
 
-  const contents = [
-    <c:forEach var="c" items="${contents}" varStatus="loop">
-      {
-        contentId: ${c.contentId},
-        title: '${c.title}',
-        url: '${c.url}',
-        duration: ${c.duration > 0 ? c.duration : 300},
-        progress: ${c.progressPercent}
+let currentIndex = 0;
+let hls = null;
+let playedTime = 0;
+let lastCheckTime = 0;
+let lastSentPercent = 0;
+let isPlaying = false;
 
+//진도율 저장 AJAX
+async function sendProgress(lectureId, contentId, percent) {
+try {
+ const res = await fetch(CONTEXT_PATH + "/lecture/progress/update", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ lectureId, contentId, progress: percent })
+ });
+ const data = await res.json();
+ return data.success;
+} catch (e) {
+ alert("❌ 진도율 저장 실패");
+ return false;
+}
+}
 
-      }<c:if test="${!loop.last}">,</c:if>
-    </c:forEach>
-  ];
+//UI 진도/뱃지 갱신
+function updateProgressBar(idx, percent) {
+const li = contentList.children[idx];
+let bar = li.querySelector('.progress-bar');
+let fill = li.querySelector('.progress-bar-fill');
+if (!bar) {
+ bar = document.createElement('span');
+ bar.className = 'progress-bar';
+ fill = document.createElement('span');
+ fill.className = 'progress-bar-fill';
+ bar.appendChild(fill);
+ li.querySelector('.progress-percent').appendChild(bar);
+}
+fill.style.width = percent + "%";
+li.querySelector('.progress-percent').childNodes[0].nodeValue = percent + "% ";
+if (percent === 100) {
+ li.classList.add("completed");
+ setBadge(li, "✔ 수료");
+}
+}
+function setBadge(li, text) {
+let badge = li.querySelector('.badge');
+if (!badge) {
+ badge = document.createElement('span');
+ badge.className = 'badge';
+ li.appendChild(badge);
+}
+badge.innerText = text;
+}
 
-  const video = document.getElementById("lectureVideo");
-  const loadingMessage = document.getElementById("loadingMessage");
-  const titleDisplay = document.getElementById("currentContentTitle");
+function playContent(index, autoplay = true) {
+if (!contents.length) return alert("시청 가능한 콘텐츠가 없습니다.");
+const content = contents[index];
+if (!content.url) return alert("콘텐츠 URL 없음");
+if (content.duration < 3) return alert("영상 길이 부족");
 
-  let currentIndex = 0;
-  let hls = null;
-  let playedTime = 0;
-  let lastCheckTime = 0;
-  let lastSentPercent = 0;
-  let isPlaying = false;
+currentIndex = index;
+titleDisplay.innerText = "📺 " + content.title;
+loadingMessage.style.display = 'block';
 
-  function isValidContent(content) {
-    if (!content.url || content.url.trim() === "") {
-      alert("⚠️ 콘텐츠 URL이 없습니다. 관리자에게 문의하세요.");
-      return false;
-    }
+// HLS 지원시
+if (window.Hls && Hls.isSupported()) {
+ if (hls) hls.destroy();
+ hls = new Hls();
+ hls.loadSource(content.url);
+ hls.attachMedia(video);
+ hls.on(Hls.Events.MANIFEST_PARSED, () => {
+   video.onloadedmetadata = () => {
+     if (content.progress > 0 && video.duration)
+       video.currentTime = Math.max(0, video.duration * (content.progress / 100));
+     playedTime = video.duration * (content.progress / 100);
+     lastSentPercent = content.progress;
+     lastCheckTime = video.currentTime;
+     loadingMessage.style.display = 'none';
+     video.focus();
+   };
+   if (autoplay) video.play();
+ });
+} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+ video.src = content.url;
+ video.onloadedmetadata = () => {
+   if (content.progress > 0 && video.duration)
+     video.currentTime = Math.max(0, video.duration * (content.progress / 100));
+   playedTime = video.duration * (content.progress / 100);
+   lastSentPercent = content.progress;
+   lastCheckTime = video.currentTime;
+   loadingMessage.style.display = 'none';
+   video.focus();
+ };
+ if (autoplay) video.play();
+} else {
+ alert("HLS 미지원 브라우저");
+ loadingMessage.style.display = 'none';
+}
 
-    if (content.duration < 3) {
-      alert("⚠️ 영상 길이가 너무 짧아 재생할 수 없습니다.");
-      return false;
-    }
+// UI 업데이트
+Array.from(contentList.children).forEach(li => li.classList.remove("active"));
+contentList.children[index].classList.add("active");
+updateProgressBar(index, content.progress);
+}
 
-    return true;
-  }
+//진도율 처리
+video.addEventListener("play", () => { isPlaying = true; lastCheckTime = video.currentTime; });
+video.addEventListener("pause", () => { isPlaying = false; });
+video.addEventListener("seeking", () => { lastCheckTime = video.currentTime; });
 
-  const originalPlayContent = function(index) {
-	  currentIndex = index;
-	  const content = contents[index];
-	  titleDisplay.innerText = "📺 현재 콘텐츠: " + content.title;
-	  loadingMessage.style.display = 'block';
+video.addEventListener("timeupdate", async () => {
+if (!isPlaying || video.seeking || video.paused) return;
+const now = video.currentTime;
+const delta = now - lastCheckTime;
+if (delta > 0 && delta < 5) playedTime += delta;
+lastCheckTime = now;
 
-	  if (Hls.isSupported()) {
-	    if (hls) hls.destroy();
-	    hls = new Hls();
-	    hls.loadSource(content.url);
-	    hls.attachMedia(video);
+const content = contents[currentIndex];
+const percent = Math.min(100, Math.round((playedTime / content.duration) * 100));
+if (content.progress >= 100) return;
+if (percent - lastSentPercent >= 5 || (percent === 100 && lastSentPercent < 100)) {
+ lastSentPercent = percent;
+ content.progress = percent;
+ updateProgressBar(currentIndex, percent);
+ await sendProgress("<c:out value='${lecture.lectureId}'/>", content.contentId, percent);
+}
+});
 
-	    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-	      video.addEventListener("loadedmetadata", () => {
-	        if (content.progress > 0 && video.duration) {
-	          video.currentTime = video.duration * (content.progress / 100);
-	        }
+video.addEventListener("ended", async () => {
+const content = contents[currentIndex];
+if (content.progress < 100) {
+ content.progress = 100;
+ await sendProgress("<c:out value='${lecture.lectureId}'/>", content.contentId, 100);
+ updateProgressBar(currentIndex, 100);
+}
+if (currentIndex < contents.length - 1) {
+ playContent(currentIndex + 1, true);
+} else {
+ alert("🎉 강의 수강 완료!");
+}
+});
 
-	        // ✅ 여기서 playedTime 초기화
-	        playedTime = video.duration * (content.progress / 100);
-	        lastSentPercent = content.progress;
-	        lastCheckTime = video.currentTime;
-	      });
+//최초 로드 시 진도/뱃지 UI 및 첫 챕터 재생
+window.addEventListener("DOMContentLoaded", () => {
+contents.forEach((content, idx) => {
+ const el = document.getElementById("progress-" + content.contentId);
+ if (el) el.innerText = content.progress + "%";
+ updateProgressBar(idx, content.progress);
+ if (content.progress === 100) {
+   const li = document.getElementById("content-" + content.contentId);
+   if (li) li.classList.add("completed");
+ }
+});
+playContent(0, true);
+});
 
-	      video.play();
-	      loadingMessage.style.display = 'none';
-	    });
-	  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-	    video.src = content.url;
-
-	    video.addEventListener("loadedmetadata", () => {
-	      if (content.progress > 0 && video.duration) {
-	        video.currentTime = video.duration * (content.progress / 100);
-	      }
-
-	      playedTime = video.duration * (content.progress / 100);
-	      lastSentPercent = content.progress;
-	      lastCheckTime = video.currentTime;
-
-	      video.play();
-	      loadingMessage.style.display = 'none';
-	    });
-	  } else {
-	    alert("⚠️ 브라우저에서 HLS를 지원하지 않습니다.");
-	    loadingMessage.style.display = 'none';
-	  }
-
-	  updateActiveUI(content.contentId);
-	};
-
-
-  playContent = function(index) {
-    if (!contents || contents.length === 0) {
-      alert("⚠️ 시청 가능한 콘텐츠가 없습니다.");
-      return;
-    }
-
-    const content = contents[index];
-    if (!isValidContent(content)) return;
-
-    if (content.progress === 100) {
-      const proceed = confirm("✔ 이미 완료된 콘텐츠입니다.\n다시 재생하시겠습니까?");
-      if (!proceed) return;
-    }
-
-    originalPlayContent(index);
-  };
-
-  function updateActiveUI(contentId) {
-    document.querySelectorAll("#contentList li").forEach(li => li.classList.remove("active"));
-    const li = document.getElementById("content-" + contentId);
-    if (li) li.classList.add("active");
-  }
-
-  video.addEventListener("play", () => {
-    isPlaying = true;
-    lastCheckTime = video.currentTime;
-  });
-
-  video.addEventListener("pause", () => {
-    isPlaying = false;
-  });
-
-  video.addEventListener("seeking", () => {
-    lastCheckTime = video.currentTime;
-  });
-
-  video.addEventListener("timeupdate", () => {
-	  if (!isPlaying || video.seeking || video.paused) return;
-
-	  const now = video.currentTime;
-	  const delta = now - lastCheckTime;
-
-	  if (delta > 0 && delta < 5) {
-	    playedTime += delta;
-	  }
-
-	  lastCheckTime = now;
-
-	  const content = contents[currentIndex];
-	  const percent = Math.min(100, Math.round((playedTime / content.duration) * 100));
-
-	  // ✅ 이미 100%면 더 이상 전송 안함
-	  if (content.progress >= 100) return;
-
-	  if (percent - lastSentPercent >= 5 || (percent === 100 && lastSentPercent < 100)) {
-	    lastSentPercent = percent;
-
-	    // 실시간 표시
-	    const progressEl = document.getElementById("progress-" + content.contentId);
-	    if (progressEl) {
-	      progressEl.innerText = percent + "%";
-	    }
-
-	    fetch("${pageContext.request.contextPath}/lecture/progress/update", {
-	      method: "POST",
-	      headers: { "Content-Type": "application/json" },
-	      body: JSON.stringify({
-	        lectureId: "${lecture.lectureId}",
-	        contentId: content.contentId,
-	        progress: percent
-	      })
-	    })
-	    .then(res => res.json())
-	    .then(res => {
-	      if (res.success) {
-	        contents[currentIndex].progress = percent;
-
-	        if (percent === 100) {
-	          const li = document.getElementById("content-" + content.contentId);
-	          if (li) li.classList.add("completed");
-	        }
-	      }
-	    })
-	    .catch(err => {
-	      console.error("❌ 진도율 전송 실패:", err);
-	    });
-	  }
-	});
-
-
-  video.addEventListener("ended", () => {
-    if (currentIndex < contents.length - 1) {
-      playContent(currentIndex + 1);
-    }
-  });
-
-  window.onload = () => {
-    playContent(0);
-  };
-  
-  video.addEventListener("ended", () => {
-	  const content = contents[currentIndex];
-	  if (content.progress < 100) {
-	    fetch("${pageContext.request.contextPath}/lecture/progress/update", {
-	      method: "POST",
-	      headers: { "Content-Type": "application/json" },
-	      body: JSON.stringify({
-	        lectureId: "${lecture.lectureId}",
-	        contentId: content.contentId,
-	        progress: 100
-	      })
-	    })
-	    .then(res => res.json())
-	    .then(res => {
-	      if (res.success) {
-	        contents[currentIndex].progress = 100;
-
-	        const el = document.getElementById("progress-" + content.contentId);
-	        if (el) el.innerText = "100%";
-
-	        const li = document.getElementById("content-" + content.contentId);
-	        if (li) li.classList.add("completed");
-
-	        const badge = document.getElementById("badge-" + content.contentId);
-	        if (badge) badge.innerText = "✔ 수료";
-	      }
-	    });
-	  }
-
-	  if (currentIndex < contents.length - 1) {
-	    playContent(currentIndex + 1);
-	  }
-	});
-
-  
 </script>
 
 

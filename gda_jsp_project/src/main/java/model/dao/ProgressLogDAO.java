@@ -25,10 +25,10 @@ public class ProgressLogDAO {
         return session.getMapper(LectureMapper.class).selectAllContents(lectureId);
     }
     
-    public void saveOrUpdateProgress(int userId, int contentId, int progressPercent) {
-        session.getMapper(ProgressMapper.class)
-               .saveOrUpdateProgress(userId, contentId, progressPercent);
-    }
+//    public void saveOrUpdateProgress(int userId, int contentId, int progressPercent) {
+//        session.getMapper(ProgressMapper.class)
+//               .saveOrUpdateProgress(userId, contentId, progressPercent);
+//    }
 
     public boolean checkLectureCompletion(int lectureId, int userId) {
         int incomplete = session.getMapper(ProgressMapper.class)
