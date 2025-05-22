@@ -113,6 +113,20 @@
     color: #555;
     font-size: 1.2rem;
   }
+
+  .password-match-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: none;
+  }
+
+  .password-match-success {
+    color: #28a745;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -158,12 +172,14 @@
 
     <div class="form-group">
       <span class="input-icon"><i class="fas fa-lock"></i></span>
-      <input type="password" name="password" class="form-control" placeholder="비밀번호" required />
+      <input type="password" name="password" id="passwordInput" class="form-control" placeholder="비밀번호" required />
     </div>
 
     <div class="form-group">
       <span class="input-icon"><i class="fas fa-lock"></i></span>
-      <input type="password" name="passwordCheck" class="form-control" placeholder="비밀번호 확인" required />
+      <input type="password" name="passwordCheck" id="passwordCheckInput" class="form-control" placeholder="비밀번호 확인" required />
+      <div class="password-match-error" id="passwordError">비밀번호가 일치하지 않습니다.</div>
+      <div class="password-match-success" id="passwordSuccess">비밀번호가 일치합니다.</div>
     </div>
 
     <div class="form-group">
@@ -205,6 +221,34 @@ $(function () {
   };
 
   let emailConfirmed = false;
+  let passwordsMatch = false;
+
+  // 비밀번호 일치 확인 함수
+  function checkPasswordMatch() {
+    const password = $("#passwordInput").val();
+    const passwordCheck = $("#passwordCheckInput").val();
+    
+    if (password && passwordCheck) {
+      if (password === passwordCheck) {
+        $("#passwordError").hide();
+        $("#passwordSuccess").show();
+        passwordsMatch = true;
+      } else {
+        $("#passwordError").show();
+        $("#passwordSuccess").hide();
+        passwordsMatch = false;
+      }
+    } else {
+      $("#passwordError").hide();
+      $("#passwordSuccess").hide();
+      passwordsMatch = false;
+    }
+    
+    checkFormValidity();
+  }
+
+  // 비밀번호 입력 필드에 이벤트 리스너 추가
+  $("#passwordInput, #passwordCheckInput").on("input", checkPasswordMatch);
 
   $(".tab-btn").on("click", function () {
     const role = $(this).data("role");
@@ -276,7 +320,8 @@ $(function () {
     const resumeOk = !isInstructor || $("#resumeInput").val();
     const agreed = $("input[name='agree']").is(":checked");
 
-    $("button[type='submit']").prop("disabled", !(allFilled && isEmailVerified && resumeOk && agreed));
+    // 비밀번호 일치 조건 추가
+    $("button[type='submit']").prop("disabled", !(allFilled && isEmailVerified && resumeOk && agreed && passwordsMatch));
   }
 });
 </script>
