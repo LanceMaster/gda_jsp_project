@@ -190,7 +190,7 @@ a.delete-link:hover {
 					<c:choose>
 						<c:when test="${user.role eq 'STUDENT'}">수강생</c:when>
 						<c:when test="${user.role eq 'INSTRUCTOR'}">강사</c:when>
-						<c:otherwise>회원</c:otherwise>
+						<c:otherwise>네이버 유저</c:otherwise>
 					</c:choose>
 				</div>
 

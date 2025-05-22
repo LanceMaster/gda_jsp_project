@@ -25,4 +25,7 @@ public interface NaverMapper {
         )
     """)
     int insertNewUser(NaverUserDTO newUser);
+
+    @Select("SELECT * FROM social_users WHERE email = #{email}")
+	NaverUserDTO getInformationByEmail(@Param("email")String email);
 }
