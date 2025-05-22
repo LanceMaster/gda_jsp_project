@@ -44,7 +44,7 @@
 
 			<div class="form-actions">
 				<a
-					href="<c:url value='/lecture/inquiry/list?lectureId=${inquiry.lectureId != null ? inquiry.lectureId : lectureId}' />"
+					href="<c:url value='/lecture/inquiry/detail?inquiryId=${inquiry.inquiryId != null ? inquiry.inquiryId : lectureId}' />"
 					class="cancel-btn">취소</a>
 				<button type="submit">
 					<c:choose>

@@ -59,7 +59,7 @@
 				<a href="${path}/lecture/lecturelist" class="nav-link-custom">강의</a>
 
 
-	            <%-- 강의 등록 --%>
+				<%-- 강의 등록 --%>
 				<c:if
 					test="${not empty sessionScope.user and sessionScope.user.role == 'INSTRUCTOR'}">
 					<a href="${path}/lecture/lectureUpload" class="nav-link-custom">강의
@@ -67,15 +67,8 @@
 				</c:if>
 
 
-				<div class="dropdown d-inline">
-					<a href="#" class="nav-link-custom dropdown-toggle"
-						id="communityDropdown" data-toggle="dropdown" aria-haspopup="true"
-						aria-expanded="false">커뮤니티</a>
-					<div class="dropdown-menu" aria-labelledby="communityDropdown">
-						<a class="dropdown-item" href="${path}/projects/projectsList">팀
-							프로젝트</a> <a class="dropdown-item" href="${path}/community/mentoring">멘토링</a>
-					</div>
-				</div>
+				<a class="nav-link-custom" href="${path}/projects/projectsList">팀
+					프로젝트</a>
 
 				<c:if test="${empty sessionScope.user}">
 					<button class="login-btn ml-3"
@@ -126,9 +119,10 @@
 				</div>
 				<nav class="nav-area"
 					style="display: flex; gap: 24px; font-weight: 500;">
-					<a href="${path}/company"
+					<a href="${path}/user/siteabout"
 						style="color: #666; text-decoration: none;">회사 소개</a> <a
-						href="${path}/siteinquiry/siteinquiryList" style="color: #666; text-decoration: none;">문의하기</a>
+						href="${path}/siteinquiry/siteinquiryList"
+						style="color: #666; text-decoration: none;">문의하기</a>
 				</nav>
 			</div>
 

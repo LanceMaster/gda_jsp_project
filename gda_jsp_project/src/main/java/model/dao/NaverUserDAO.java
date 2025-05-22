@@ -9,7 +9,7 @@ import model.mapper.NaverMapper;
 public class NaverUserDAO {
 	private Class<NaverMapper> mapperClass = NaverMapper.class;
 
-	public static  NaverUserDTO findBySocialId(String socialId, String socialType) {
+	public static NaverUserDTO findBySocialId(String socialId, String socialType) {
 		// TODO Auto-generated method stub
 		// 데이터베이스에서 socialId로 사용자 정보를 조회하는 로직을 구현합니다.
 
@@ -45,6 +45,26 @@ public class NaverUserDAO {
 			session.close();
 		}
 		return 0;
+	}
+
+	public static NaverUserDTO getInformationByEmail(String email) {
+		SqlSession session = MybatisConnection.getConnection();
+		try {
+			NaverMapper mapper = session.getMapper(NaverMapper.class);
+			NaverUserDTO naverUserDTO = mapper.getInformationByEmail(email);
+			if (naverUserDTO.getSocialId() != null) {
+				return naverUserDTO;
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+
+			// TODO: handle exception
+		} finally {
+			session.close();
+		}
+
+		return null;
 	}
 
 }

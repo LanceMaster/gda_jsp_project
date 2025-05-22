@@ -1,8 +1,18 @@
 package model.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class UserDTO {
+	@Override
+	public String toString() {
+		return "UserDTO [userId=" + userId + ", email=" + email + ", password=" + password + ", name=" + name
+				+ ", phone=" + phone + ", birthdate=" + birthdate + ", profileImage=" + profileImage + ", role=" + role
+				+ ", deletedAt=" + deletedAt + ", bio=" + bio + ", resume=" + resume + ", isVerified=" + isVerified
+				+ ", isDeleted=" + isDeleted + ", agreedTerms=" + agreedTerms + ", createdAt=" + createdAt
+				+ ", updatedAt=" + updatedAt + ", lastLoginAt=" + lastLoginAt + "]";
+	}
+
 	private int userId; // user_id
 	private String email;
 	private String password;
@@ -11,16 +21,8 @@ public class UserDTO {
 	private Date birthdate;
 	private String profileImage; // profile_image
 	private String role;
-
-	@Override
-	public String toString() {
-		return "UserDTO [userId=" + userId + ", email=" + email + ", password=" + password + ", name=" + name
-				+ ", phone=" + phone + ", birthdate=" + birthdate + ", profileImage=" + profileImage + ", role=" + role
-				+ ", bio=" + bio + ", resume=" + resume + ", isVerified=" + isVerified + ", isDeleted=" + isDeleted
-				+ ", agreedTerms=" + agreedTerms + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt
-				+ ", lastLoginAt=" + lastLoginAt + "]";
-	}
-
+//	private LocalDateTime deletedAt; // ✅ 추가된 필드
+	private Date deletedAt;
 	private String bio;
 	private String resume;
 	private boolean isVerified; // is_verified
@@ -157,6 +159,14 @@ public class UserDTO {
 
 	public void setLastLoginAt(Date lastLoginAt) {
 		this.lastLoginAt = lastLoginAt;
+	}
+
+	public Date getDeletedAt() {
+		return deletedAt;
+	}
+
+	public void setDeletedAt(Date deletedAt) {
+		this.deletedAt = deletedAt;
 	}
 
 }

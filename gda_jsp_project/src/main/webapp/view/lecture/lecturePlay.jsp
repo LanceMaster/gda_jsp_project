@@ -209,21 +209,20 @@ video:hover {
   
 }
 </style>
-
 </head>
 <body>
-
 <div class="video-section">
   <div class="lecture-title">${lecture.title}</div>
-
+  <div class="lecture-instructor">강사: ${instructor.name}</div>
 
   <div id="loadingMessage">⏳ 콘텐츠 로딩 중입니다...</div>
 
   <video id="lectureVideo" controls></video>
   <div id="currentContentTitle">📺 콘텐츠를 준비 중입니다...</div>
-    <div class="lecture-description">${lecture.description}</div>
+  <div class="lecture-description">${lecture.description}</div>
+
 </div>
-<!-- ewfwfew -->
+
 <div class="sidebar">
   <h4>📑 콘텐츠 목록</h4>
   <ul id="contentList">
@@ -239,7 +238,6 @@ video:hover {
     </c:forEach>
   </ul>
 </div>
-
 <script>
 
 window.onload = () => {

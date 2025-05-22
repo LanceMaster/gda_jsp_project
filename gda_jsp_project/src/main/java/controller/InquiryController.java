@@ -133,10 +133,17 @@ public class InquiryController extends MskimRequestMapping {
 	 */
 	@RequestMapping("delete")
 	public String deleteInquiry(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		String lectureIdStr = request.getParameter("lectureId");
+		if (lectureIdStr == null || lectureIdStr.isBlank()) {
+			throw new IllegalArgumentException("lectureId가 전달되지 않았습니다.");
+		}
+		
 		String idParam = request.getParameter("inquiryId");
 		if (idParam == null || !idParam.matches("\\d+")) {
 			throw new IllegalArgumentException("❌ 유효하지 않은 ID입니다.");
 		}
+		
 
 		int inquiryId = Integer.parseInt(idParam);
 		inquiryService.deleteInquiry(inquiryId);
@@ -145,7 +152,7 @@ public class InquiryController extends MskimRequestMapping {
 
 		String path = request.getContextPath();
 
-		return "redirect:" + path + "/lecture/inquiry/list"; // ✅ 등록 후에는 목록으로 이동
+		return "redirect:" + path + "/lecture/inquiry/list?lectureId="+lectureIdStr; // ✅ 등록 후에는 목록으로 이동
 	}
 
 	@RequestMapping("detail")
@@ -160,6 +167,8 @@ public class InquiryController extends MskimRequestMapping {
 		if (inquiry == null) {
 			throw new IllegalArgumentException("해당 문의글을 찾을 수 없습니다.");
 		}
+		
+		
 
 		request.setAttribute("inquiry", inquiry);
 		return "lecture/inquiryDetail";
